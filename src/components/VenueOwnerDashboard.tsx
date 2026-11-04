@@ -19,7 +19,9 @@ import {
   TrendingUp,
   MessageSquare,
   AlertCircle,
+  BarChart3,
 } from 'lucide-react';
+import { VenueAnalytics } from './VenueAnalytics';
 
 export const VenueOwnerDashboard: React.FC = () => {
   const { language } = useLanguage();
@@ -149,6 +151,15 @@ export const VenueOwnerDashboard: React.FC = () => {
             >
               <Plus className="w-3 h-3 text-amber-800" />
               <span>Walk-in</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('ANALYTICS')}
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
+                activeTab === 'ANALYTICS' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-amber-800" />
+              <span>Analytics & Trends</span>
             </button>
           </div>
         </div>
@@ -418,6 +429,15 @@ export const VenueOwnerDashboard: React.FC = () => {
             </button>
           </form>
         </div>
+      )}
+
+      {/* TAB 4: ADVANCED RECHARTS ANALYTICS & MARKET INTELLIGENCE */}
+      {activeTab === 'ANALYTICS' && (
+        <VenueAnalytics
+          venue={myVenue}
+          bookings={venueBookings}
+          negotiations={venueNegotiations}
+        />
       )}
 
     </div>
