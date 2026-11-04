@@ -20,10 +20,11 @@ import { VenueOwnerDashboard } from './components/VenueOwnerDashboard';
 import { AdminDashboard } from './components/AdminDashboard';
 import { ReviewModal } from './components/ReviewModal';
 import { GeminiChatbotModal } from './components/GeminiChatbotModal';
+import { VenueOnboardingModal } from './components/VenueOnboardingModal';
 import { Footer } from './components/Footer';
 
 const MainShell: React.FC = () => {
-  const { currentUser } = useMarketplace();
+  const { currentUser, activeModal, setActiveModal } = useMarketplace();
   const [activeView, setActiveView] = useState<'EXPLORE' | 'DASHBOARD'>('EXPLORE');
 
   // Review modal state
@@ -87,6 +88,10 @@ const MainShell: React.FC = () => {
           setReviewBookingId(null);
           setReviewVenueId(null);
         }}
+      />
+      <VenueOnboardingModal
+        isOpen={activeModal === 'VENUE_ONBOARDING'}
+        onClose={() => setActiveModal('NONE')}
       />
 
       {/* Floating AI Assistant Trigger (Bottom Right) */}

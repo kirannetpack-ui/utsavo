@@ -9,14 +9,20 @@ import { SEED_VENUES } from '../data/venuesData';
 import { SEED_BOOKINGS, SEED_NEGOTIATIONS, SEED_REVIEWS } from '../data/seedMarketplaceState';
 
 export interface SearchFilterState {
+  searchQuery: string;
   destination: string;
   province: string;
   district: string;
+  locality: string;
   eventType: EventType | 'ALL';
   dateBS: string;
   dateAD: string;
   guestCount: number;
+  minCapacity: number;
+  maxCapacity: number;
+  minPerPlateBudget: number;
   maxPerPlateBudget: number;
+  maxHallRentalNpr: number;
   includeAdjacentDistricts: boolean;
   selectedAmenities: string[];
   sortBy: 'RECOMMENDED' | 'PRICE_ASC' | 'CAPACITY_DESC' | 'RATING_DESC';
@@ -31,6 +37,7 @@ interface MarketplaceContextType {
   reviews: VerifiedReview[];
   filters: SearchFilterState;
   setFilters: React.Dispatch<React.SetStateAction<SearchFilterState>>;
+  resetFilters: () => void;
   selectedVenue: Venue | null;
   setSelectedVenue: (venue: Venue | null) => void;
   
@@ -67,8 +74,11 @@ interface MarketplaceContextType {
     transactionId: string;
   }) => Promise<boolean>;
 
-  // Venue Management Actions
+  // Venue Management & Onboarding Actions
   updateVenueListing: (updatedVenue: Venue) => void;
+  saveVenueListing: (venue: Venue) => void;
+  openVenueOnboarding: (venue?: Venue | null) => void;
+  editingVenue: Venue | null;
   createWalkInBooking: (booking: Partial<Booking>) => void;
   verifyVenueStatus: (venueId: string, newStatus: any) => void;
 
@@ -76,8 +86,8 @@ interface MarketplaceContextType {
   addVerifiedReview: (review: Omit<VerifiedReview, 'id' | 'createdAt'>) => void;
 
   // Modals & Drawers
-  activeModal: 'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW';
-  setActiveModal: (modal: 'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW') => void;
+  activeModal: 'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING';
+  setActiveModal: (modal: 'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING') => void;
   activeNegotiationId: string | null;
   setActiveNegotiationId: (id: string | null) => void;
   activeBookingId: string | null;
@@ -95,14 +105,20 @@ const DEFAULT_USER: UserProfile = {
 };
 
 const DEFAULT_FILTERS: SearchFilterState = {
+  searchQuery: '',
   destination: '',
   province: '',
   district: '',
+  locality: '',
   eventType: 'ALL',
   dateBS: '',
   dateAD: '',
-  guestCount: 300,
-  maxPerPlateBudget: 3000,
+  guestCount: 350,
+  minCapacity: 50,
+  maxCapacity: 1500,
+  minPerPlateBudget: 800,
+  maxPerPlateBudget: 4000,
+  maxHallRentalNpr: 250000,
   includeAdjacentDistricts: true,
   selectedAmenities: [],
   sortBy: 'RECOMMENDED',
@@ -118,10 +134,20 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [reviews, setReviews] = useState<VerifiedReview[]>(SEED_REVIEWS);
   const [filters, setFilters] = useState<SearchFilterState>(DEFAULT_FILTERS);
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
+  const [editingVenue, setEditingVenue] = useState<Venue | null>(null);
 
-  const [activeModal, setActiveModal] = useState<'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW'>('NONE');
+  const [activeModal, setActiveModal] = useState<'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING'>('NONE');
   const [activeNegotiationId, setActiveNegotiationId] = useState<string | null>(null);
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
+
+  const resetFilters = () => {
+    setFilters(DEFAULT_FILTERS);
+  };
+
+  const openVenueOnboarding = (venue?: Venue | null) => {
+    setEditingVenue(venue || null);
+    setActiveModal('VENUE_ONBOARDING');
+  };
 
   const setCurrentRole = (role: UserRole) => {
     setCurrentUser((prev) => ({
@@ -363,6 +389,19 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setVenues((prev) => prev.map((v) => (v.id === updatedVenue.id ? updatedVenue : v)));
   };
 
+  const saveVenueListing = (venue: Venue) => {
+    setVenues((prev) => {
+      const idx = prev.findIndex((v) => v.id === venue.id);
+      if (idx >= 0) {
+        const copy = [...prev];
+        copy[idx] = venue;
+        return copy;
+      } else {
+        return [venue, ...prev];
+      }
+    });
+  };
+
   const createWalkInBooking = (bookingData: Partial<Booking>) => {
     const bookingRef = `UTS-OFFLINE-${Math.floor(1000 + Math.random() * 9000)}`;
     const fullBooking: Booking = {
@@ -423,6 +462,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         reviews,
         filters,
         setFilters,
+        resetFilters,
         selectedVenue,
         setSelectedVenue,
         createNegotiationOffer,
@@ -433,6 +473,9 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         signAgreement,
         processPayment,
         updateVenueListing,
+        saveVenueListing,
+        openVenueOnboarding,
+        editingVenue,
         createWalkInBooking,
         verifyVenueStatus,
         addVerifiedReview,

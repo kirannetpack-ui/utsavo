@@ -10,6 +10,7 @@ import { Venue } from '../types';
 import { VenueImageVisual } from './VenueImageVisual';
 import { getAdjacentDistricts } from '../data/nepalGeography';
 import {
+  Building2,
   MapPin,
   Users,
   ShieldCheck,
@@ -27,20 +28,46 @@ import {
 
 export const VenueCatalog: React.FC = () => {
   const { t, language } = useLanguage();
-  const { venues, filters, setFilters, setSelectedVenue } = useMarketplace();
+  const { venues, filters, setFilters, setSelectedVenue, openVenueOnboarding, resetFilters } = useMarketplace();
 
   const [selectedAmenity, setSelectedAmenity] = useState<string>('ALL');
   const [activeTab, setActiveTab] = useState<'GRID' | 'MAP_VIEW'>('GRID');
 
-  // Filter venues with adjacent district intelligence
+  // Filter venues with adjacent district intelligence, query, price ranges and capacity
   const filteredVenues = useMemo(() => {
     return venues.filter((venue) => {
-      // Province filter
+      // 1. Full text search query (name, nepali name, locality, address, municipality, district)
+      if (filters.searchQuery && filters.searchQuery.trim() !== '') {
+        const query = filters.searchQuery.toLowerCase().trim();
+        const matchName = venue.name.toLowerCase().includes(query);
+        const matchNepali = venue.nepaliName?.toLowerCase().includes(query);
+        const matchLocality = venue.locality?.toLowerCase().includes(query);
+        const matchAddress = venue.address?.toLowerCase().includes(query);
+        const matchMunicipality = venue.municipality?.toLowerCase().includes(query);
+        const matchDistrict = venue.district?.toLowerCase().includes(query);
+        const matchTagline = venue.tagline?.toLowerCase().includes(query);
+        if (!matchName && !matchNepali && !matchLocality && !matchAddress && !matchMunicipality && !matchDistrict && !matchTagline) {
+          return false;
+        }
+      }
+
+      // 2. Locality or municipality specific filter
+      if (filters.locality && filters.locality.trim() !== '') {
+        const locQuery = filters.locality.toLowerCase().trim();
+        const matchLoc = venue.locality?.toLowerCase().includes(locQuery);
+        const matchMuni = venue.municipality?.toLowerCase().includes(locQuery);
+        const matchAddr = venue.address?.toLowerCase().includes(locQuery);
+        if (!matchLoc && !matchMuni && !matchAddr) {
+          return false;
+        }
+      }
+
+      // 3. Province filter
       if (filters.province && venue.province.toLowerCase() !== filters.province.toLowerCase()) {
         return false;
       }
 
-      // District filter with adjacent district fallback logic
+      // 4. District filter with adjacent district fallback logic
       if (filters.district) {
         const matchesDistrict = venue.district.toLowerCase() === filters.district.toLowerCase();
         if (!matchesDistrict) {
@@ -54,12 +81,32 @@ export const VenueCatalog: React.FC = () => {
         }
       }
 
-      // Capacity filter
+      // 5. Capacity constraints
+      // Target guest count: venue max capacity must comfortably fit
       if (filters.guestCount && venue.maxGuests < filters.guestCount) {
         return false;
       }
+      // Min capacity filter
+      if (filters.minCapacity && venue.maxGuests < filters.minCapacity) {
+        return false;
+      }
+      // Max capacity filter (don't show massive halls if user specifically asks for smaller spaces)
+      if (filters.maxCapacity && venue.minGuests > filters.maxCapacity) {
+        return false;
+      }
 
-      // Amenity filter
+      // 6. Price range constraints
+      if (filters.minPerPlateBudget && venue.cateringStartingNpr < filters.minPerPlateBudget) {
+        return false;
+      }
+      if (filters.maxPerPlateBudget && venue.cateringStartingNpr > filters.maxPerPlateBudget) {
+        return false;
+      }
+      if (filters.maxHallRentalNpr && venue.baseRentalStartingNpr > filters.maxHallRentalNpr) {
+        return false;
+      }
+
+      // 7. Amenity filter
       if (selectedAmenity === 'POWER_BACKUP' && !venue.hasPowerBackup) return false;
       if (selectedAmenity === 'MANDAP' && !venue.hasMandapSetup) return false;
       if (selectedAmenity === 'WHEELCHAIR' && !venue.hasWheelchairAccess) return false;
@@ -101,7 +148,7 @@ export const VenueCatalog: React.FC = () => {
   };
 
   return (
-    <section className="py-12 bg-stone-50 min-h-[600px]">
+    <section id="venues-catalog" className="py-12 bg-stone-50 min-h-[600px] scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header & View Controls */}
@@ -320,6 +367,37 @@ export const VenueCatalog: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Empty State when no venues match */}
+        {sortedVenues.length === 0 && (
+          <div className="text-center py-16 px-4 bg-white rounded-3xl border border-stone-200 mt-8 shadow-xs max-w-xl mx-auto">
+            <div className="w-14 h-14 bg-amber-50 text-amber-800 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-200">
+              <Building2 className="w-7 h-7 text-amber-800" />
+            </div>
+            <h3 className="font-display text-xl font-bold text-stone-900">
+              {language === 'ne' ? 'कुनै भेन्यु वा पार्टी प्यालेस फेला परेन' : 'No Venues Found Matching Your Criteria'}
+            </h3>
+            <p className="text-xs text-stone-500 mt-2 max-w-md mx-auto leading-relaxed">
+              {language === 'ne'
+                ? 'तपाईंले छान्नुभएको मूल्य, क्षमता वा स्थानको दायरा अलि फराकिलो बनाएर पुनः प्रयास गर्नुहोस् वा सबै फिल्टरहरू रिसेट गर्नुहोस्।'
+                : 'Try adjusting your price range, guest capacity, or search query to explore more party palaces across Nepal.'}
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+              <button
+                onClick={resetFilters}
+                className="px-4 py-2 text-xs font-semibold text-stone-800 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
+              >
+                {language === 'ne' ? 'सबै फिल्टर रिसेट गर्नुहोस्' : 'Reset All Filters'}
+              </button>
+              <button
+                onClick={() => openVenueOnboarding(null)}
+                className="px-4 py-2 text-xs font-semibold text-white bg-amber-900 hover:bg-amber-950 rounded-xl shadow-xs transition-colors"
+              >
+                {language === 'ne' ? 'नयाँ पार्टी प्यालेस दर्ता गर्नुहोस्' : 'Register a Party Palace Here'}
+              </button>
+            </div>
+          </div>
+        )}
 
       </div>
     </section>

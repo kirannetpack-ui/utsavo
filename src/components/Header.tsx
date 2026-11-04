@@ -19,7 +19,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ activeView, setActiveView, onOpenAiAssistant }) => {
   const { language, setLanguage, t } = useLanguage();
-  const { currentUser, setCurrentRole, setActiveModal } = useMarketplace();
+  const { currentUser, setCurrentRole, setActiveModal, openVenueOnboarding } = useMarketplace();
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
 
@@ -101,10 +101,26 @@ export const Header: React.FC<HeaderProps> = ({ activeView, setActiveView, onOpe
             >
               {t('navDashboard')}
             </button>
+            <button
+              onClick={() => openVenueOnboarding(null)}
+              className="hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 text-amber-950 font-medium"
+            >
+              <Building2 className="w-4 h-4 text-amber-800" />
+              <span>{language === 'ne' ? 'भेन्यु दर्ता' : 'List Venue'}</span>
+            </button>
           </nav>
 
           {/* Zone 3: 1 Primary Action + Role/Language/Firebase Controls */}
           <div className="flex items-center gap-2.5 shrink-0">
+            {/* Quick List Venue CTA for Venue Operators */}
+            <button
+              onClick={() => openVenueOnboarding(null)}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-amber-900 hover:bg-amber-950 text-white rounded-lg shadow-xs transition-colors"
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>{language === 'ne' ? 'भेन्यु दर्ता' : 'List Venue'}</span>
+            </button>
+
             {/* Language Toggle (EN / नेपाली) */}
             <button
               onClick={() => setLanguage(language === 'en' ? 'ne' : 'en')}
