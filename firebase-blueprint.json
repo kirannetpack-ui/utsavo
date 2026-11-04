@@ -1,0 +1,88 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile with role and contact information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "name": { "type": "string", "maxLength": 100, "description": "Display name" },
+        "phone": { "type": "string", "maxLength": 30, "description": "Phone number" },
+        "role": { "type": "string", "enum": ["CUSTOMER", "VENUE_OWNER", "SUPER_ADMIN", "FINANCE_ADMIN"], "description": "User role" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Booking": {
+      "title": "Booking Document",
+      "description": "Party palace event booking record",
+      "type": "object",
+      "properties": {
+        "bookingRef": { "type": "string", "maxLength": 32, "description": "Unique booking reference" },
+        "customerId": { "type": "string", "maxLength": 128, "description": "Customer UID" },
+        "customerName": { "type": "string", "maxLength": 100, "description": "Customer name" },
+        "customerPhone": { "type": "string", "maxLength": 30, "description": "Customer phone" },
+        "venueId": { "type": "string", "maxLength": 128, "description": "Venue ID" },
+        "venueName": { "type": "string", "maxLength": 150, "description": "Venue name" },
+        "hallId": { "type": "string", "maxLength": 128, "description": "Hall ID" },
+        "eventType": { "type": "string", "maxLength": 50, "description": "Event type" },
+        "eventDateBS": { "type": "string", "maxLength": 50, "description": "Date in Bikram Sambat" },
+        "eventDateAD": { "type": "string", "maxLength": 50, "description": "Date in Gregorian" },
+        "shift": { "type": "string", "maxLength": 20, "description": "Shift" },
+        "guestCount": { "type": "number", "description": "Number of guests" },
+        "totalAmountNpr": { "type": "number", "description": "Total consideration in NPR" },
+        "depositPaidNpr": { "type": "number", "description": "Deposit paid in NPR" },
+        "status": { "type": "string", "enum": ["ON_HOLD", "CONFIRMED", "COMPLETED", "CANCELLED"], "description": "Booking status" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["bookingRef", "customerId", "venueId", "status"]
+    },
+    "Negotiation": {
+      "title": "Negotiation Thread",
+      "description": "Structured counter-offer negotiation",
+      "type": "object",
+      "properties": {
+        "venueId": { "type": "string", "maxLength": 128, "description": "Venue ID" },
+        "customerId": { "type": "string", "maxLength": 128, "description": "Customer UID" },
+        "customerName": { "type": "string", "maxLength": 100, "description": "Customer name" },
+        "status": { "type": "string", "maxLength": 30, "description": "Negotiation status" },
+        "currentVersion": { "type": "number", "description": "Version number" },
+        "updatedAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["venueId", "customerId", "status"]
+    },
+    "Review": {
+      "title": "Verified Review",
+      "description": "Post-event verified feedback",
+      "type": "object",
+      "properties": {
+        "venueId": { "type": "string", "maxLength": 128, "description": "Venue ID" },
+        "bookingRef": { "type": "string", "maxLength": 32, "description": "Booking Reference" },
+        "customerName": { "type": "string", "maxLength": 100, "description": "Customer name" },
+        "overallRating": { "type": "number", "description": "1 to 5 rating" },
+        "comment": { "type": "string", "maxLength": 1000, "description": "Review text" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["venueId", "overallRating", "comment"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User account profiles"
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Party palace event reservations"
+    },
+    "/negotiations/{negotiationId}": {
+      "schema": "Negotiation",
+      "description": "Commercial negotiation threads"
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Verified venue reviews"
+    }
+  }
+}

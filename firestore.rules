@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default Deny All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Hardened Security Primitives
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'kiran67311@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Entity Validation Blueprints
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'role']) &&
+        data.keys().hasOnly(['uid', 'email', 'name', 'phone', 'role', 'createdAt', 'organization', 'assignedVenueId']) &&
+        data.uid is string && data.uid.size() <= 128 &&
+        data.email is string && data.email.size() <= 100 &&
+        data.role in ['CUSTOMER', 'VENUE_OWNER', 'SUPER_ADMIN', 'FINANCE_ADMIN'];
+    }
+
+    function isValidBooking(data) {
+      return data.keys().hasAll(['bookingRef', 'customerId', 'venueId', 'status']) &&
+        data.bookingRef is string && data.bookingRef.size() <= 32 &&
+        data.customerId is string && data.customerId.size() <= 128 &&
+        data.venueId is string && data.venueId.size() <= 128 &&
+        data.status in ['ON_HOLD', 'DEPOSIT_PAID', 'CONFIRMED', 'COMPLETED', 'CANCELLED', 'DISPUTED'];
+    }
+
+    function isValidNegotiation(data) {
+      return data.keys().hasAll(['venueId', 'customerId', 'status']) &&
+        data.venueId is string && data.venueId.size() <= 128 &&
+        data.customerId is string && data.customerId.size() <= 128 &&
+        data.status is string && data.status.size() <= 50;
+    }
+
+    function isValidReview(data) {
+      return data.keys().hasAll(['venueId', 'overallRating', 'comment']) &&
+        data.venueId is string && data.venueId.size() <= 128 &&
+        data.overallRating is number && data.overallRating >= 1 && data.overallRating <= 5 &&
+        data.comment is string && data.comment.size() <= 1000;
+    }
+
+    // 1. Users Collection
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) && isValidUser(incoming()) && incoming().uid == request.auth.uid;
+      allow update: if (isOwner(userId) || isAdmin()) && isValidUser(incoming()) && incoming().uid == existing().uid;
+      allow delete: if isAdmin();
+    }
+
+    // 2. Bookings Collection
+    match /bookings/{bookingId} {
+      allow get: if isSignedIn() && (resource.data.customerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.customerId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidBooking(incoming()) && incoming().customerId == request.auth.uid;
+      allow update: if isSignedIn() && isValidBooking(incoming()) && (
+        existing().customerId == request.auth.uid || isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // 3. Negotiations Collection
+    match /negotiations/{negotiationId} {
+      allow get: if isSignedIn() && (resource.data.customerId == request.auth.uid || isAdmin());
+      allow list: if isSignedIn() && (resource.data.customerId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && isValidNegotiation(incoming()) && incoming().customerId == request.auth.uid;
+      allow update: if isSignedIn() && isValidNegotiation(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // 4. Reviews Collection
+    match /reviews/{reviewId} {
+      allow get, list: if true; // Public verified reviews
+      allow create: if isSignedIn() && isValidReview(incoming());
+      allow update, delete: if isAdmin();
+    }
+
+    // 5. Test connection collection
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}
