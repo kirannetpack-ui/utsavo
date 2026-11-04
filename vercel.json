@@ -8,11 +8,8 @@
       "destination": "/api"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/|assets/|favicon.ico|.*\\..*).*)",
       "destination": "/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
