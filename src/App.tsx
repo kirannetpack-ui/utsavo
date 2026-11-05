@@ -3,7 +3,7 @@
  * Main Application Shell & Master Orchestration
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LanguageProvider } from './context/LanguageContext';
 import { MarketplaceProvider, useMarketplace } from './context/MarketplaceContext';
 import { Header } from './components/Header';
@@ -27,11 +27,59 @@ import { DestinationCelebrationHub } from './components/DestinationCelebrationHu
 import { CulturalVendorsDirectory } from './components/CulturalVendorsDirectory';
 import { DigitalNimantranaSuite } from './components/DigitalNimantranaSuite';
 import { LegalContractQuotationGenerator } from './components/LegalContractQuotationGenerator';
+import { PublicInvitationCardView } from './components/PublicInvitationCardView';
 import { Footer } from './components/Footer';
 
 const MainShell: React.FC = () => {
   const { currentUser, activeModal, setActiveModal, openOrganizerRegistration } = useMarketplace();
   const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION'>('EXPLORE');
+
+  // Check if current URL is an invitation link (e.g. /invite/UTS-INV-8921 or ?invite=UTS-INV-8921 or #invite/...)
+  const [activeInviteCode, setActiveInviteCode] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const path = window.location.pathname;
+    const match = path.match(/\/invite\/([A-Za-z0-9_-]+)/i);
+    if (match && match[1]) return match[1];
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('invite')) return params.get('invite');
+
+    const hash = window.location.hash;
+    const hashMatch = hash.match(/invite[=/]([A-Za-z0-9_-]+)/i);
+    if (hashMatch && hashMatch[1]) return hashMatch[1];
+
+    return null;
+  });
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      const match = path.match(/\/invite\/([A-Za-z0-9_-]+)/i);
+      if (match && match[1]) {
+        setActiveInviteCode(match[1]);
+        return;
+      }
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('invite')) {
+        setActiveInviteCode(params.get('invite'));
+        return;
+      }
+      const hash = window.location.hash;
+      const hashMatch = hash.match(/invite[=/]([A-Za-z0-9_-]+)/i);
+      if (hashMatch && hashMatch[1]) {
+        setActiveInviteCode(hashMatch[1]);
+        return;
+      }
+      setActiveInviteCode(null);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handlePopState);
+    };
+  }, []);
 
   // Review modal state
   const [reviewBookingId, setReviewBookingId] = useState<string | null>(null);
@@ -46,6 +94,21 @@ const MainShell: React.FC = () => {
   };
 
   const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
+
+  // If viewing a standalone guest invitation link (e.g. /invite/:code or from QR scan)
+  if (activeInviteCode) {
+    return (
+      <PublicInvitationCardView
+        invitationCode={activeInviteCode}
+        onBackToApp={() => {
+          setActiveInviteCode(null);
+          if (window.history?.pushState) {
+            window.history.pushState({}, '', '/');
+          }
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fbfbf9] text-stone-900 font-sans selection:bg-amber-100 selection:text-amber-950">

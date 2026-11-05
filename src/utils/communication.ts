@@ -68,13 +68,22 @@ ${inquiryRef ? `Reference ID: ${inquiryRef}\n` : ''}
 We would like to discuss high-altitude logistics, luxury guest accommodation, and customized itineraries. Please connect with our family!`;
 };
 
+export const getPublicInvitationUrl = (invitationCode: string): string => {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}/invite/${invitationCode}`;
+  }
+  return `https://utsavo.com/invite/${invitationCode}`;
+};
+
 export const createNimantranaShareMessage = (
   celebrantsTitle: string,
   eventType: string,
   dateBS: string,
   venueName: string,
-  invitationCode: string
+  invitationCode: string,
+  customUrl?: string
 ): string => {
+  const inviteUrl = customUrl || getPublicInvitationUrl(invitationCode);
   return `🙏 *हार्दिक निमन्त्रणा (Cordially Invited)* 🙏
 
 We warmly invite you and your family to bless the auspicious *${eventType}* of *${celebrantsTitle}*.
@@ -83,7 +92,7 @@ We warmly invite you and your family to bless the auspicious *${eventType}* of *
 📍 *स्थान (Venue)*: ${venueName}
 
 Please view our digital invitation card and confirm your attendance (RSVP) here:
-👉 https://utsavo.com/invite/${invitationCode}
+👉 ${inviteUrl}
 
 (Your early RSVP helps our venue kitchen team prepare with zero food wastage)
 धन्यवाद!`;

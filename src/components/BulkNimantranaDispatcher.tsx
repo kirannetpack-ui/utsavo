@@ -6,7 +6,7 @@
 
 import React, { useState } from 'react';
 import { DigitalInvitation } from '../types';
-import { getWhatsAppUrl, getViberUrl, sanitizeNepalPhone } from '../utils/communication';
+import { getWhatsAppUrl, getViberUrl, sanitizeNepalPhone, getPublicInvitationUrl } from '../utils/communication';
 import {
   Users,
   Send,
@@ -138,6 +138,7 @@ export const BulkNimantranaDispatcher: React.FC<BulkNimantranaDispatcherProps> =
   };
 
   const getPersonalizedMessage = (contactName: string) => {
+    const publicUrl = getPublicInvitationUrl(invitation.invitationCode);
     return `🙏 *हार्दिक निमन्त्रणा (CORDIAL INVITATION)* 🙏
 
 नमस्ते *${contactName}* जी,
@@ -149,7 +150,7 @@ We warmly invite you and your family to grace the auspicious *${invitation.event
 📍 *स्थान*: ${invitation.venueName} · ${invitation.locationAddress}
 
 Kindly open our interactive Digital E-Card & confirm your attendance (RSVP) here:
-👉 https://utsavo.com/invite/${invitation.invitationCode}
+👉 ${publicUrl}
 
 (Your early RSVP automatically syncs with our venue kitchen to guarantee zero food wastage)
 निमन्त्रक: *${invitation.hostName}*

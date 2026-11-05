@@ -30,7 +30,8 @@ import {
   QrCode
 } from 'lucide-react';
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
-import { createNimantranaShareMessage } from '../utils/communication';
+import { ScannableQrCode } from './ScannableQrCode';
+import { createNimantranaShareMessage, getPublicInvitationUrl } from '../utils/communication';
 
 interface InteractiveGuestInvitationModalProps {
   isOpen: boolean;
@@ -147,6 +148,7 @@ export const InteractiveGuestInvitationModal: React.FC<InteractiveGuestInvitatio
   };
 
   const theme = getThemeStyling(invitation.templateId);
+  const publicUrl = getPublicInvitationUrl(invitation.invitationCode);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 animate-in fade-in duration-200">
@@ -196,10 +198,10 @@ export const InteractiveGuestInvitationModal: React.FC<InteractiveGuestInvitatio
             {/* Auspicious Vedic Symbol */}
             <div className="space-y-1">
               <div className="text-2xl sm:text-3xl font-bold tracking-wide text-amber-900 select-none">
-                {theme.symbol}
+                {invitation.invocationText || theme.symbol}
               </div>
               <div className="text-[11px] font-bold text-amber-800 uppercase tracking-widest">
-                शुभ विवाह · हार्दिक निमन्त्रणा (CORDIAL INVITATION)
+                {invitation.taglineText || 'शुभ विवाह · हार्दिक निमन्त्रणा (CORDIAL INVITATION)'}
               </div>
             </div>
 
@@ -211,11 +213,16 @@ export const InteractiveGuestInvitationModal: React.FC<InteractiveGuestInvitatio
             {/* The Celebrants Core Header */}
             <div className="py-4 border-y-2 border-dashed border-amber-900/20 space-y-1">
               <span className="text-[11px] uppercase tracking-widest text-amber-900 font-bold block">
-                The Auspicious Matrimony of
+                {invitation.celebrantsPrefix || 'The Auspicious Matrimony of'}
               </span>
               <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-amber-950 tracking-tight">
                 {invitation.celebrantsTitle}
               </h1>
+              {invitation.celebrantsParentsText && (
+                <p className="text-xs text-stone-600 font-serif italic pt-1">
+                  {invitation.celebrantsParentsText}
+                </p>
+              )}
               <div className="text-xs text-stone-500 font-medium pt-1">
                 Requested by: <strong className="text-stone-800">{invitation.hostName}</strong>
               </div>
@@ -287,12 +294,13 @@ export const InteractiveGuestInvitationModal: React.FC<InteractiveGuestInvitatio
                 </p>
               </div>
 
-              <div className="p-2.5 bg-white rounded-2xl border border-stone-200 shadow-xs flex items-center gap-3">
-                <QrCode className="w-12 h-12 text-stone-900 shrink-0" />
-                <div className="text-[10px] text-stone-500">
-                  <span className="font-bold text-stone-800 block">Digital Pass</span>
-                  <span className="font-mono text-amber-800">{invitation.invitationCode}</span>
-                </div>
+              <div className="flex items-center gap-3">
+                <ScannableQrCode
+                  url={publicUrl}
+                  code={invitation.invitationCode}
+                  label="Scan to RSVP"
+                  size={95}
+                />
               </div>
             </div>
 

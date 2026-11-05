@@ -3,7 +3,7 @@
  * Solves Nepal's #1 wedding catering food waste problem through real-time guest sync
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   DigitalInvitation,
   GuestRsvpResponse,
@@ -13,9 +13,10 @@ import {
   ShiftTime
 } from '../types';
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
-import { createNimantranaShareMessage } from '../utils/communication';
+import { createNimantranaShareMessage, getPublicInvitationUrl } from '../utils/communication';
 import { InteractiveGuestInvitationModal } from './InteractiveGuestInvitationModal';
 import { BulkNimantranaDispatcher } from './BulkNimantranaDispatcher';
+import { ScannableQrCode } from './ScannableQrCode';
 import {
   Sparkles,
   QrCode,
@@ -38,7 +39,12 @@ import {
   HeartHandshake,
   Eye,
   ExternalLink,
-  SendHorizontal
+  SendHorizontal,
+  Copy,
+  Check,
+  Trash2,
+  PlusCircle,
+  RefreshCw
 } from 'lucide-react';
 
 // Initial mock invitation
@@ -61,6 +67,12 @@ const initialInvitation: DigitalInvitation = {
     'With the divine blessings of Lord Shiva & Goddess Parvati, we solicit your auspicious presence and blessings on the joyous occasion of the wedding ceremony of our beloved daughter and son.',
   templateId: 'MITHILA_MADHUBANI',
   accentColor: '#92400e', // Amber 800
+  invocationText: '🦚 ॐ श्री गणेशाय नमः 🦚',
+  taglineText: 'शुभ विवाह · हार्दिक निमन्त्रणा (CORDIAL INVITATION)',
+  celebrantsPrefix: 'The Auspicious Matrimony of',
+  celebrantsParentsText: 'Daughter of Mr. Kiran & Mrs. Anita Thapa (Lalitpur) and Son of Mr. Bikram & Mrs. Sunita Sharma (Kathmandu)',
+  rsvpContactPerson: 'Kiran Thapa (+977-9851023456)',
+  customNote: 'Your presence is our biggest blessing and gift / उपहार होइन उपस्थिति नै हाम्रो सौभाग्य',
   subEvents: [
     { time: '09:30 AM', title: 'Barani & Janti Welcome', description: 'Welcoming the Groom’s procession with traditional Panche Baja fanfare' },
     { time: '11:15 AM', title: 'Kanyadaan & Saptapadi', description: 'Vedic rituals around the sacred Agni Kunda mandap' },
@@ -149,12 +161,70 @@ const initialRsvps: GuestRsvpResponse[] = [
 
 export const DigitalNimantranaSuite: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'CARD' | 'BULK_DISPATCH' | 'TRACKER' | 'KITCHEN_SYNC'>('CARD');
-  const [invitation, setInvitation] = useState<DigitalInvitation>(initialInvitation);
+  const [invitation, setInvitation] = useState<DigitalInvitation>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('utsavo_current_invitation');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return initialInvitation;
+  });
   const [rsvps, setRsvps] = useState<GuestRsvpResponse[]>(initialRsvps);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  // Auto-sync invitation edits to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(`utsavo_invitation_${invitation.invitationCode}`, JSON.stringify(invitation));
+        localStorage.setItem('utsavo_current_invitation', JSON.stringify(invitation));
+      } catch (e) {}
+    }
+  }, [invitation]);
+
+  const publicUrl = getPublicInvitationUrl(invitation.invitationCode);
+
+  const handleCopyLink = () => {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(publicUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
 
   const handleGuestRsvpSubmitted = (newRsvp: GuestRsvpResponse) => {
     setRsvps((prev) => [newRsvp, ...prev]);
+  };
+
+  // Sub-Event CRUD Helpers
+  const handleAddSubEvent = () => {
+    const newSub = {
+      time: '12:00 PM',
+      title: 'New Ceremony / Ritual',
+      description: 'Ceremony details and instructions for guests'
+    };
+    setInvitation({
+      ...invitation,
+      subEvents: [...invitation.subEvents, newSub]
+    });
+  };
+
+  const handleUpdateSubEvent = (index: number, field: string, value: string) => {
+    const updated = [...invitation.subEvents];
+    updated[index] = { ...updated[index], [field]: value };
+    setInvitation({ ...invitation, subEvents: updated });
+  };
+
+  const handleDeleteSubEvent = (index: number) => {
+    const updated = invitation.subEvents.filter((_, i) => i !== index);
+    setInvitation({ ...invitation, subEvents: updated });
+  };
+
+  const handleRegenerateCode = () => {
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    setInvitation({ ...invitation, invitationCode: `UTS-INV-${randomNum}` });
   };
 
   // Manual RSVP Modal State
@@ -234,7 +304,8 @@ export const DigitalNimantranaSuite: React.FC = () => {
     invitation.eventType === 'WEDDING' ? 'शुभ विवाह' : invitation.eventType,
     invitation.dateBS,
     invitation.venueName,
-    invitation.invitationCode
+    invitation.invitationCode,
+    publicUrl
   );
 
   return (
@@ -334,16 +405,21 @@ export const DigitalNimantranaSuite: React.FC = () => {
       {activeTab === 'CARD' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Left: Customization Controls */}
-          <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-stone-200 shadow-xs space-y-4 text-xs">
-            <h3 className="font-bold text-sm text-stone-900 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-700" />
-              <span>Card Parameters & Cultural Themes</span>
-            </h3>
+          {/* Left: Customization Controls (EVERY INFORMATION EDITABLE) */}
+          <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-stone-200 shadow-xs space-y-5 text-xs max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
+              <h3 className="font-bold text-sm text-stone-900 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-700" />
+                <span>Card Customization & Information Editor</span>
+              </h3>
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+                Live Auto-Saving
+              </span>
+            </div>
 
             {/* Template Selection */}
             <div>
-              <label className="font-semibold text-stone-700 block mb-1.5">Artistic Theme Motif</label>
+              <label className="font-bold text-stone-800 block mb-1.5">Artistic Theme Motif</label>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { id: 'MITHILA_MADHUBANI', name: 'Mithila Madhubani Art', icon: '🦚' },
@@ -368,93 +444,385 @@ export const DigitalNimantranaSuite: React.FC = () => {
               </div>
             </div>
 
-            {/* Celebrants Title */}
-            <div>
-              <label className="font-semibold text-stone-700 block mb-1">Celebrants Title (वर तथा वधु)</label>
+            {/* 1. Religious / Spiritual Invocation (EDITABLE) */}
+            <div className="space-y-1.5 pt-2 border-t border-stone-100">
+              <label className="font-bold text-stone-800 block">
+                Religious / Spiritual Invocation Header (धार्मिक मन्त्र तथा प्रतीक)
+              </label>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {[
+                  '🦚 ॐ श्री गणेशाय नमः 🦚',
+                  '卐 श्री गणेशाय नमः 卐',
+                  '🏔️ ॐ नमो भगवते वासुदेवाय 🏔️',
+                  '🏛️ 卐 न्हूज्याः सुभाय् 卐 🏛️',
+                  '🪷 ॐ सर्वमङ्गलमाङ्गल्ये 🪷',
+                  'ੴ ਸਤਿਗੁਰੁ ਪ੍ਰਸਾਦਿ'
+                ].map((phrase) => (
+                  <button
+                    key={phrase}
+                    type="button"
+                    onClick={() => setInvitation({ ...invitation, invocationText: phrase })}
+                    className="px-2 py-1 bg-stone-100 hover:bg-amber-100 text-stone-800 rounded-lg text-[10px] font-semibold transition-colors"
+                  >
+                    {phrase}
+                  </button>
+                ))}
+              </div>
               <input
                 type="text"
-                value={invitation.celebrantsTitle}
-                onChange={(e) => setInvitation({ ...invitation, celebrantsTitle: e.target.value })}
+                value={invitation.invocationText || ''}
+                onChange={(e) => setInvitation({ ...invitation, invocationText: e.target.value })}
+                placeholder="e.g. ॐ श्री गणेशाय नमः or custom spiritual mantra"
                 className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-medium"
               />
             </div>
 
-            {/* Host Family Name */}
-            <div>
-              <label className="font-semibold text-stone-700 block mb-1">Host Family Name (निमन्त्रक परिवार)</label>
+            {/* 2. Occasion Tagline (EDITABLE) */}
+            <div className="space-y-1.5 pt-2 border-t border-stone-100">
+              <label className="font-bold text-stone-800 block">
+                Occasion Tagline / Subtitle (उत्सव शीर्षक)
+              </label>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {[
+                  'शुभ विवाह · हार्दिक निमन्त्रणा (CORDIAL INVITATION)',
+                  'पावन विवाह समारोह · हार्दीक निम्तो',
+                  'शुभ पास्नी · भात खुवाई महोत्सव',
+                  'शुभ ब्रतबन्ध / उपनयन संस्कार',
+                  'Grand Vivaha Bhoj & Reception'
+                ].map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setInvitation({ ...invitation, taglineText: tag })}
+                    className="px-2 py-0.5 bg-stone-100 hover:bg-amber-100 text-stone-800 rounded-lg text-[10px] font-semibold transition-colors"
+                  >
+                    {tag.split('·')[0]}
+                  </button>
+                ))}
+              </div>
               <input
                 type="text"
-                value={invitation.hostName}
-                onChange={(e) => setInvitation({ ...invitation, hostName: e.target.value })}
-                className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                value={invitation.taglineText || ''}
+                onChange={(e) => setInvitation({ ...invitation, taglineText: e.target.value })}
+                placeholder="e.g. शुभ विवाह · हार्दिक निमन्त्रणा"
+                className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-medium"
               />
             </div>
 
-            {/* Date & Muhurat */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {/* 3. Celebrants Title & Prefix (EDITABLE) */}
+            <div className="space-y-2 pt-2 border-t border-stone-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label className="font-bold text-stone-800 block mb-1">Prefix Label</label>
+                  <input
+                    type="text"
+                    value={invitation.celebrantsPrefix || ''}
+                    onChange={(e) => setInvitation({ ...invitation, celebrantsPrefix: e.target.value })}
+                    placeholder="e.g. The Auspicious Matrimony of"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-800 block mb-1">Celebrants Title (वर तथा वधु) *</label>
+                  <input
+                    type="text"
+                    value={invitation.celebrantsTitle}
+                    onChange={(e) => setInvitation({ ...invitation, celebrantsTitle: e.target.value })}
+                    placeholder="e.g. Sneha & Aayush"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-bold text-amber-950"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="font-semibold text-stone-700 block mb-1">Date BS</label>
+                <label className="font-bold text-stone-800 block mb-1">
+                  Parents & Lineage Line (अभिभावक तथा वंश विवरण)
+                </label>
+                <textarea
+                  rows={2}
+                  value={invitation.celebrantsParentsText || ''}
+                  onChange={(e) => setInvitation({ ...invitation, celebrantsParentsText: e.target.value })}
+                  placeholder="e.g. Daughter of Mr. Kiran & Mrs. Anita Thapa and Son of Mr. Bikram & Mrs. Sunita Sharma"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none leading-relaxed"
+                />
+              </div>
+            </div>
+
+            {/* 4. Host Family & Contacts (EDITABLE) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-stone-100">
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">Host Family Name (निमन्त्रक)</label>
+                <input
+                  type="text"
+                  value={invitation.hostName}
+                  onChange={(e) => setInvitation({ ...invitation, hostName: e.target.value })}
+                  placeholder="e.g. Kiran Thapa & Family"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-medium"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">Host Phone (WhatsApp)</label>
+                <input
+                  type="text"
+                  value={invitation.hostPhone}
+                  onChange={(e) => setInvitation({ ...invitation, hostPhone: e.target.value })}
+                  placeholder="+977-98..."
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* 5. Date & Muhurat (EDITABLE) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-stone-100">
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">Auspicious Date BS (नेपाली मिति)</label>
                 <input
                   type="text"
                   value={invitation.dateBS}
                   onChange={(e) => setInvitation({ ...invitation, dateBS: e.target.value })}
+                  placeholder="e.g. 2081 Mangsir 14, Friday"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-medium"
+                />
+              </div>
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">Date AD (अंग्रेजी मिति)</label>
+                <input
+                  type="text"
+                  value={invitation.dateAD}
+                  onChange={(e) => setInvitation({ ...invitation, dateAD: e.target.value })}
+                  placeholder="2024-11-29"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">Auspicious Muhurat Time (शुभ मुहूर्त)</label>
+                <input
+                  type="text"
+                  value={invitation.muhuratTime}
+                  onChange={(e) => setInvitation({ ...invitation, muhuratTime: e.target.value })}
+                  placeholder="e.g. 09:15 AM - 01:45 PM"
                   className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 />
               </div>
               <div>
-                <label className="font-semibold text-stone-700 block mb-1">RSVP Deadline</label>
+                <label className="font-bold text-stone-800 block mb-1">RSVP Deadline (म्याद)</label>
                 <input
                   type="text"
                   value={invitation.rsvpDeadlineBS}
                   onChange={(e) => setInvitation({ ...invitation, rsvpDeadlineBS: e.target.value })}
+                  placeholder="e.g. 2081 Mangsir 07"
                   className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 />
               </div>
             </div>
 
-            {/* Venue & Hall */}
-            <div>
-              <label className="font-semibold text-stone-700 block mb-1">Venue & Location</label>
-              <input
-                type="text"
-                value={invitation.venueName}
-                onChange={(e) => setInvitation({ ...invitation, venueName: e.target.value })}
-                className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
-              />
+            {/* 6. Venue & Location (EDITABLE) */}
+            <div className="space-y-2 pt-2 border-t border-stone-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label className="font-bold text-stone-800 block mb-1">Venue Name (स्थान/प्यालेस)</label>
+                  <input
+                    type="text"
+                    value={invitation.venueName}
+                    onChange={(e) => setInvitation({ ...invitation, venueName: e.target.value })}
+                    placeholder="e.g. Heritage Garden Sanepa"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-stone-800 block mb-1">Hall / Lawn</label>
+                  <input
+                    type="text"
+                    value={invitation.hallName || ''}
+                    onChange={(e) => setInvitation({ ...invitation, hallName: e.target.value })}
+                    placeholder="e.g. Sagarmatha Grand Ballroom & Lawn"
+                    className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">Street Address</label>
+                <input
+                  type="text"
+                  value={invitation.locationAddress}
+                  onChange={(e) => setInvitation({ ...invitation, locationAddress: e.target.value })}
+                  placeholder="e.g. Sanepa-2, Lalitpur, Kathmandu Valley"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">Google Maps Directions Link</label>
+                <input
+                  type="text"
+                  value={invitation.mapDirectionsUrl || ''}
+                  onChange={(e) => setInvitation({ ...invitation, mapDirectionsUrl: e.target.value })}
+                  placeholder="https://maps.google.com/?q=..."
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none text-blue-700"
+                />
+              </div>
             </div>
 
-            {/* Welcome Blessings Text */}
-            <div>
-              <label className="font-semibold text-stone-700 block mb-1">Blessing Message (आशीर्वाद तथा निम्तो)</label>
-              <textarea
-                rows={3}
-                value={invitation.welcomeMessage}
-                onChange={(e) => setInvitation({ ...invitation, welcomeMessage: e.target.value })}
-                className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none leading-relaxed"
-              />
-            </div>
-          </div>
+            {/* 7. Welcome Message & Personal Note (EDITABLE) */}
+            <div className="space-y-2 pt-2 border-t border-stone-100">
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">Blessing Message (आशीर्वाद तथा निम्तो)</label>
+                <textarea
+                  rows={3}
+                  value={invitation.welcomeMessage}
+                  onChange={(e) => setInvitation({ ...invitation, welcomeMessage: e.target.value })}
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none leading-relaxed"
+                />
+              </div>
 
-          {/* Right: Authentic Printable Invitation Preview */}
-          <div className="lg:col-span-7 flex flex-col items-center">
-            {/* Action Bar for Opening E-Card */}
-            <div className="w-full max-w-lg mb-3 flex items-center justify-between bg-amber-50/90 border border-amber-200/80 rounded-2xl px-4 py-2.5 shadow-xs">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-700" />
-                <span className="text-xs font-bold text-amber-950">Guest E-Card Preview</span>
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">Gift Policy / Personal Note</label>
+                <input
+                  type="text"
+                  value={invitation.customNote || ''}
+                  onChange={(e) => setInvitation({ ...invitation, customNote: e.target.value })}
+                  placeholder="e.g. उपहार होइन उपस्थिति नै हाम्रो सौभाग्य / No Boxed Gifts Please"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-stone-800 block mb-1">RSVP Contact Persons</label>
+                <input
+                  type="text"
+                  value={invitation.rsvpContactPerson || ''}
+                  onChange={(e) => setInvitation({ ...invitation, rsvpContactPerson: e.target.value })}
+                  placeholder="e.g. Kiran Thapa (+977-9851023456), Anita Thapa (9841223344)"
+                  className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* 8. Sub-Events Ceremonial Schedule (ADD, EDIT, DELETE) */}
+            <div className="space-y-3 pt-2 border-t border-stone-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="font-bold text-stone-800 block">
+                    Ceremonial Order of Events (शुभ कार्यक्रम)
+                  </label>
+                  <span className="text-[10px] text-stone-500">Edit, add or remove sub-events in real-time</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddSubEvent}
+                  className="px-2.5 py-1 bg-amber-900 hover:bg-amber-950 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs transition-colors"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span>Add Event</span>
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                {invitation.subEvents.map((evt, idx) => (
+                  <div key={idx} className="p-3 bg-stone-50 rounded-xl border border-stone-200 space-y-2 relative">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-amber-900 text-[11px]">#{idx + 1} Ceremony</span>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteSubEvent(idx)}
+                        className="text-stone-400 hover:text-rose-600 transition-colors p-1"
+                        title="Delete Sub-event"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="col-span-1">
+                        <label className="text-[10px] text-stone-500 block mb-0.5">Time</label>
+                        <input
+                          type="text"
+                          value={evt.time}
+                          onChange={(e) => handleUpdateSubEvent(idx, 'time', e.target.value)}
+                          className="w-full p-1.5 bg-white border border-stone-200 rounded-lg text-xs font-medium"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <label className="text-[10px] text-stone-500 block mb-0.5">Title</label>
+                        <input
+                          type="text"
+                          value={evt.title}
+                          onChange={(e) => handleUpdateSubEvent(idx, 'title', e.target.value)}
+                          className="w-full p-1.5 bg-white border border-stone-200 rounded-lg text-xs font-bold text-amber-950"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] text-stone-500 block mb-0.5">Description</label>
+                      <input
+                        type="text"
+                        value={evt.description}
+                        onChange={(e) => handleUpdateSubEvent(idx, 'description', e.target.value)}
+                        className="w-full p-1.5 bg-white border border-stone-200 rounded-lg text-xs text-stone-600"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 9. Invitation Code & Link */}
+            <div className="pt-2 border-t border-stone-100 flex items-center justify-between">
+              <div>
+                <label className="font-bold text-stone-800 block text-[11px]">Invitation Pass Code</label>
+                <div className="font-mono font-bold text-amber-800 text-sm">{invitation.invitationCode}</div>
               </div>
               <button
                 type="button"
-                onClick={() => setIsGuestModalOpen(true)}
-                className="px-3.5 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 active:scale-95"
+                onClick={handleRegenerateCode}
+                className="px-3 py-1.5 border border-stone-200 rounded-xl hover:bg-stone-50 text-stone-700 font-semibold flex items-center gap-1"
               >
-                <Eye className="w-3.5 h-3.5" />
-                <span>Open Interactive E-Card</span>
-                <ExternalLink className="w-3 h-3 opacity-70" />
+                <RefreshCw className="w-3 h-3" />
+                <span>Regenerate</span>
               </button>
             </div>
+          </div>
 
-            <div className="w-full max-w-lg bg-[#fffdf7] rounded-3xl p-8 sm:p-10 shadow-xl border-4 border-amber-900/20 relative overflow-hidden text-center space-y-6">
+          {/* Right: Authentic Printable & Live Invitation Preview */}
+          <div className="lg:col-span-7 flex flex-col items-center">
+            
+            {/* Top Toolbar with Direct Open, Test Link, and Copy */}
+            <div className="w-full max-w-lg mb-3 flex flex-wrap items-center justify-between gap-2 bg-amber-50/90 border border-amber-200/80 rounded-2xl px-4 py-2.5 shadow-xs">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-700" />
+                <span className="text-xs font-bold text-amber-950">Live Card Preview</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="px-3 py-1.5 bg-white hover:bg-stone-100 text-stone-800 rounded-xl text-xs font-bold border border-stone-200 shadow-xs flex items-center gap-1 transition-colors"
+                  title="Copy shareable link"
+                >
+                  {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-stone-600" />}
+                  <span>{copiedLink ? 'Copied!' : 'Copy Link'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsGuestModalOpen(true)}
+                  className="px-3.5 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 active:scale-95"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Open Full E-Card</span>
+                  <ExternalLink className="w-3 h-3 opacity-70" />
+                </button>
+              </div>
+            </div>
+
+            {/* Direct Invitation Live Card Display */}
+            <div className="w-full max-w-lg bg-[#fffdf7] rounded-3xl p-6 sm:p-10 shadow-xl border-4 border-amber-900/20 relative overflow-hidden text-center space-y-6">
               
               {/* Ornate Corner Accents */}
               <div className="absolute top-3 left-3 text-amber-800/40 text-xl font-serif">✥</div>
@@ -462,91 +830,119 @@ export const DigitalNimantranaSuite: React.FC = () => {
               <div className="absolute bottom-3 left-3 text-amber-800/40 text-xl font-serif">✥</div>
               <div className="absolute bottom-3 right-3 text-amber-800/40 text-xl font-serif">✥</div>
 
-              {/* Cultural Om / Ganesha Symbol */}
+              {/* Cultural Om / Ganesha Symbol (EDITABLE) */}
               <div className="space-y-1">
-                <div className="text-3xl text-amber-900 font-bold select-none">
-                  {invitation.templateId === 'MITHILA_MADHUBANI' ? 'ॐ श्री गणेशाय नमः' : '卐 श्री गणेशाय नमः 卐'}
+                <div className="text-2xl sm:text-3xl text-amber-900 font-bold select-none">
+                  {invitation.invocationText || (invitation.templateId === 'MITHILA_MADHUBANI' ? 'ॐ श्री गणेशाय नमः' : '卐 श्री गणेशाय नमः 卐')}
                 </div>
                 <div className="text-[11px] font-bold text-amber-800 uppercase tracking-widest">
-                  शुभ विवाह · हार्दीक निमन्त्रणा
+                  {invitation.taglineText || 'शुभ विवाह · हार्दीक निमन्त्रणा'}
                 </div>
               </div>
 
-              {/* Blessing Invocation */}
+              {/* Blessing Invocation (EDITABLE) */}
               <p className="text-xs text-stone-600 leading-relaxed italic px-4 font-serif">
                 "{invitation.welcomeMessage}"
               </p>
 
-              {/* Celebrants Names */}
-              <div className="py-2 border-y border-amber-900/15 space-y-1">
-                <span className="text-[10px] uppercase tracking-widest text-amber-900 font-bold">
-                  The Auspicious Matrimony of
+              {/* Celebrants Names & Lineage (EDITABLE) */}
+              <div className="py-3 border-y border-amber-900/15 space-y-1">
+                <span className="text-[10px] uppercase tracking-widest text-amber-900 font-bold block">
+                  {invitation.celebrantsPrefix || 'The Auspicious Matrimony of'}
                 </span>
                 <h2 className="font-display text-2xl sm:text-3xl font-bold text-amber-950">
                   {invitation.celebrantsTitle}
                 </h2>
-                <span className="text-xs text-stone-500 font-medium">
+                {invitation.celebrantsParentsText && (
+                  <p className="text-[11px] text-stone-600 italic font-serif px-2">
+                    {invitation.celebrantsParentsText}
+                  </p>
+                )}
+                <span className="text-xs text-stone-500 font-medium block pt-1">
                   Cordially invited by {invitation.hostName}
                 </span>
               </div>
 
-              {/* Schedule and Venue Box */}
+              {/* Schedule and Venue Box (EDITABLE) */}
               <div className="bg-amber-50/70 p-4 rounded-2xl border border-amber-900/10 space-y-2 text-xs text-stone-800">
                 <div className="flex items-center justify-center gap-1.5 font-bold text-amber-950">
                   <Calendar className="w-4 h-4 text-amber-800" />
                   <span>{invitation.dateBS}</span>
+                  {invitation.dateAD && (
+                    <span className="text-[10px] text-stone-500 font-normal">({invitation.dateAD})</span>
+                  )}
                 </div>
                 <div className="flex items-center justify-center gap-1.5 text-stone-600">
                   <Clock className="w-3.5 h-3.5 text-amber-700" />
                   <span>{invitation.muhuratTime}</span>
                 </div>
                 <div className="flex items-center justify-center gap-1.5 text-stone-700 font-medium pt-1">
-                  <MapPin className="w-3.5 h-3.5 text-rose-700" />
-                  <span>{invitation.venueName} · {invitation.locationAddress}</span>
+                  <MapPin className="w-3.5 h-3.5 text-rose-700 shrink-0" />
+                  <span>{invitation.venueName} {invitation.hallName ? `· ${invitation.hallName}` : ''}</span>
+                </div>
+                <div className="text-[11px] text-stone-500">
+                  {invitation.locationAddress}
                 </div>
               </div>
 
-              {/* Sub-Events Timeline */}
-              <div className="space-y-2 text-left pt-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 block text-center">
-                  Ceremonial Order of Events (शुभ कार्यक्रम)
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
-                  {invitation.subEvents.map((sub, idx) => (
-                    <div key={idx} className="p-2 rounded-xl bg-white border border-amber-900/10">
-                      <span className="font-bold text-amber-900 block">{sub.time} — {sub.title}</span>
-                      <span className="text-stone-500 text-[10px] leading-tight block">{sub.description}</span>
-                    </div>
-                  ))}
+              {/* Sub-Events Timeline (EDITABLE) */}
+              {invitation.subEvents && invitation.subEvents.length > 0 && (
+                <div className="space-y-2 text-left pt-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 block text-center">
+                    Ceremonial Order of Events (शुभ कार्यक्रम)
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                    {invitation.subEvents.map((sub, idx) => (
+                      <div key={idx} className="p-2 rounded-xl bg-white border border-amber-900/10 space-y-0.5">
+                        <span className="font-bold text-amber-900 block">{sub.time} — {sub.title}</span>
+                        <span className="text-stone-500 text-[10px] leading-tight block">{sub.description}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* QR Code and RSVP footer */}
-              <div className="pt-4 border-t border-amber-900/15 flex items-center justify-between text-left">
-                <div className="space-y-1 max-w-[280px]">
+              {/* Personal Note (EDITABLE) */}
+              {invitation.customNote && (
+                <p className="text-[11px] text-stone-500 italic pt-1 border-t border-amber-900/10">
+                  🌸 {invitation.customNote} 🌸
+                </p>
+              )}
+
+              {/* SCANNABLE REAL QR CODE AND RSVP FOOTER */}
+              <div className="pt-4 border-t border-amber-900/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-left">
+                <div className="space-y-1 max-w-[260px]">
                   <span className="text-[10px] font-bold text-stone-700 block uppercase">
                     RSVP By: {invitation.rsvpDeadlineBS}
                   </span>
                   <p className="text-[10px] text-stone-500 leading-tight">
-                    Kindly scan QR to confirm attendance & dietary choices to help avoid catering food waste.
+                    Scan with your mobile camera or click QR code to view the live card and submit dietary headcount.
                   </p>
+                  {invitation.rsvpContactPerson && (
+                    <p className="text-[10px] text-stone-700 font-semibold pt-1">
+                      RSVP: {invitation.rsvpContactPerson}
+                    </p>
+                  )}
                 </div>
-                <div className="p-2 bg-white rounded-xl border border-stone-200 shadow-xs flex flex-col items-center">
-                  <QrCode className="w-12 h-12 text-stone-800" />
-                  <span className="text-[8px] font-mono font-bold text-stone-500 mt-0.5">
-                    {invitation.invitationCode}
-                  </span>
-                </div>
+
+                {/* Scannable Real QR Code Component */}
+                <ScannableQrCode
+                  url={publicUrl}
+                  code={invitation.invitationCode}
+                  label="Click or Scan to Open"
+                  size={105}
+                  onClick={() => setIsGuestModalOpen(true)}
+                />
               </div>
             </div>
 
-            {/* Quick Share Buttons under card */}
-            <div className="mt-4 flex items-center gap-3">
-              <span className="text-xs font-semibold text-stone-600">Direct Share:</span>
+            {/* Direct Share Buttons under card */}
+            <div className="mt-4 flex flex-col sm:flex-row items-center justify-between w-full max-w-lg gap-3 bg-stone-50 p-3 rounded-2xl border border-stone-200">
+              <span className="text-xs font-semibold text-stone-700">Direct Share:</span>
               <WhatsAppViberButtons
                 phone={invitation.hostPhone}
                 messageText={shareMessage}
-                variant="compact"
+                variant="full"
               />
             </div>
           </div>

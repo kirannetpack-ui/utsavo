@@ -582,6 +582,12 @@ export interface DigitalInvitation {
   enableKitchenRsvpSync: boolean;
   isPublished: boolean;
   createdAt: string;
+  invocationText?: string;
+  taglineText?: string;
+  celebrantsPrefix?: string;
+  celebrantsParentsText?: string;
+  rsvpContactPerson?: string;
+  customNote?: string;
 }
 
 export interface GuestRsvpResponse {
