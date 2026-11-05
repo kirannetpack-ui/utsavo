@@ -32,7 +32,16 @@ import { Footer } from './components/Footer';
 
 const MainShell: React.FC = () => {
   const { currentUser, activeModal, setActiveModal, openOrganizerRegistration } = useMarketplace();
-  const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION'>('EXPLORE');
+  const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION'>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const view = params.get('view')?.toUpperCase();
+      if (view === 'NIMANTRANA' || view === 'DESTINATION' || view === 'VENDORS' || view === 'ORGANIZERS' || view === 'DASHBOARD') {
+        return view as any;
+      }
+    }
+    return 'EXPLORE';
+  });
 
   // Check if current URL is an invitation link (e.g. /invite/UTS-INV-8921 or ?invite=UTS-INV-8921 or #invite/...)
   const [activeInviteCode, setActiveInviteCode] = useState<string | null>(() => {

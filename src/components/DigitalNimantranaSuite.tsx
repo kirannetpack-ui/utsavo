@@ -17,6 +17,7 @@ import { createNimantranaShareMessage, getPublicInvitationUrl } from '../utils/c
 import { InteractiveGuestInvitationModal } from './InteractiveGuestInvitationModal';
 import { BulkNimantranaDispatcher } from './BulkNimantranaDispatcher';
 import { ScannableQrCode } from './ScannableQrCode';
+import { NimantranaQrCodeUtility } from './NimantranaQrCodeUtility';
 import {
   Sparkles,
   QrCode,
@@ -172,6 +173,7 @@ export const DigitalNimantranaSuite: React.FC = () => {
   });
   const [rsvps, setRsvps] = useState<GuestRsvpResponse[]>(initialRsvps);
   const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
+  const [isQrUtilityOpen, setIsQrUtilityOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
   // Auto-sync invitation edits to localStorage
@@ -346,6 +348,14 @@ export const DigitalNimantranaSuite: React.FC = () => {
           >
             <Eye className="w-3.5 h-3.5 text-stone-950" />
             <span>Open Guest E-Card (निमन्त्रणा खोल्नुहोस्)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsQrUtilityOpen(true)}
+            className="w-full mt-1.5 py-1.5 px-3 bg-white/15 hover:bg-white/25 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all active:scale-95 border border-white/20"
+          >
+            <QrCode className="w-3.5 h-3.5 text-amber-300" />
+            <span>Download Unique QR & Badge (क्युआर डाउनलोड)</span>
           </button>
         </div>
       </div>
@@ -811,6 +821,17 @@ export const DigitalNimantranaSuite: React.FC = () => {
 
                 <button
                   type="button"
+                  onClick={() => setIsQrUtilityOpen(true)}
+                  className="px-3.5 py-1.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 active:scale-95"
+                  title="Generate and Download High-Res QR code & printable card badge"
+                >
+                  <QrCode className="w-3.5 h-3.5" />
+                  <span>Download QR</span>
+                  <Download className="w-3 h-3 opacity-80" />
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => setIsGuestModalOpen(true)}
                   className="px-3.5 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 active:scale-95"
                 >
@@ -925,14 +946,25 @@ export const DigitalNimantranaSuite: React.FC = () => {
                   )}
                 </div>
 
-                {/* Scannable Real QR Code Component */}
-                <ScannableQrCode
-                  url={publicUrl}
-                  code={invitation.invitationCode}
-                  label="Click or Scan to Open"
-                  size={105}
-                  onClick={() => setIsGuestModalOpen(true)}
-                />
+                {/* Scannable Real QR Code Component with Direct Download Trigger */}
+                <div className="flex flex-col items-center shrink-0">
+                  <ScannableQrCode
+                    url={publicUrl}
+                    code={invitation.invitationCode}
+                    label="Click or Scan to Open"
+                    size={105}
+                    onClick={() => setIsGuestModalOpen(true)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsQrUtilityOpen(true)}
+                    className="mt-1.5 px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-lg text-[10px] font-bold flex items-center gap-1 shadow-2xs transition-colors"
+                    title="Generate & Download QR Code in High-Res or SVG"
+                  >
+                    <Download className="w-2.5 h-2.5" />
+                    <span>Download QR & Print Badge</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1381,6 +1413,13 @@ export const DigitalNimantranaSuite: React.FC = () => {
         onClose={() => setIsGuestModalOpen(false)}
         invitation={invitation}
         onRsvpSubmitted={handleGuestRsvpSubmitted}
+      />
+
+      {/* Downloadable QR Code Generation & Print Suite Modal */}
+      <NimantranaQrCodeUtility
+        isOpen={isQrUtilityOpen}
+        onClose={() => setIsQrUtilityOpen(false)}
+        invitation={invitation}
       />
     </div>
   );

@@ -5,7 +5,8 @@
 
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { ExternalLink, QrCode as QrIcon } from 'lucide-react';
+import { ExternalLink, QrCode as QrIcon, Download } from 'lucide-react';
+import { triggerFileDownload } from '../utils/qrGenerator';
 
 interface ScannableQrCodeProps {
   url: string;
@@ -14,6 +15,7 @@ interface ScannableQrCodeProps {
   label?: string;
   onClick?: () => void;
   className?: string;
+  showDownloadButton?: boolean;
 }
 
 export const ScannableQrCode: React.FC<ScannableQrCodeProps> = ({
@@ -22,7 +24,8 @@ export const ScannableQrCode: React.FC<ScannableQrCodeProps> = ({
   code,
   label = 'Scan to RSVP',
   onClick,
-  className = ''
+  className = '',
+  showDownloadButton = true
 }) => {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
 
@@ -31,13 +34,13 @@ export const ScannableQrCode: React.FC<ScannableQrCodeProps> = ({
     QRCode.toDataURL(
       url,
       {
-        width: size * 2, // High DPI
+        width: Math.max(size * 4, 800), // High DPI 800px+ for crisp scanning and downloading
         margin: 1,
         color: {
           dark: '#1c1917', // Stone 900
           light: '#ffffff'
         },
-        errorCorrectionLevel: 'M'
+        errorCorrectionLevel: 'H'
       },
       (err, result) => {
         if (!err && isMounted && result) {
@@ -50,6 +53,13 @@ export const ScannableQrCode: React.FC<ScannableQrCodeProps> = ({
     };
   }, [url, size]);
 
+  const handleDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (dataUrl) {
+      triggerFileDownload(dataUrl, `UTSAVO-QR-${code || 'invitation'}.png`);
+    }
+  };
+
   return (
     <div
       onClick={onClick}
@@ -58,6 +68,18 @@ export const ScannableQrCode: React.FC<ScannableQrCodeProps> = ({
       title="Click to open or test this invitation card"
       className={`group relative flex flex-col items-center justify-center p-2 bg-white rounded-2xl border border-stone-200 shadow-xs transition-all hover:border-amber-600 hover:shadow-md cursor-pointer ${className}`}
     >
+      {/* Quick Download Overlay Button */}
+      {showDownloadButton && dataUrl && (
+        <button
+          type="button"
+          onClick={handleDownload}
+          title="Download High-Res QR PNG"
+          className="absolute top-1.5 right-1.5 p-1 bg-amber-900/90 hover:bg-amber-950 text-white rounded-lg shadow-sm opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        >
+          <Download className="w-3 h-3" />
+        </button>
+      )}
+
       {dataUrl ? (
         <img
           src={dataUrl}
