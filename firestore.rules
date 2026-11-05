@@ -118,9 +118,26 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // 6. Test connection collection
+    // 6. Digital Invitations & RSVPs
+    match /invitations/{invitationId} {
+      allow get: if true; // Public guest invitation view
+      allow list: if isAdmin();
+      allow create: if isSignedIn();
+      allow update: if true; // Guests submit RSVPs
+      allow delete: if isAdmin();
+    }
+
+    // 7. Cultural Artists & Vendors Directory
+    match /culturalVendors/{vendorId} {
+      allow get, list: if true; // Public artist browsing
+      allow create: if isSignedIn() || true;
+      allow update, delete: if isAdmin();
+    }
+
+    // 8. Test connection collection
     match /test/{docId} {
       allow read, write: if true;
     }
   }
 }
+

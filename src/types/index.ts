@@ -486,3 +486,220 @@ export interface VerifiedReview {
   createdAt: string;
   verifiedBooking: boolean;
 }
+
+// -------------------------------------------------------------
+// CULTURAL VENDOR MARKETPLACE TYPES
+// -------------------------------------------------------------
+export type CulturalVendorCategory = 
+  | 'PANCHE_NAUMATI_BAJA'      // पञ्चे बाजा तथा नौमती बाजा
+  | 'NEWARI_DHIME_BAJA'        // नेवारी धिमे तथा बाँसुरी बाजा
+  | 'VEDIC_PUROHIT_ACHARYA'    // वैदिक पण्डित तथा पुरोहित (नेपाली/English)
+  | 'PHOTOGRAPHY_CINEMATOGRAPHY' // फोटोग्राफी तथा ड्रोन सिनेमाटोग्राफी
+  | 'BRIDAL_MAKEUP_MEHENDI'    // ब्राइडल मेकअप तथा मेहन्दी आर्ट
+  | 'DECOR_MANDAP_ARTIST'      // मण्डप तथा स्टेज सजावट
+  | 'TRADITIONAL_ATTIRE_JEWELRY'; // दौरा सुरुवाल, ढाका टोपी, गुन्यु चोलो
+
+export interface VendorPackage {
+  id: string;
+  name: string;
+  priceNpr: number;
+  description: string;
+  deliverables: string[];
+}
+
+export interface CulturalVendor {
+  id: string;
+  name: string;
+  nepaliName?: string;
+  category: CulturalVendorCategory;
+  leaderOrContact: string;
+  phone: string;
+  email: string;
+  district: string;
+  province: string;
+  address: string;
+  yearsOfExperience: number;
+  rating: number;
+  reviewCount: number;
+  verifiedBadge: boolean;
+  startingPriceNpr: number;
+  priceUnit: 'PER_EVENT' | 'PER_DAY' | 'PER_PERSON' | 'FIXED_PACKAGE';
+  packages: VendorPackage[];
+  portfolioImages: string[];
+  audioSampleTitle?: string;
+  videoClipUrl?: string;
+  bio: string;
+  specializations: string[];
+  isOpenForTravelAcrossNepal: boolean;
+  bilingualEnglishSupport?: boolean; // For diaspora & international destination clients
+}
+
+// -------------------------------------------------------------
+// DIGITAL NIMANTRANA (INVITATION) & RSVP KITCHEN SYNC TYPES
+// -------------------------------------------------------------
+export type NimantranaTemplate = 
+  | 'MITHILA_MADHUBANI'   // परम्परागत मिथिला कला
+  | 'NEWARI_MALLA_GOLD'   // नेवारी परम्परागत कला
+  | 'HIMALAYAN_ROYAL'     // हिमाल तथा सुनौलो राजसी
+  | 'CONTEMPORARY_LOTUS'; // आधुनिक कमल शैली
+
+export type DietaryType = 
+  | 'VEG' 
+  | 'NON_VEG_CHICKEN' 
+  | 'NON_VEG_MUTTON' 
+  | 'NON_VEG_FISH' 
+  | 'JAIN_NO_ROOTS' 
+  | 'HALAL';
+
+export interface CeremonySubEvent {
+  time: string;
+  title: string;
+  nepaliTitle?: string;
+  description: string;
+}
+
+export interface DigitalInvitation {
+  id: string;
+  invitationCode: string; // e.g. "UTS-INV-8901"
+  hostUserId: string;
+  hostName: string;
+  hostPhone: string;
+  eventType: EventType;
+  celebrantsTitle: string; // e.g. "Aayush & Sneha" or "Aarav's Bratabandha"
+  venueId?: string;
+  venueName: string;
+  hallName?: string;
+  dateBS: string;
+  dateAD: string;
+  muhuratTime: string;
+  locationAddress: string;
+  mapDirectionsUrl?: string;
+  welcomeMessage: string;
+  templateId: NimantranaTemplate;
+  accentColor: string;
+  subEvents: CeremonySubEvent[];
+  rsvpDeadlineBS: string;
+  enableKitchenRsvpSync: boolean;
+  isPublished: boolean;
+  createdAt: string;
+}
+
+export interface GuestRsvpResponse {
+  id: string;
+  invitationId: string;
+  guestName: string;
+  phone: string;
+  attendanceStatus: 'ATTENDING' | 'NOT_ATTENDING' | 'TENTATIVE';
+  adultsCount: number;
+  childrenCount: number;
+  dietaryPreferences: {
+    veg: number;
+    nonVegChicken: number;
+    nonVegMutton: number;
+    nonVegFish: number;
+    jain: number;
+    halal: number;
+  };
+  transportNeeded: boolean;
+  arrivalShift: ShiftTime;
+  wishesMessage?: string;
+  submittedAt: string;
+}
+
+export interface KitchenPrepSheet {
+  invitationId: string;
+  venueName: string;
+  eventDateBS: string;
+  shift: ShiftTime;
+  totalConfirmedAdults: number;
+  totalConfirmedChildren: number;
+  totalConfirmedHeads: number;
+  vegHeadcount: number;
+  nonVegChickenHeadcount: number;
+  nonVegMuttonHeadcount: number;
+  jainHeadcount: number;
+  halalHeadcount: number;
+  bufferMarginPercent: number; // e.g. 8%
+  bufferHeadcount: number;
+  totalPlatesToPrepare: number;
+  rawMaterialsKg: {
+    basmatiRiceKg: number;
+    muttonKhasiKg: number;
+    chickenBroilerKg: number;
+    paneerFreshKg: number;
+    dalBlackMahaKg: number;
+    seasonalVegKg: number;
+    dahiCurdLtr: number;
+    lalmohanSweetsPieces: number;
+    saladVeggiesKg: number;
+    cookingOilGheeLtr: number;
+  };
+  generatedAt: string;
+}
+
+// -------------------------------------------------------------
+// LEGAL CONTRACT & QUOTATION TYPES (Nepal Contract Act 2056)
+// -------------------------------------------------------------
+export interface LegalContractDocument {
+  contractRef: string; // e.g. "UTS-KRA-2081-0419"
+  dateIssuedBS: string;
+  dateIssuedAD: string;
+  partyAVenue: {
+    legalEntityName: string;
+    tradeName: string;
+    panOrVatNumber: string;
+    regNumber: string;
+    authorizedSignatory: string;
+    designation: string;
+    phone: string;
+    email: string;
+    address: string;
+  };
+  partyBClient: {
+    fullName: string;
+    citizenshipOrPassportNumber: string;
+    panNumber?: string;
+    phone: string;
+    email: string;
+    address: string;
+  };
+  eventDetails: {
+    eventType: EventType;
+    eventDateBS: string;
+    eventDateAD: string;
+    shift: ShiftTime;
+    hallName: string;
+    guaranteedGuestCount: number;
+  };
+  pricingBreakdown: {
+    perPlateAgreedRateNpr: number;
+    cateringSubtotalNpr: number;
+    hallRentalNpr: number;
+    amenitiesSubtotalNpr: number;
+    grossSubtotalNpr: number;
+    discountNpr: number;
+    taxableAmountNpr: number;
+    vatRatePercent: number; // 13%
+    vatAmountNpr: number;
+    grandTotalNpr: number;
+    securityDepositRefundableNpr: number;
+  };
+  paymentMilestones: {
+    tokenAdvance20Npr: number;
+    dueAtTokenDate: string;
+    preEvent60Npr: number;
+    dueAtPreEventDate: string;
+    finalClearance20Npr: number;
+    dueAtFinalDate: string;
+  };
+  legalClauses: {
+    soundCurfewTime: string; // e.g. 10:30 PM
+    generatorFuelTerms: string;
+    outsideVendorPolicy: string;
+    cancellationRefundSchedule: string;
+    disputeJurisdiction: string; // e.g. Kathmandu District Court / Nepal Arbitration
+  };
+  partyASigned: boolean;
+  partyBSigned: boolean;
+  signedTimestamp?: string;
+}

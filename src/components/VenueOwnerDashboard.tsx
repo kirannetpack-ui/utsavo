@@ -55,8 +55,11 @@ import {
   Camera,
   FileCheck,
   Eye,
+  Printer,
+  UtensilsCrossed,
 } from 'lucide-react';
 import { VenueAnalytics } from './VenueAnalytics';
+import { LegalContractQuotationGenerator } from './LegalContractQuotationGenerator';
 
 export const VenueOwnerDashboard: React.FC = () => {
   const { language } = useLanguage();
@@ -79,6 +82,7 @@ export const VenueOwnerDashboard: React.FC = () => {
   >('CALENDAR');
 
   const [selectedHallId, setSelectedHallId] = useState<string>(myVenue.halls[0].id);
+  const [isLegalPdfOpen, setIsLegalPdfOpen] = useState(false);
 
   // OFFERS & DISCOUNTS STATE
   const [offersList, setOffersList] = useState<VenueOffer[]>(
@@ -616,6 +620,15 @@ export const VenueOwnerDashboard: React.FC = () => {
 
         {/* Action Controls & Tab Switcher */}
         <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setIsLegalPdfOpen(true)}
+            className="px-3.5 py-1.5 rounded-xl bg-stone-900 hover:bg-stone-950 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+            title="Generate binding contract per Nepal Contract Act 2056"
+          >
+            <FileText className="w-3.5 h-3.5 text-amber-400" />
+            <span>Draft Contract / Quotation (PDF)</span>
+          </button>
+
           <button
             onClick={() => openVenueOnboarding(myVenue)}
             className="px-3.5 py-1.5 rounded-xl border border-stone-300 text-stone-700 hover:bg-stone-50 text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
@@ -2160,6 +2173,23 @@ export const VenueOwnerDashboard: React.FC = () => {
         </div>
       )}
 
+      {/* Legal Contract & Quotation PDF Generator Modal */}
+      <LegalContractQuotationGenerator
+        isOpen={isLegalPdfOpen}
+        onClose={() => setIsLegalPdfOpen(false)}
+        initialVenueData={{
+          venueName: myVenue.name,
+          panNumber: myVenue.panNumber,
+          contactPerson: myVenue.contactPerson,
+          phone: myVenue.phone,
+          email: myVenue.email,
+          address: `${myVenue.locality}, ${myVenue.district}, ${myVenue.province}`,
+          cateringStartingNpr: myVenue.cateringStartingNpr,
+          baseRentalStartingNpr: myVenue.baseRentalStartingNpr,
+        }}
+      />
+
     </div>
   );
 };
+

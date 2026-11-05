@@ -38,6 +38,8 @@ import {
   X,
   Share2,
 } from 'lucide-react';
+import { WhatsAppViberButtons } from './WhatsAppViberButtons';
+import { createDestinationInquiryMessage } from '../utils/communication';
 
 interface DestinationCelebrationHubProps {
   onBackToExplore?: () => void;
@@ -370,27 +372,36 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setSelectedPkg(pkg)}
-                    className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-lg transition-colors"
-                  >
-                    Itinerary
-                  </button>
-                  <button
-                    onClick={() => {
-                      setTargetDestination(pkg.locationName);
-                      const el = document.getElementById('intake-portal');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="px-3 py-1.5 bg-amber-900 hover:bg-amber-950 text-white text-xs font-semibold rounded-lg transition-colors shadow-xs"
-                  >
-                    Select
-                  </button>
+                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setSelectedPkg(pkg)}
+                      className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold rounded-lg transition-colors"
+                    >
+                      Itinerary
+                    </button>
+                    <button
+                      onClick={() => {
+                        setTargetDestination(pkg.locationName);
+                        const el = document.getElementById('intake-portal');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                      className="px-3 py-1.5 bg-amber-900 hover:bg-amber-950 text-white text-xs font-semibold rounded-lg transition-colors shadow-xs"
+                    >
+                      Select
+                    </button>
+                  </div>
+
+                  <WhatsAppViberButtons
+                    phone="+977-9801234567"
+                    messageText={createDestinationInquiryMessage(pkg.title, pkg.locationName)}
+                    variant="badges"
+                  />
                 </div>
               </div>
             </div>
           ))}
+
         </div>
       </div>
 

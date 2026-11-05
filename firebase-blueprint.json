@@ -83,6 +83,35 @@
         "createdAt": { "type": "string", "description": "Timestamp" }
       },
       "required": ["inquiryRef", "clientName", "clientEmail", "targetDestination"]
+    },
+    "DigitalInvitation": {
+      "title": "Digital Nimantrana Card",
+      "description": "Digital invitation and RSVP configuration with kitchen headcount synchronization",
+      "type": "object",
+      "properties": {
+        "invitationCode": { "type": "string", "maxLength": 32, "description": "Code" },
+        "hostName": { "type": "string", "maxLength": 100, "description": "Host name" },
+        "celebrantsTitle": { "type": "string", "maxLength": 120, "description": "Celebrants" },
+        "venueName": { "type": "string", "maxLength": 150, "description": "Venue name" },
+        "dateBS": { "type": "string", "maxLength": 50, "description": "BS Date" },
+        "templateId": { "type": "string", "maxLength": 50, "description": "Template motif" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["invitationCode", "hostName", "celebrantsTitle", "venueName"]
+    },
+    "CulturalVendor": {
+      "title": "Cultural Artist & Vendor Profile",
+      "description": "Panche Baja, Dhime Baja, Purohits, Photographers, and Attire vendors",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 150, "description": "Vendor or ensemble name" },
+        "category": { "type": "string", "maxLength": 60, "description": "Vendor category" },
+        "district": { "type": "string", "maxLength": 50, "description": "District" },
+        "phone": { "type": "string", "maxLength": 30, "description": "Contact phone" },
+        "startingPriceNpr": { "type": "number", "description": "Starting rate in NPR" },
+        "rating": { "type": "number", "description": "Rating score" }
+      },
+      "required": ["name", "category", "phone"]
     }
   },
   "firestore": {
@@ -105,6 +134,14 @@
     "/destinationInquiries/{inquiryId}": {
       "schema": "DestinationInquiry",
       "description": "Destination wedding and occasion celebration inquiries"
+    },
+    "/invitations/{invitationId}": {
+      "schema": "DigitalInvitation",
+      "description": "Digital invitations and RSVPs"
+    },
+    "/culturalVendors/{vendorId}": {
+      "schema": "CulturalVendor",
+      "description": "Cultural artist and ensemble profiles"
     }
   }
 }

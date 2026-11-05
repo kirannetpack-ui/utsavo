@@ -27,6 +27,8 @@ import {
   Tag,
   Percent,
 } from 'lucide-react';
+import { WhatsAppViberButtons } from './WhatsAppViberButtons';
+import { createVenueInquiryMessage } from '../utils/communication';
 
 export const VenueCatalog: React.FC = () => {
   const { t, language } = useLanguage();
@@ -417,7 +419,7 @@ export const VenueCatalog: React.FC = () => {
                 </div>
 
                 {/* Card Action Footer */}
-                <div className="p-5 pt-0">
+                <div className="p-5 pt-0 space-y-2">
                   <button
                     onClick={() => setSelectedVenue(venue)}
                     className="w-full py-2.5 text-xs font-semibold text-amber-950 bg-stone-100 hover:bg-amber-900 hover:text-white rounded-xl transition-all flex items-center justify-center gap-1.5 group-hover:bg-amber-900 group-hover:text-white"
@@ -425,6 +427,16 @@ export const VenueCatalog: React.FC = () => {
                     <span>{t('btnViewDetails')}</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
+
+                  {/* Direct WhatsApp / Viber Chat */}
+                  <div className="flex items-center justify-between pt-1 border-t border-stone-100">
+                    <span className="text-[10px] font-semibold text-stone-400">Direct Chat:</span>
+                    <WhatsAppViberButtons
+                      phone={venue.phone}
+                      messageText={createVenueInquiryMessage(venue.name, 'Subha Muhurat Celebration', 'Upcoming BS Date', venue.minGuests || 300)}
+                      variant="badges"
+                    />
+                  </div>
                 </div>
 
               </div>

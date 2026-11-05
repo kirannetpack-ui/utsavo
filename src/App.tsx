@@ -24,15 +24,21 @@ import { VenueOnboardingModal } from './components/VenueOnboardingModal';
 import { EventOrganizerRegistrationModal } from './components/EventOrganizerRegistrationModal';
 import { EventOrganizersDirectory } from './components/EventOrganizersDirectory';
 import { DestinationCelebrationHub } from './components/DestinationCelebrationHub';
+import { CulturalVendorsDirectory } from './components/CulturalVendorsDirectory';
+import { DigitalNimantranaSuite } from './components/DigitalNimantranaSuite';
+import { LegalContractQuotationGenerator } from './components/LegalContractQuotationGenerator';
 import { Footer } from './components/Footer';
 
 const MainShell: React.FC = () => {
   const { currentUser, activeModal, setActiveModal, openOrganizerRegistration } = useMarketplace();
-  const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'DASHBOARD' | 'DESTINATION'>('EXPLORE');
+  const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION'>('EXPLORE');
 
   // Review modal state
   const [reviewBookingId, setReviewBookingId] = useState<string | null>(null);
   const [reviewVenueId, setReviewVenueId] = useState<string | null>(null);
+
+  // Legal Contract Modal State
+  const [isLegalContractOpen, setIsLegalContractOpen] = useState(false);
 
   const handleOpenReviewModal = (bookingId: string, venueId: string) => {
     setReviewBookingId(bookingId);
@@ -61,6 +67,14 @@ const MainShell: React.FC = () => {
         ) : activeView === 'DESTINATION' ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <DestinationCelebrationHub onBackToExplore={() => setActiveView('EXPLORE')} />
+          </div>
+        ) : activeView === 'VENDORS' ? (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <CulturalVendorsDirectory onBackToExplore={() => setActiveView('EXPLORE')} />
+          </div>
+        ) : activeView === 'NIMANTRANA' ? (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <DigitalNimantranaSuite />
           </div>
         ) : activeView === 'ORGANIZERS' ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -112,6 +126,10 @@ const MainShell: React.FC = () => {
       <NegotiationDrawer />
       <BookingAgreementModal />
       <PaymentModal />
+      <LegalContractQuotationGenerator
+        isOpen={isLegalContractOpen}
+        onClose={() => setIsLegalContractOpen(false)}
+      />
       <GeminiChatbotModal
         isOpen={isAiAssistantOpen}
         onClose={() => setIsAiAssistantOpen(false)}

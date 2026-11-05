@@ -30,7 +30,12 @@ import {
   Award,
   ExternalLink,
   Tag,
+  FileText,
+  Printer,
 } from 'lucide-react';
+import { WhatsAppViberButtons } from './WhatsAppViberButtons';
+import { createVenueInquiryMessage } from '../utils/communication';
+import { LegalContractQuotationGenerator } from './LegalContractQuotationGenerator';
 
 export const VenueDetailModal: React.FC = () => {
   const { language, t } = useLanguage();
@@ -42,6 +47,8 @@ export const VenueDetailModal: React.FC = () => {
     setActiveModal,
     setActiveNegotiationId,
   } = useMarketplace();
+
+  const [isLegalPdfOpen, setIsLegalPdfOpen] = useState(false);
 
   if (!selectedVenue) return null;
 
@@ -166,8 +173,24 @@ export const VenueDetailModal: React.FC = () => {
             </button>
           </div>
 
-          <div className="text-xs text-stone-500">
-            Response Rate: <strong className="text-stone-800">{selectedVenue.responseRatePercent}%</strong>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsLegalPdfOpen(true)}
+              className="px-3 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-lg text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+            >
+              <FileText className="w-3.5 h-3.5 text-amber-300" />
+              <span>Official Quotation & Contract (PDF)</span>
+            </button>
+
+            <WhatsAppViberButtons
+              phone={selectedVenue.phone}
+              messageText={createVenueInquiryMessage(selectedVenue.name, 'Subha Muhurat Celebration', selectedDateBS, selectedVenue.minGuests || 350)}
+              variant="badges"
+            />
+
+            <div className="text-xs text-stone-500 hidden sm:block">
+              Response Rate: <strong className="text-stone-800">{selectedVenue.responseRatePercent}%</strong>
+            </div>
           </div>
         </div>
 
@@ -594,6 +617,23 @@ export const VenueDetailModal: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Legal Contract & Quotation PDF Generator Modal */}
+      <LegalContractQuotationGenerator
+        isOpen={isLegalPdfOpen}
+        onClose={() => setIsLegalPdfOpen(false)}
+        initialVenueData={{
+          venueName: selectedVenue.name,
+          panNumber: selectedVenue.panNumber,
+          contactPerson: selectedVenue.contactPerson,
+          phone: selectedVenue.phone,
+          email: selectedVenue.email,
+          address: `${selectedVenue.locality}, ${selectedVenue.district}, ${selectedVenue.province}`,
+          cateringStartingNpr: selectedVenue.cateringStartingNpr,
+          baseRentalStartingNpr: selectedVenue.baseRentalStartingNpr,
+        }}
+      />
     </div>
   );
 };
+

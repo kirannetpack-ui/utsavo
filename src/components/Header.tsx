@@ -7,13 +7,13 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { UserRole } from '../types';
-import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Tag } from 'lucide-react';
+import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Tag, Music, UtensilsCrossed } from 'lucide-react';
 import { auth, loginWithGoogle, logoutUser, testFirestoreConnection } from '../firebase/config';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 
 interface HeaderProps {
-  activeView: 'EXPLORE' | 'ORGANIZERS' | 'DASHBOARD' | 'DESTINATION';
-  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'DASHBOARD' | 'DESTINATION') => void;
+  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION';
+  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION') => void;
   onOpenAiAssistant: () => void;
 }
 
@@ -70,12 +70,12 @@ export const Header: React.FC<HeaderProps> = ({ activeView, setActiveView, onOpe
             </span>
           </button>
 
-          {/* Zone 2: 4-5 Concise Single-Line Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-stone-600">
+          {/* Zone 2: Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-stone-600">
             <button
               onClick={() => setActiveView('EXPLORE')}
               className={`hover:text-amber-900 transition-colors whitespace-nowrap shrink-0 ${
-                activeView === 'EXPLORE' ? 'text-amber-950 font-semibold' : ''
+                activeView === 'EXPLORE' ? 'text-amber-950 font-bold' : ''
               }`}
             >
               {t('navExplore')}
@@ -90,13 +90,31 @@ export const Header: React.FC<HeaderProps> = ({ activeView, setActiveView, onOpe
               <span>{language === 'ne' ? 'डेस्टिनेशन नेपाल' : 'Destination Nepal'}</span>
             </button>
             <button
+              onClick={() => setActiveView('VENDORS')}
+              className={`hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeView === 'VENDORS' ? 'text-amber-950 font-bold bg-amber-50 px-2 py-1 rounded-lg' : 'text-stone-700'
+              }`}
+            >
+              <Music className="w-4 h-4 text-amber-700" />
+              <span>{language === 'ne' ? 'कलाकार तथा बाजा' : 'Artists & Vendors'}</span>
+            </button>
+            <button
+              onClick={() => setActiveView('NIMANTRANA')}
+              className={`hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeView === 'NIMANTRANA' ? 'text-amber-950 font-bold bg-amber-50 px-2 py-1 rounded-lg' : 'text-stone-700'
+              }`}
+            >
+              <UtensilsCrossed className="w-4 h-4 text-amber-700" />
+              <span>{language === 'ne' ? 'स्मार्ट निम्तो र भान्सा' : 'RSVP & Kitchen'}</span>
+            </button>
+            <button
               onClick={() => setActiveView('ORGANIZERS')}
               className={`hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 activeView === 'ORGANIZERS' ? 'text-amber-950 font-semibold' : ''
               }`}
             >
               <Award className="w-4 h-4 text-amber-700" />
-              <span>{language === 'ne' ? 'इभेन्ट अर्गनाइजर' : 'Event Planners'}</span>
+              <span>{language === 'ne' ? 'इभेन्ट अर्गनाइजर' : 'Planners'}</span>
             </button>
             <button
               onClick={() => setActiveModal('PANCHANGA_CALENDAR')}
@@ -106,13 +124,6 @@ export const Header: React.FC<HeaderProps> = ({ activeView, setActiveView, onOpe
               <span>{t('navMuhurats')}</span>
             </button>
             <button
-              onClick={onOpenAiAssistant}
-              className="hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 text-amber-900 font-semibold"
-            >
-              <Sparkles className="w-4 h-4 text-amber-700" />
-              <span>AI Assistant</span>
-            </button>
-            <button
               onClick={() => setActiveView('DASHBOARD')}
               className={`hover:text-amber-900 transition-colors whitespace-nowrap shrink-0 ${
                 activeView === 'DASHBOARD' ? 'text-amber-950 font-semibold' : ''
@@ -120,14 +131,8 @@ export const Header: React.FC<HeaderProps> = ({ activeView, setActiveView, onOpe
             >
               {t('navDashboard')}
             </button>
-            <button
-              onClick={() => openVenueOnboarding(null)}
-              className="hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 text-amber-950 font-medium"
-            >
-              <Building2 className="w-4 h-4 text-amber-800" />
-              <span>{language === 'ne' ? 'भेन्यु दर्ता' : 'List Venue'}</span>
-            </button>
           </nav>
+
 
           {/* Zone 3: 1 Primary Action + Role/Language/Firebase Controls */}
           <div className="flex items-center gap-2.5 shrink-0">
