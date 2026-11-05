@@ -7,6 +7,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   ResponsiveContainer,
+  ComposedChart,
   AreaChart,
   Area,
   BarChart,
@@ -124,7 +125,7 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
 
   // Timeframe filter state
   const [timeRange, setTimeRange] = useState<'FY_2081_82' | 'PEAK_SEASON' | 'LAST_6_MONTHS' | 'ALL_TIME'>('FY_2081_82');
-  const [trendMetric, setTrendMetric] = useState<'revenue' | 'bookings' | 'inquiries'>('revenue');
+  const [trendMetric, setTrendMetric] = useState<'combined' | 'revenue' | 'bookings' | 'inquiries'>('combined');
   const [selectedHall, setSelectedHall] = useState<string>('ALL');
   const [reportExported, setReportExported] = useState(false);
 
@@ -340,32 +341,41 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
         </div>
       </div>
 
-      {/* SECTION 1: BOOKING & REVENUE SEASONAL TRENDS CHART */}
+      {/* SECTION 1: BOOKING PERFORMANCE & REVENUE TRENDS (RECHARTS) */}
       <div className="bg-white rounded-3xl border border-stone-200 p-6 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-4">
           <div>
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-amber-800" />
+              <TrendingUp className="w-5 h-5 text-amber-800" />
               <h4 className="text-base font-bold text-stone-900">
-                {isNepali ? '१. महिनागत बुकिङ तथा आम्दानी ट्रेन्ड (वि.सं. पात्रो अनुसार)' : '1. Monthly Booking & Revenue Trends (Bikram Sambat Calendar)'}
+                {isNepali ? '१. बुकिङ पर्फर्मेन्स तथा राजस्व ट्रेन्ड (Booking Performance & Revenue Trends)' : '1. Booking Performance & Revenue Trends (Recharts)'}
               </h4>
             </div>
             <p className="text-xs text-stone-500 mt-1">
               {isNepali
-                ? 'नेपाली लगन (विवाह मुहूर्त) अनुसार मंसिर, माघ, जेठ र वैशाखमा देखिने उच्च चाप र आम्दानी'
-                : 'Tracks booking volume, plate realization rates, and gross revenue across Nepal\'s auspicious muhurat calendar.'}
+                ? 'मासिक सोधपुछ (Inquiries), सफल बुकिङ (Successful Bookings) र कुल आम्दानी (Revenue Lakhs) को तुलनात्मक विश्लेषण'
+                : 'Comparative visual correlation of monthly customer inquiries, confirmed celebration bookings, and revenue trends across the Bikram Sambat calendar.'}
             </p>
           </div>
 
           {/* Metric Toggle */}
-          <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl text-xs font-semibold">
+          <div className="flex flex-wrap items-center gap-1 bg-stone-100 p-1 rounded-xl text-xs font-semibold">
+            <button
+              onClick={() => setTrendMetric('combined')}
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+                trendMetric === 'combined' ? 'bg-amber-900 text-white shadow-xs' : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>{isNepali ? 'बुकिङ पर्फर्मेन्स (सबै)' : 'Booking Performance (All)'}</span>
+            </button>
             <button
               onClick={() => setTrendMetric('revenue')}
               className={`px-3 py-1.5 rounded-lg transition-colors ${
                 trendMetric === 'revenue' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              {isNepali ? 'आम्दानी (NPR Lakhs)' : 'Revenue (Lakhs NPR)'}
+              {isNepali ? 'आम्दानी' : 'Revenue'}
             </button>
             <button
               onClick={() => setTrendMetric('bookings')}
@@ -373,7 +383,7 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
                 trendMetric === 'bookings' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              {isNepali ? 'बुकिङ संख्या' : 'Bookings Count'}
+              {isNepali ? 'बुकिङ' : 'Bookings'}
             </button>
             <button
               onClick={() => setTrendMetric('inquiries')}
@@ -381,24 +391,125 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
                 trendMetric === 'inquiries' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              {isNepali ? 'सोधपुछ संख्या' : 'Inquiries'}
+              {isNepali ? 'सोधपुछ' : 'Inquiries'}
             </button>
           </div>
         </div>
 
-        {/* Recharts Area / Bar Chart */}
-        <div className="h-80 w-full">
-          <ResponsiveContainer width="100%" height="100%" minHeight={300}>
-            {trendMetric === 'revenue' ? (
+        {/* Recharts Area / Composed / Bar Chart */}
+        <div className="h-88 w-full">
+          <ResponsiveContainer width="100%" height="100%" minHeight={330}>
+            {trendMetric === 'combined' ? (
+              <ComposedChart data={filteredMonthlyData} margin={{ top: 15, right: 25, left: 0, bottom: 20 }}>
+                <defs>
+                  <linearGradient id="combinedRevenueArea" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#78350f" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#78350f" stopOpacity={0.0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f1ee" />
+                <XAxis
+                  dataKey="month"
+                  tick={{ fontSize: 11, fill: '#78716c' }}
+                  tickFormatter={(val, idx) => `${val} (${filteredMonthlyData[idx]?.bsMonth || ''})`}
+                  axisLine={{ stroke: '#e7e5e4' }}
+                />
+                <YAxis
+                  yAxisId="volume"
+                  tick={{ fontSize: 11, fill: '#78716c' }}
+                  axisLine={{ stroke: '#e7e5e4' }}
+                  label={{ value: 'Inquiries & Bookings Count', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fontSize: 10, fill: '#a8a29e' } }}
+                />
+                <YAxis
+                  yAxisId="revenue"
+                  orientation="right"
+                  tick={{ fontSize: 11, fill: '#78716c' }}
+                  unit="L"
+                  axisLine={{ stroke: '#e7e5e4' }}
+                  label={{ value: 'Revenue (Lakhs NPR)', angle: 90, position: 'insideRight', style: { textAnchor: 'middle', fontSize: 10, fill: '#a8a29e' } }}
+                />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const d = payload[0].payload;
+                      const conversionRate = ((d.bookings / d.inquiries) * 100).toFixed(1);
+                      return (
+                        <div className="bg-stone-900 text-white p-3.5 rounded-2xl shadow-xl text-xs space-y-2 border border-stone-800 min-w-[220px]">
+                          <div className="flex items-center justify-between border-b border-stone-800 pb-1.5">
+                            <span className="font-bold text-amber-300 font-display text-sm">{d.month} ({d.bsMonth})</span>
+                            <span className="text-[10px] bg-stone-800 px-2 py-0.5 rounded text-stone-300">{d.season}</span>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-amber-400">
+                              <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-sm bg-amber-400 inline-block" />
+                                <span>Monthly Inquiries:</span>
+                              </span>
+                              <span className="font-bold tabular-nums">{d.inquiries}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-emerald-400">
+                              <span className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block" />
+                                <span>Successful Bookings:</span>
+                              </span>
+                              <span className="font-bold tabular-nums">{d.bookings}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-stone-300 text-[11px] pt-0.5">
+                              <span>Conversion Efficiency:</span>
+                              <span className="font-bold text-white bg-stone-800 px-1.5 py-0.5 rounded tabular-nums">
+                                {conversionRate}%
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-amber-200 font-semibold border-t border-stone-800 pt-1.5">
+                              <span>Revenue Trend:</span>
+                              <span className="font-bold tabular-nums">NPR {d.revenueLakhs} Lakhs</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Legend
+                  verticalAlign="top"
+                  align="right"
+                  wrapperStyle={{ paddingBottom: 14, fontSize: 11 }}
+                />
+                <Bar
+                  yAxisId="volume"
+                  dataKey="inquiries"
+                  name="Monthly Inquiries (सोधपुछ)"
+                  fill="#f59e0b"
+                  radius={[4, 4, 0, 0]}
+                  barSize={16}
+                />
+                <Bar
+                  yAxisId="volume"
+                  dataKey="bookings"
+                  name="Successful Bookings (सफल बुकिङ)"
+                  fill="#059669"
+                  radius={[4, 4, 0, 0]}
+                  barSize={16}
+                />
+                <Area
+                  yAxisId="revenue"
+                  type="monotone"
+                  dataKey="revenueLakhs"
+                  name="Revenue Curve (NPR Lakhs)"
+                  fill="url(#combinedRevenueArea)"
+                  stroke="#78350f"
+                  strokeWidth={3}
+                  dot={{ r: 4, fill: '#78350f', stroke: '#fff', strokeWidth: 1.5 }}
+                  activeDot={{ r: 6 }}
+                />
+              </ComposedChart>
+            ) : trendMetric === 'revenue' ? (
               <AreaChart data={filteredMonthlyData} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
                 <defs>
                   <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#b45309" stopOpacity={0.8} />
                     <stop offset="95%" stopColor="#b45309" stopOpacity={0.05} />
-                  </linearGradient>
-                  <linearGradient id="plateGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#047857" stopOpacity={0.7} />
-                    <stop offset="95%" stopColor="#047857" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f1ee" />
@@ -412,13 +523,6 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
                   yAxisId="left"
                   tick={{ fontSize: 11, fill: '#78716c' }}
                   unit="L"
-                  axisLine={{ stroke: '#e7e5e4' }}
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  tick={{ fontSize: 11, fill: '#78716c' }}
-                  unit=" pts"
                   axisLine={{ stroke: '#e7e5e4' }}
                 />
                 <Tooltip
@@ -439,23 +543,11 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
                             <span>Events Booked:</span>
                             <span className="tabular-nums font-bold text-white">{data.bookings}</span>
                           </div>
-                          <div className="text-stone-300 flex items-center justify-between">
-                            <span>Avg Rate / Plate:</span>
-                            <span className="tabular-nums font-bold text-amber-200">NPR {data.avgPlateNpr}</span>
-                          </div>
-                          <div className="text-stone-400 text-[10px] pt-1">
-                            Inquiries received: {data.inquiries}
-                          </div>
                         </div>
                       );
                     }
                     return null;
                   }}
-                />
-                <Legend
-                  verticalAlign="top"
-                  align="right"
-                  wrapperStyle={{ paddingBottom: 12, fontSize: 11 }}
                 />
                 <Area
                   yAxisId="left"
@@ -466,16 +558,6 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
                   strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#revenueGrad)"
-                />
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="bookings"
-                  name="Events Booked"
-                  stroke="#047857"
-                  strokeWidth={2}
-                  dot={{ r: 4, fill: '#047857' }}
-                  activeDot={{ r: 6 }}
                 />
               </AreaChart>
             ) : trendMetric === 'bookings' ? (
@@ -488,22 +570,8 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
                   axisLine={{ stroke: '#e7e5e4' }}
                 />
                 <YAxis tick={{ fontSize: 11, fill: '#78716c' }} axisLine={{ stroke: '#e7e5e4' }} />
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      return (
-                        <div className="bg-stone-900 text-white p-3 rounded-xl shadow-xl text-xs space-y-1">
-                          <div className="font-bold text-amber-400">{data.month} ({data.bsMonth})</div>
-                          <div className="text-white">Booked Events: <strong className="text-emerald-400">{data.bookings}</strong></div>
-                          <div className="text-stone-300">Season: {data.season}</div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Bar dataKey="bookings" name="Confirmed Bookings" fill="#b45309" radius={[6, 6, 0, 0]} />
+                <Tooltip />
+                <Bar dataKey="bookings" name="Confirmed Bookings" fill="#059669" radius={[6, 6, 0, 0]} />
               </BarChart>
             ) : (
               <BarChart data={filteredMonthlyData} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
@@ -516,27 +584,58 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
                 />
                 <YAxis tick={{ fontSize: 11, fill: '#78716c' }} axisLine={{ stroke: '#e7e5e4' }} />
                 <Tooltip />
-                <Bar dataKey="inquiries" name="Customer Inquiries" fill="#d97706" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="inquiries" name="Customer Inquiries" fill="#f59e0b" radius={[6, 6, 0, 0]} />
               </BarChart>
             )}
           </ResponsiveContainer>
         </div>
 
-        {/* Insight Callout */}
-        <div className="p-4 bg-amber-50/70 rounded-2xl border border-amber-200/80 flex items-start gap-3 text-xs text-amber-950">
-          <Sparkles className="w-4 h-4 text-amber-800 shrink-0 mt-0.5" />
-          <div className="space-y-0.5">
-            <span className="font-bold block">
-              {isNepali ? 'मुहूर्त विश्लेषण र राजस्व सल्लाह:' : 'Seasonal Muhurat Strategy Insight:'}
-            </span>
-            <p className="text-amber-900 leading-relaxed">
-              {isNepali
-                ? 'मंसिर र माघ महिनामा कुल वार्षिक आम्दानीको ५२% उत्पन्न हुन्छ। यी महिनाहरूका शुभ लगन मितिहरूमा प्रतिप्लेट दर कम्तिमा NPR १८५० कायम गरी हल भाडा पूर्ण लिन सिफारिस गरिन्छ। अर्कोतर्फ, साउन र पुसको अफ-सिजनमा व्रतबन्ध र पास्नीका लागि विशेष प्याकेज दिनुहोस्।'
-                : 'Mangsir and Magh drive 52% of total annual palace revenue. For these high-lagan dates, maintain a minimum plate price of NPR 1,850 and enforce non-negotiable hall minimums. For off-peak Shrawan and Poush, offer customized Bratabandha and Pasni packages to maximize hall utilization.'}
-            </p>
+        {/* OPERATIONAL OPTIMIZATION ADVISORY (सञ्चालन अनुकूलन सल्लाह) */}
+        <div className="space-y-3 pt-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-amber-700" />
+            <h5 className="font-bold text-xs uppercase tracking-wider text-stone-900">
+              {isNepali ? 'सञ्चालन अनुकूलन सल्लाहकार (Operations Optimization Advisory)' : 'Operations Optimization Advisory for Venue Operators'}
+            </h5>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+            {/* Advice 1: Yield Strategy */}
+            <div className="p-3.5 bg-gradient-to-br from-amber-50 to-orange-50/50 rounded-2xl border border-amber-200/80 space-y-1.5">
+              <span className="font-bold text-amber-950 flex items-center gap-1.5">
+                <span>🏔️</span>
+                <span>Peak Lagan Dynamic Pricing (मंसिर & माघ)</span>
+              </span>
+              <p className="text-stone-600 leading-relaxed text-[11px]">
+                Inquiry volume peaks at <strong>84 in Mangsir</strong> and <strong>68 in Magh</strong>. Apply a +12% premium on per-plate catering and require 350+ guest guarantee to maximize revenue per square foot.
+              </p>
+            </div>
+
+            {/* Advice 2: Off-Peak Utilization */}
+            <div className="p-3.5 bg-gradient-to-br from-emerald-50 to-teal-50/50 rounded-2xl border border-emerald-200/80 space-y-1.5">
+              <span className="font-bold text-emerald-950 flex items-center gap-1.5">
+                <span>🎁</span>
+                <span>Off-Season Utilization (साउन & भदौ)</span>
+              </span>
+              <p className="text-stone-600 leading-relaxed text-[11px]">
+                Inquiries drop to 16 in Shrawan. Activate Utsavo's <strong>15% Off-Season Deal Badge</strong> and bundle complimentary Mandap rig to attract Bratabandha, Pasni, and corporate AGM bookings.
+              </p>
+            </div>
+
+            {/* Advice 3: Inquiry SLA & Kitchen Bulk */}
+            <div className="p-3.5 bg-gradient-to-br from-stone-50 to-stone-100 rounded-2xl border border-stone-200 space-y-1.5">
+              <span className="font-bold text-stone-900 flex items-center gap-1.5">
+                <span>⚡</span>
+                <span>Inquiry SLA & Bulk Procurement</span>
+              </span>
+              <p className="text-stone-600 leading-relaxed text-[11px]">
+                Responding to leads within <strong>15 minutes</strong> increases booking conversion by <strong>+28%</strong>. Lock wholesale rice and dairy contracts 30 days prior to Kartik to safeguard catering profit margins.
+              </p>
+            </div>
           </div>
         </div>
       </div>
+
 
       {/* SECTION 2 & 3 GRID: PEAK INQUIRY HOURS & CONVERSION FUNNEL */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

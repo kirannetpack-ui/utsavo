@@ -616,6 +616,19 @@ export const VenueOwnerDashboard: React.FC = () => {
           <div className="text-xs text-stone-500 mt-0.5">
             PAN: <strong>{myVenue.panNumber}</strong> · {myVenue.locality}, {myVenue.district} · {myVenue.halls.length} Halls Registered · {mediaList.length} Photos & Videos · {packages.length} Menu Packages
           </div>
+
+          {/* Booking Performance Quick Metrics Bar */}
+          <div className="flex flex-wrap items-center gap-2 pt-2">
+            <button
+              onClick={() => setActiveTab('ANALYTICS')}
+              className="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-200/80 text-[11px] font-semibold flex items-center gap-1.5 transition-colors"
+              title="Click to view full Booking Performance Recharts Dashboard"
+            >
+              <TrendingUp className="w-3.5 h-3.5 text-amber-800" />
+              <span>Performance Pulse: <strong>84 Inquiries</strong> · <strong className="text-emerald-700">26 Booked</strong> · <strong>NPR 48.6L Revenue Peak</strong></span>
+              <span className="text-[10px] text-amber-800 underline ml-1">View Performance Charts →</span>
+            </button>
+          </div>
         </div>
 
         {/* Action Controls & Tab Switcher */}
@@ -724,8 +737,8 @@ export const VenueOwnerDashboard: React.FC = () => {
                 activeTab === 'ANALYTICS' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              <BarChart3 className="w-3.5 h-3.5 text-amber-800" />
-              <span>Analytics & Trends</span>
+              <TrendingUp className="w-3.5 h-3.5 text-amber-800" />
+              <span>Booking Performance & Analytics</span>
             </button>
           </div>
         </div>
