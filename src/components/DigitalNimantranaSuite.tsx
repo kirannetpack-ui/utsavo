@@ -14,6 +14,8 @@ import {
 } from '../types';
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
 import { createNimantranaShareMessage } from '../utils/communication';
+import { InteractiveGuestInvitationModal } from './InteractiveGuestInvitationModal';
+import { BulkNimantranaDispatcher } from './BulkNimantranaDispatcher';
 import {
   Sparkles,
   QrCode,
@@ -33,7 +35,10 @@ import {
   Download,
   Flame,
   ChefHat,
-  HeartHandshake
+  HeartHandshake,
+  Eye,
+  ExternalLink,
+  SendHorizontal
 } from 'lucide-react';
 
 // Initial mock invitation
@@ -143,9 +148,14 @@ const initialRsvps: GuestRsvpResponse[] = [
 ];
 
 export const DigitalNimantranaSuite: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'CARD' | 'TRACKER' | 'KITCHEN_SYNC'>('CARD');
+  const [activeTab, setActiveTab] = useState<'CARD' | 'BULK_DISPATCH' | 'TRACKER' | 'KITCHEN_SYNC'>('CARD');
   const [invitation, setInvitation] = useState<DigitalInvitation>(initialInvitation);
   const [rsvps, setRsvps] = useState<GuestRsvpResponse[]>(initialRsvps);
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
+
+  const handleGuestRsvpSubmitted = (newRsvp: GuestRsvpResponse) => {
+    setRsvps((prev) => [newRsvp, ...prev]);
+  };
 
   // Manual RSVP Modal State
   const [isAddRsvpOpen, setIsAddRsvpOpen] = useState(false);
@@ -258,11 +268,19 @@ export const DigitalNimantranaSuite: React.FC = () => {
               variant="full"
             />
           </div>
+          <button
+            type="button"
+            onClick={() => setIsGuestModalOpen(true)}
+            className="w-full mt-2 py-2 px-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-95"
+          >
+            <Eye className="w-3.5 h-3.5 text-stone-950" />
+            <span>Open Guest E-Card (निमन्त्रणा खोल्नुहोस्)</span>
+          </button>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-stone-200 pb-2">
+      <div className="flex flex-wrap items-center gap-2 border-b border-stone-200 pb-2">
         <button
           onClick={() => setActiveTab('CARD')}
           className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
@@ -273,6 +291,18 @@ export const DigitalNimantranaSuite: React.FC = () => {
         >
           <Sparkles className="w-4 h-4" />
           <span>E-Invitation Card (निमन्त्रणा पत्र)</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('BULK_DISPATCH')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            activeTab === 'BULK_DISPATCH'
+              ? 'bg-amber-900 text-white shadow-xs'
+              : 'text-stone-600 hover:bg-stone-100'
+          }`}
+        >
+          <SendHorizontal className="w-4 h-4 text-emerald-600" />
+          <span>Bulk WhatsApp & Viber Dispatch (बल्क पठाउने)</span>
         </button>
 
         <button
@@ -407,6 +437,23 @@ export const DigitalNimantranaSuite: React.FC = () => {
 
           {/* Right: Authentic Printable Invitation Preview */}
           <div className="lg:col-span-7 flex flex-col items-center">
+            {/* Action Bar for Opening E-Card */}
+            <div className="w-full max-w-lg mb-3 flex items-center justify-between bg-amber-50/90 border border-amber-200/80 rounded-2xl px-4 py-2.5 shadow-xs">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-700" />
+                <span className="text-xs font-bold text-amber-950">Guest E-Card Preview</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsGuestModalOpen(true)}
+                className="px-3.5 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105 active:scale-95"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Open Interactive E-Card</span>
+                <ExternalLink className="w-3 h-3 opacity-70" />
+              </button>
+            </div>
+
             <div className="w-full max-w-lg bg-[#fffdf7] rounded-3xl p-8 sm:p-10 shadow-xl border-4 border-amber-900/20 relative overflow-hidden text-center space-y-6">
               
               {/* Ornate Corner Accents */}
@@ -504,6 +551,11 @@ export const DigitalNimantranaSuite: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Tab: Bulk WhatsApp & Viber Dispatch */}
+      {activeTab === 'BULK_DISPATCH' && (
+        <BulkNimantranaDispatcher invitation={invitation} />
       )}
 
       {/* Tab 2: Guest RSVP Tracker */}
@@ -926,6 +978,14 @@ export const DigitalNimantranaSuite: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Interactive Fullscreen Guest Invitation Modal */}
+      <InteractiveGuestInvitationModal
+        isOpen={isGuestModalOpen}
+        onClose={() => setIsGuestModalOpen(false)}
+        invitation={invitation}
+        onRsvpSubmitted={handleGuestRsvpSubmitted}
+      />
     </div>
   );
 };
