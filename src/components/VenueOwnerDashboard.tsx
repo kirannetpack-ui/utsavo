@@ -57,9 +57,11 @@ import {
   Eye,
   Printer,
   UtensilsCrossed,
+  Briefcase,
 } from 'lucide-react';
 import { VenueAnalytics } from './VenueAnalytics';
 import { LegalContractQuotationGenerator } from './LegalContractQuotationGenerator';
+import { EventStaffTalentPool } from './EventStaffTalentPool';
 
 export const VenueOwnerDashboard: React.FC = () => {
   const { language } = useLanguage();
@@ -72,13 +74,14 @@ export const VenueOwnerDashboard: React.FC = () => {
     saveVenueListing,
     setActiveModal,
     setActiveNegotiationId,
+    eventStaffPool,
   } = useMarketplace();
 
   // Active venue for the logged-in venue operator
   const myVenue: Venue = venues[0]; // The Regal Pavilion & Heritage Banquet
 
   const [activeTab, setActiveTab] = useState<
-    'CALENDAR' | 'INBOX' | 'WALK_IN' | 'MENU_PRICING' | 'MEDIA_GALLERY' | 'OFFERS' | 'KYC_VERIFICATION' | 'EVENT_POLICY' | 'ANALYTICS'
+    'CALENDAR' | 'INBOX' | 'WALK_IN' | 'MENU_PRICING' | 'MEDIA_GALLERY' | 'OFFERS' | 'KYC_VERIFICATION' | 'EVENT_POLICY' | 'ANALYTICS' | 'EVENT_STAFF'
   >('CALENDAR');
 
   const [selectedHallId, setSelectedHallId] = useState<string>(myVenue.halls[0].id);
@@ -739,6 +742,15 @@ export const VenueOwnerDashboard: React.FC = () => {
             >
               <TrendingUp className="w-3.5 h-3.5 text-amber-800" />
               <span>Booking Performance & Analytics</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('EVENT_STAFF')}
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
+                activeTab === 'EVENT_STAFF' ? 'bg-white text-stone-900 shadow-sm font-bold' : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Briefcase className="w-3.5 h-3.5 text-amber-800" />
+              <span>Hire Event Staff ({eventStaffPool.length})</span>
             </button>
           </div>
         </div>
@@ -2157,6 +2169,22 @@ export const VenueOwnerDashboard: React.FC = () => {
           bookings={venueBookings}
           negotiations={venueNegotiations}
         />
+      )}
+
+      {/* TAB 8: CELEBRATION STAFF & GIG WORKFORCE TALENT POOL */}
+      {activeTab === 'EVENT_STAFF' && (
+        <div className="space-y-4">
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between text-xs text-amber-950">
+            <div className="flex items-center gap-2">
+              <Briefcase className="w-4 h-4 text-amber-800 shrink-0" />
+              <span>
+                <strong>Venue Staffing Portal:</strong> Direct access to verified banquet servers, assistant halwais, ushers, and sound technicians for upcoming event shifts.
+              </span>
+            </div>
+            <span className="font-bold text-amber-900">{eventStaffPool.length} Candidates in Pool</span>
+          </div>
+          <EventStaffTalentPool />
+        </div>
       )}
 
       {/* Video Modal Preview */}

@@ -797,3 +797,73 @@ export interface LegalContractDocument {
   partyBSigned: boolean;
   signedTimestamp?: string;
 }
+
+// -------------------------------------------------------------
+// EVENT STAFF & GIG TALENT POOL TYPES (उत्सव जनशक्ति तथा गिग कार्यथलो)
+// -------------------------------------------------------------
+export type EventStaffGigRole = 
+  | 'BANQUET_SERVER_WAITER'   // ब्यान्क्वेट वेटर / सर्भर
+  | 'ASSISTANT_COOK_HALWAI'   // कुक / हलुवाई सहयोगी
+  | 'BARTENDER_BARISTA'       // बारटेन्डर / पेय व्यवस्थापक
+  | 'DISHWASHING_SANITATION'  // भाँडा सरसफाइ तथा किचन हाइजिन
+  | 'MANDAP_DECOR_CREW'       // मण्डप तथा स्टेज सजावट सहयोगी
+  | 'EVENT_USHER_HOST'        // अतिथि सत्कार तथा स्वागत टोली
+  | 'SOUND_LIGHTING_TECH'     // ध्वनि तथा प्रकाश सहयोगी
+  | 'VALET_SECURITY_PARKING'  // पार्किङ तथा सुरक्षा सहयोगी
+  | 'PHOTOGRAPHY_ASSISTANT'   // फोटो/भिडियो क्यामेरा सहयोगी
+  | 'OTHER_EVENT_STAFF';      // अन्य उत्सव सहयोग
+
+export type EmploymentAvailabilityType = 
+  | 'PART_TIME'       // अंशकालीन - Part Time
+  | 'FULL_TIME'       // पूर्णकालीन - Full Time
+  | 'WEEKEND_GIGS'    // शनिबार/बिदाको गिग - Weekend Gigs
+  | 'ON_CALL_DAILY';  // दैनिक आवश्यकतामा - On-Call Daily
+
+export type StaffShiftPreference = 
+  | 'MORNING_SHIFT'   // बिहानी सिफ्ट (7 AM - 3 PM)
+  | 'EVENING_SHIFT'   // साँझको सिफ्ट (3 PM - 11 PM)
+  | 'FULL_DAY'        // पूरा दिन (All Day)
+  | 'ANY_FLEXIBLE';   // जुनसुकै समय (Any Flexible)
+
+export interface StaffReviewComment {
+  id: string;
+  staffId: string;
+  reviewerName: string;            // Name of manager / hiring vendor
+  reviewerOrganization: string;    // e.g. "The Regal Pavilion", "Kathmandu Royal Catering"
+  reviewerRole?: string;           // "Banquet Manager", "Head Chef", "Event Planner"
+  rating: number;                  // 1 to 5
+  punctualityScore?: number;       // 1 to 5
+  groomingCourtesyScore?: number;  // 1 to 5
+  comment: string;                 // Detailed evaluation & feedback
+  eventDate: string;               // When the work was performed
+  eventType?: string;              // "Bihav Vivah", "Reception", "Bratabandha"
+  createdAt: string;
+}
+
+export interface EventStaffProfile {
+  id: string;
+  fullName: string;
+  nepaliName?: string;
+  phone: string;
+  whatsapp?: string;
+  email?: string;
+  photo: string;
+  bio: string;
+  availabilityType: EmploymentAvailabilityType;
+  primaryRole: EventStaffGigRole;
+  secondarySkills: string[];
+  shiftPreference: StaffShiftPreference;
+  expectedWageNpr: number;
+  wageType: 'PER_SHIFT' | 'PER_HOUR' | 'MONTHLY';
+  district: string;
+  preferredLocalities: string[];
+  isAvailableNow: boolean;
+  experienceYears: number;
+  pastVenuesWorked: string[];
+  rating: number;
+  totalShiftsCompleted: number;
+  reviews: StaffReviewComment[];
+  nidOrCitizenshipVerified: boolean;
+  createdAt: string;
+}
+

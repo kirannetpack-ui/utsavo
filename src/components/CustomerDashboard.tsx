@@ -42,7 +42,7 @@ import {
 
 interface CustomerDashboardProps {
   onOpenReviewModal: (bookingId: string, venueId: string) => void;
-  onNavigateView?: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION') => void;
+  onNavigateView?: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL') => void;
 }
 
 export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({

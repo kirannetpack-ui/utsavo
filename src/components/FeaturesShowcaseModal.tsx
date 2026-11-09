@@ -23,12 +23,13 @@ import {
   FileSpreadsheet,
   QrCode,
   Bookmark,
+  Briefcase,
 } from 'lucide-react';
 
 interface FeaturesShowcaseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigate: (view: 'EXPLORE' | 'DESTINATION' | 'VENDORS' | 'NIMANTRANA' | 'ORGANIZERS' | 'DASHBOARD') => void;
+  onNavigate: (view: 'EXPLORE' | 'DESTINATION' | 'VENDORS' | 'NIMANTRANA' | 'ORGANIZERS' | 'DASHBOARD' | 'STAFF_POOL') => void;
   onOpenModal: (modal: 'PANCHANGA_CALENDAR' | 'LEGAL_CONTRACT' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER') => void;
 }
 
@@ -136,6 +137,20 @@ export const FeaturesShowcaseModal: React.FC<FeaturesShowcaseModalProps> = ({
       actionLabel: 'View Planners',
       action: () => {
         onNavigate('ORGANIZERS');
+        onClose();
+      },
+    },
+    {
+      id: 'staff_pool',
+      category: 'Workforce & Employment',
+      title: 'Celebration Staff & Gig Talent Pool',
+      nepali: 'उत्सव जनशक्ति तथा गिग कार्यथलो',
+      description: 'Open, unrestricted workforce pool for banquet servers, kitchen halwais, ushers, and decorators with direct hiring and verified vendor ratings.',
+      icon: Briefcase,
+      badge: 'Gig Economy',
+      actionLabel: 'Explore Talent Pool',
+      action: () => {
+        onNavigate('STAFF_POOL');
         onClose();
       },
     },

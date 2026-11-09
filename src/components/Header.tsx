@@ -7,15 +7,15 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { UserRole } from '../types';
-import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Tag, Music, UtensilsCrossed, FileText, Layers, Bookmark } from 'lucide-react';
+import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Tag, Music, UtensilsCrossed, FileText, Layers, Bookmark, Briefcase } from 'lucide-react';
 import { auth, loginWithGoogle, logoutUser, testFirestoreConnection } from '../firebase/config';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { BrandLogo } from './BrandLogo';
 import { PWAInstallButton } from './PWAInstallButton';
 
 interface HeaderProps {
-  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION';
-  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION') => void;
+  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL';
+  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL') => void;
   onOpenAiAssistant: () => void;
   onOpenFeatures?: () => void;
   onOpenLegalContract?: () => void;
@@ -116,6 +116,16 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Music className="w-4 h-4 text-amber-700" />
               <span>{language === 'ne' ? 'कलाकार तथा बाजा' : 'Artists & Vendors'}</span>
+            </button>
+            <button
+              onClick={() => setActiveView('STAFF_POOL')}
+              className={`hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeView === 'STAFF_POOL' ? 'text-amber-950 font-bold bg-amber-50 px-2 py-1 rounded-lg' : 'text-stone-700'
+              }`}
+            >
+              <Briefcase className="w-4 h-4 text-amber-700" />
+              <span>{language === 'ne' ? 'उत्सव जनशक्ति' : 'Staff & Gigs'}</span>
+              <span className="px-1.5 py-0.2 text-[9px] bg-amber-600 text-white font-bold rounded-full">New</span>
             </button>
             <button
               onClick={() => setActiveView('NIMANTRANA')}

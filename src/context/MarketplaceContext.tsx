@@ -18,12 +18,15 @@ import {
   CulturalVendor,
   DestinationHotelProperty,
   DestinationVendorService,
+  EventStaffProfile,
+  StaffReviewComment,
 } from '../types';
 import { SEED_VENUES } from '../data/venuesData';
 import { SEED_BOOKINGS, SEED_NEGOTIATIONS, SEED_REVIEWS } from '../data/seedMarketplaceState';
 import { SEED_EVENT_ORGANIZERS } from '../data/organizersData';
 import { initialCulturalVendors } from '../data/culturalVendorsData';
 import { SEED_DESTINATION_HOTELS, SEED_DESTINATION_VENDOR_SERVICES } from '../data/destinationVendorsData';
+import { SEED_EVENT_STAFF } from '../data/eventStaffData';
 
 export interface SearchFilterState {
   searchQuery: string;
@@ -143,6 +146,12 @@ interface MarketplaceContextType {
   destinationVendors: DestinationVendorService[];
   addDestinationHotel: (hotel: DestinationHotelProperty) => void;
   addDestinationVendorService: (service: DestinationVendorService) => void;
+
+  // Event Staff & Gig Talent Pool (उत्सव जनशक्ति तथा गिग कार्यथलो)
+  eventStaffPool: EventStaffProfile[];
+  addEventStaffProfile: (profile: Omit<EventStaffProfile, 'id' | 'createdAt' | 'rating' | 'totalShiftsCompleted' | 'reviews'>) => EventStaffProfile;
+  toggleStaffAvailability: (staffId: string) => void;
+  addStaffReview: (staffId: string, review: Omit<StaffReviewComment, 'id' | 'createdAt'>) => void;
 }
 
 const DEFAULT_USER: UserProfile = {
@@ -440,6 +449,79 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const addDestinationVendorService = (service: DestinationVendorService) => {
     setDestinationVendors((prev) => [service, ...prev]);
+  };
+
+  // Event Staff & Gig Talent Pool (उत्सव जनशक्ति तथा गिग कार्यथलो)
+  const [eventStaffPool, setEventStaffPool] = useState<EventStaffProfile[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_event_staff_pool_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load event staff pool', e);
+      }
+    }
+    return SEED_EVENT_STAFF;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_event_staff_pool_v1', JSON.stringify(eventStaffPool));
+      } catch (e) {
+        console.warn('Failed to save event staff pool', e);
+      }
+    }
+  }, [eventStaffPool]);
+
+  const addEventStaffProfile = (
+    profile: Omit<EventStaffProfile, 'id' | 'createdAt' | 'rating' | 'totalShiftsCompleted' | 'reviews'>
+  ): EventStaffProfile => {
+    const newStaff: EventStaffProfile = {
+      ...profile,
+      id: `staff-${Date.now()}`,
+      rating: 5.0,
+      totalShiftsCompleted: 0,
+      reviews: [],
+      createdAt: new Date().toISOString(),
+    };
+    setEventStaffPool((prev) => [newStaff, ...prev]);
+    return newStaff;
+  };
+
+  const toggleStaffAvailability = (staffId: string) => {
+    setEventStaffPool((prev) =>
+      prev.map((staff) =>
+        staff.id === staffId ? { ...staff, isAvailableNow: !staff.isAvailableNow } : staff
+      )
+    );
+  };
+
+  const addStaffReview = (
+    staffId: string,
+    review: Omit<StaffReviewComment, 'id' | 'createdAt'>
+  ) => {
+    const newReview: StaffReviewComment = {
+      ...review,
+      id: `rev-st-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    setEventStaffPool((prev) =>
+      prev.map((staff) => {
+        if (staff.id === staffId) {
+          const updatedReviews = [newReview, ...staff.reviews];
+          const totalScore = updatedReviews.reduce((sum, r) => sum + r.rating, 0);
+          const newAverage = Number((totalScore / updatedReviews.length).toFixed(1));
+          return {
+            ...staff,
+            rating: newAverage,
+            totalShiftsCompleted: staff.totalShiftsCompleted + 1,
+            reviews: updatedReviews,
+          };
+        }
+        return staff;
+      })
+    );
   };
 
   const resetFilters = () => {
@@ -829,6 +911,10 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         destinationVendors,
         addDestinationHotel,
         addDestinationVendorService,
+        eventStaffPool,
+        addEventStaffProfile,
+        toggleStaffAvailability,
+        addStaffReview,
       }}
     >
       {children}

@@ -15,12 +15,13 @@ import {
   Award,
   Calendar,
   Layers,
-  Sparkles
+  Sparkles,
+  Briefcase,
 } from 'lucide-react';
 
 interface MobileAppNavBarProps {
-  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION';
-  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION') => void;
+  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL';
+  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL') => void;
   onOpenFeatures?: () => void;
 }
 
@@ -58,6 +59,14 @@ export const MobileAppNavBar: React.FC<MobileAppNavBarProps> = ({
       isActive: activeView === 'VENDORS',
     },
     {
+      id: 'STAFF_POOL',
+      label: language === 'ne' ? 'उत्सव जनशक्ति' : 'Staff & Gigs',
+      shortLabel: language === 'ne' ? 'जनशक्ति' : 'Staff',
+      icon: Briefcase,
+      onClick: () => setActiveView('STAFF_POOL'),
+      isActive: activeView === 'STAFF_POOL',
+    },
+    {
       id: 'NIMANTRANA',
       label: language === 'ne' ? 'स्मार्ट निम्तो' : 'RSVP & Kitchen',
       shortLabel: 'RSVP',
@@ -81,7 +90,7 @@ export const MobileAppNavBar: React.FC<MobileAppNavBarProps> = ({
       className="fixed bottom-0 inset-x-0 z-40 lg:hidden bg-white/98 backdrop-blur-lg border-t border-stone-200/90 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      <div className="grid grid-cols-5 h-15 max-w-md mx-auto px-1 items-center">
+      <div className="grid grid-cols-6 h-15 max-w-lg mx-auto px-1 items-center">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = item.isActive;
