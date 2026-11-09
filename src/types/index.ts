@@ -853,8 +853,13 @@ export interface EventStaffProfile {
   primaryRole: EventStaffGigRole;
   secondarySkills: string[];
   shiftPreference: StaffShiftPreference;
-  expectedWageNpr: number;
+  expectedWageNpr?: number;
   wageType: 'PER_SHIFT' | 'PER_HOUR' | 'MONTHLY';
+  isGovtStatutoryWage?: boolean; // Set when defaulting to Nepal Labour Act minimum wage
+  wageDeclaredByUser?: boolean; // False if worker left wage blank (adopted statutory min)
+  customRoleName?: string; // If candidate selected OTHER and proposed a new specialized role
+  customRoleNepaliName?: string;
+  customRoleStatus?: 'PENDING' | 'PERMANENT' | 'TEMPORARY' | 'REJECTED';
   district: string;
   preferredLocalities: string[];
   isAvailableNow: boolean;
@@ -865,5 +870,44 @@ export interface EventStaffProfile {
   reviews: StaffReviewComment[];
   nidOrCitizenshipVerified: boolean;
   createdAt: string;
+}
+
+export interface StaffCustomRoleProposal {
+  id: string;
+  proposedRoleName: string;
+  proposedNepaliName?: string;
+  submittedByStaffName: string;
+  staffPhone: string;
+  description: string;
+  status: 'PENDING' | 'PERMANENT' | 'TEMPORARY' | 'REJECTED';
+  createdAt: string;
+  reviewedAt?: string;
+  adminNotes?: string;
+}
+
+// -------------------------------------------------------------
+// NEPAL GOVERNMENT REGULATORY COMPLIANCE INTELLIGENCE
+// -------------------------------------------------------------
+export type GovtDirectiveCategory = 
+  | 'LABOUR_ACT_WAGE'
+  | 'DAO_SOUND_CURFEW'
+  | 'IRD_VAT_TDS'
+  | 'FOOD_SAFETY_ACT'
+  | 'MUNICIPAL_BANQUET_CODE';
+
+export interface NepalGovtDirectiveItem {
+  id: string;
+  category: GovtDirectiveCategory;
+  actTitle: string;
+  actTitleNepali: string;
+  gazetteNoticeRef: string;
+  effectiveDateBS: string;
+  currentEnforcedValue: string;
+  proposedGazetteUpdate?: string;
+  impactOnPlatform: string;
+  impactOnPlatformNepali: string;
+  status: 'ACTIVE_ENFORCED' | 'PENDING_ADMIN_DECISION' | 'DISMISSED';
+  verifiedSourceUrl?: string;
+  lastScannedAt: string;
 }
 

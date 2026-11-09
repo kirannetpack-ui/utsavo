@@ -1,11 +1,14 @@
 /**
  * UTSAVO - Celebration Workforce & Gig Talent Pool (उत्सव जनशक्ति तथा गिग कार्यथलो)
- * Section: Shared event staffing pool for party palaces, caterers, decorators, and planners.
- * Features: Open candidate registration (full-time/part-time), search & filter, direct WhatsApp/call hiring,
- * and a full rating & review commenting system for fair worker acknowledgement.
+ * Features:
+ * 1. View Density Switcher: Small Icons (Default), Medium Cards, Large Detailed Cards.
+ * 2. Multi-selection for vendors: Choose candidates individually or multiple at once with bulk WhatsApp shift outreach.
+ * 3. Optional worker wages: Defaulting to official Nepal Government statutory minimums (Labour Act 2074: NPR 668/shift, NPR 17,300/month).
+ * 4. Custom "OTHER" category proposal: Let joining employees propose specialized roles for different experience, informing the Admin Console.
+ * 5. Peer rating and review commenting system for fair worker acknowledgement.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useMarketplace } from '../context/MarketplaceContext';
 import {
   EventStaffProfile,
@@ -36,17 +39,51 @@ import {
   UserCheck,
   Heart,
   ChevronRight,
+  List,
+  LayoutGrid,
+  Layers,
+  CheckSquare,
+  Square,
+  HelpCircle,
+  AlertCircle,
+  Building,
+  Check,
+  Share2,
 } from 'lucide-react';
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
 
-export const EventStaffTalentPool: React.FC = () => {
+export type ViewDensity = 'SMALL' | 'MEDIUM' | 'LARGE';
+
+interface EventStaffTalentPoolProps {
+  initialOpenRegister?: boolean;
+  onResetInitialOpenRegister?: () => void;
+}
+
+export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
+  initialOpenRegister,
+  onResetInitialOpenRegister,
+}) => {
   const {
     eventStaffPool,
     addEventStaffProfile,
     toggleStaffAvailability,
     addStaffReview,
     currentUser,
+    statutoryRules,
+    proposeStaffCustomRole,
   } = useMarketplace();
+
+  // View Density (DEFAULT IS 'SMALL' per specification!)
+  const [viewDensity, setViewDensity] = useState<ViewDensity>('SMALL');
+
+  // Multi-Selection State for Vendors
+  const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
+  const [isBulkShiftModalOpen, setIsBulkShiftModalOpen] = useState(false);
+  const [bulkShiftDateBS, setBulkShiftDateBS] = useState('2081 Mangsir 20');
+  const [bulkShiftTime, setBulkShiftTime] = useState('EVENING');
+  const [bulkVenueName, setBulkVenueName] = useState('The Regal Pavilion');
+  const [bulkShiftNotes, setBulkShiftNotes] = useState('Formal black & white banquet attire required. Dinner service starts at 6:30 PM.');
+  const [bulkDispatchSuccess, setBulkDispatchSuccess] = useState(false);
 
   // Filters state
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,6 +97,14 @@ export const EventStaffTalentPool: React.FC = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [selectedStaffForDossier, setSelectedStaffForDossier] = useState<EventStaffProfile | null>(null);
   const [registrationSuccessToast, setRegistrationSuccessToast] = useState<string | null>(null);
+
+  // Auto-open registration if triggered from front page CTA
+  useEffect(() => {
+    if (initialOpenRegister) {
+      setIsRegisterModalOpen(true);
+      if (onResetInitialOpenRegister) onResetInitialOpenRegister();
+    }
+  }, [initialOpenRegister, onResetInitialOpenRegister]);
 
   // Review form state inside Dossier Modal
   const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
@@ -83,10 +128,21 @@ export const EventStaffTalentPool: React.FC = () => {
   const [bio, setBio] = useState('');
   const [availabilityType, setAvailabilityType] = useState<EmploymentAvailabilityType>('WEEKEND_GIGS');
   const [primaryRole, setPrimaryRole] = useState<EventStaffGigRole>('BANQUET_SERVER_WAITER');
+  
+  // Custom "OTHER" category proposal states
+  const [isCustomRoleSelected, setIsCustomRoleSelected] = useState(false);
+  const [customRoleTitle, setCustomRoleTitle] = useState('');
+  const [customRoleNepaliTitle, setCustomRoleNepaliTitle] = useState('');
+  const [customRoleDescription, setCustomRoleDescription] = useState('');
+
   const [secondarySkillsText, setSecondarySkillsText] = useState('Silver Service, Buffet Management, Polite Etiquette');
   const [shiftPreference, setShiftPreference] = useState<StaffShiftPreference>('EVENING_SHIFT');
-  const [expectedWageNpr, setExpectedWageNpr] = useState(1800);
+  
+  // Optional Wage State
+  const [expectedWageInput, setExpectedWageInput] = useState<string>(''); // Optional!
+  const [useStatutoryWageRule, setUseStatutoryWageRule] = useState<boolean>(true);
   const [wageType, setWageType] = useState<'PER_SHIFT' | 'PER_HOUR' | 'MONTHLY'>('PER_SHIFT');
+  
   const [district, setDistrict] = useState('Kathmandu');
   const [preferredLocalitiesText, setPreferredLocalitiesText] = useState('Baluwatar, Naya Baneshwor, Lalitpur');
   const [isAvailableNow, setIsAvailableNow] = useState(true);
@@ -113,7 +169,7 @@ export const EventStaffTalentPool: React.FC = () => {
     VALET_SECURITY_PARKING: { en: 'Valet Parking & Escort', ne: 'पार्किङ तथा सुरक्षा सहयोगी', icon: '🚗' },
     DISHWASHING_SANITATION: { en: 'Kitchen Sanitation & Hygiene', ne: 'भाँडा सरसफाइ तथा किचन हाइजिन', icon: '✨' },
     PHOTOGRAPHY_ASSISTANT: { en: 'Photo/Cinema Assistant', ne: 'फोटो/भिडियो क्यामेरा सहयोगी', icon: '📸' },
-    OTHER_EVENT_STAFF: { en: 'Event Operations Support', ne: 'अन्य उत्सव सहयोग', icon: '🤝' },
+    OTHER_EVENT_STAFF: { en: 'Other Specialized Celebration Role', ne: 'अन्य नयाँ भूमिका / फरक अनुभव', icon: '💡' },
   };
 
   // Helper labels for Availability
@@ -154,7 +210,7 @@ export const EventStaffTalentPool: React.FC = () => {
         const matchesBio = staff.bio.toLowerCase().includes(q);
         const matchesDistrict = staff.district.toLowerCase().includes(q);
         const matchesSkills = staff.secondarySkills.some((s) => s.toLowerCase().includes(q));
-        const matchesRole = ROLE_LABELS[staff.primaryRole]?.en.toLowerCase().includes(q);
+        const matchesRole = (staff.customRoleName || ROLE_LABELS[staff.primaryRole]?.en || '').toLowerCase().includes(q);
         if (!matchesName && !matchesBio && !matchesDistrict && !matchesSkills && !matchesRole) {
           return false;
         }
@@ -163,9 +219,58 @@ export const EventStaffTalentPool: React.FC = () => {
     });
   }, [eventStaffPool, selectedAvailability, selectedRole, selectedDistrict, onlyAvailableNow, minRating, searchQuery]);
 
+  // Multi-Selection helpers
+  const toggleSelectStaff = (id: string) => {
+    setSelectedStaffIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedStaffIds.length === filteredStaff.length) {
+      setSelectedStaffIds([]);
+    } else {
+      setSelectedStaffIds(filteredStaff.map((s) => s.id));
+    }
+  };
+
+  const selectedStaffObjects = useMemo(() => {
+    return eventStaffPool.filter((s) => selectedStaffIds.includes(s.id));
+  }, [eventStaffPool, selectedStaffIds]);
+
+  const totalSelectedShiftCost = useMemo(() => {
+    return selectedStaffObjects.reduce((sum, s) => {
+      const wage = s.expectedWageNpr || statutoryRules.minDailyShiftWageNpr;
+      return sum + wage;
+    }, 0);
+  }, [selectedStaffObjects, statutoryRules]);
+
   // Handle Candidate Registration
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Determine wage: optional, defaults to Nepal Govt Statutory Minimum
+    const enteredWage = expectedWageInput.trim() ? Number(expectedWageInput) : undefined;
+    const isUsingStatutory = !enteredWage || useStatutoryWageRule;
+
+    let finalCustomRoleName: string | undefined = undefined;
+    let finalCustomRoleNepali: string | undefined = undefined;
+
+    // If OTHER role or custom role proposed, save proposal to Admin Console
+    if (primaryRole === 'OTHER_EVENT_STAFF' || isCustomRoleSelected) {
+      const roleName = customRoleTitle.trim() || 'Specialized Celebration Role';
+      finalCustomRoleName = roleName;
+      finalCustomRoleNepali = customRoleNepaliTitle.trim() || undefined;
+
+      proposeStaffCustomRole({
+        proposedRoleName: roleName,
+        proposedNepaliName: finalCustomRoleNepali,
+        submittedByStaffName: fullName.trim() || 'Registered Worker',
+        staffPhone: phone.trim() || '+977-9800000000',
+        description: customRoleDescription.trim() || bio.trim() || 'New event experience role proposed from registration.',
+      });
+    }
+
     const newProfile = addEventStaffProfile({
       fullName: fullName.trim() || 'Event Talent Candidate',
       nepaliName: nepaliName.trim() || undefined,
@@ -176,9 +281,12 @@ export const EventStaffTalentPool: React.FC = () => {
       bio: bio.trim() || 'Motivated event professional eager to contribute to weddings and celebrations in Nepal.',
       availabilityType,
       primaryRole,
+      customRoleName: finalCustomRoleName,
+      customRoleNepaliName: finalCustomRoleNepali,
+      customRoleStatus: finalCustomRoleName ? 'PENDING' : undefined,
       secondarySkills: secondarySkillsText.split(',').map((s) => s.trim()).filter(Boolean),
       shiftPreference,
-      expectedWageNpr: Number(expectedWageNpr) || 1800,
+      expectedWageNpr: isUsingStatutory ? undefined : enteredWage,
       wageType,
       district: district || 'Kathmandu',
       preferredLocalities: preferredLocalitiesText.split(',').map((s) => s.trim()).filter(Boolean),
@@ -189,8 +297,10 @@ export const EventStaffTalentPool: React.FC = () => {
     });
 
     setIsRegisterModalOpen(false);
-    setRegistrationSuccessToast(`Congratulations! ${newProfile.fullName} has been added to the UTSAVO Celebration Staff Pool.`);
-    setTimeout(() => setRegistrationSuccessToast(null), 5000);
+    setRegistrationSuccessToast(
+      `बधाई छ! ${newProfile.fullName} उत्सव जनशक्ति कार्यथलोमा सफलतापूर्वक दर्ता हुनुभयो। (नेपाल सरकारको वैधानिक न्यूनतम पारिश्रमिक सुरक्षित)`
+    );
+    setTimeout(() => setRegistrationSuccessToast(null), 6000);
   };
 
   // Handle Review Submission
@@ -222,10 +332,28 @@ export const EventStaffTalentPool: React.FC = () => {
     setTimeout(() => setReviewSuccessMsg(false), 4000);
   };
 
+  // Handle Bulk WhatsApp Dispatch
+  const handleBulkWhatsAppDispatch = () => {
+    const staffNames = selectedStaffObjects.map((s) => s.fullName).join(', ');
+    const message = `Namaste! We are contacting a selected team of ${selectedStaffObjects.length} celebration professionals via UTSAVO (${staffNames}) for an upcoming event shift at ${bulkVenueName} on ${bulkShiftDateBS} (${bulkShiftTime} Shift). Total shift pay adheres to Nepal Government statutory standards (NPR ${statutoryRules.minDailyShiftWageNpr}/shift minimum). Notes: ${bulkShiftNotes}`;
+    
+    // Open primary selected worker's WhatsApp with full team brief
+    const targetPhone = selectedStaffObjects[0]?.whatsapp || selectedStaffObjects[0]?.phone || '+9779800000000';
+    const cleanPhone = targetPhone.replace(/[^0-9]/g, '');
+    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+    
+    setBulkDispatchSuccess(true);
+    setTimeout(() => {
+      setBulkDispatchSuccess(false);
+      setIsBulkShiftModalOpen(false);
+    }, 3000);
+  };
+
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-8 pb-24">
       
-      {/* Toast */}
+      {/* Toast Alert */}
       {registrationSuccessToast && (
         <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-950 rounded-2xl flex items-center justify-between text-xs font-semibold shadow-sm animate-fade-in">
           <div className="flex items-center gap-2">
@@ -238,7 +366,7 @@ export const EventStaffTalentPool: React.FC = () => {
         </div>
       )}
 
-      {/* 1. Hero & Value Proposition Banner */}
+      {/* 1. Hero & Open Workforce Banner */}
       <div className="relative rounded-3xl overflow-hidden shadow-xl border border-stone-800 bg-stone-950 text-white">
         <div className="absolute inset-0">
           <img
@@ -246,28 +374,34 @@ export const EventStaffTalentPool: React.FC = () => {
             alt="Nepal Wedding Banquet Staff"
             className="w-full h-full object-cover opacity-25 mix-blend-overlay filter brightness-90"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/85 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-stone-950 via-stone-950/90 to-transparent" />
         </div>
 
-        <div className="relative max-w-5xl px-6 sm:px-12 py-12 sm:py-16 space-y-6">
+        <div className="relative max-w-5xl px-6 sm:px-12 py-10 sm:py-14 space-y-5">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-semibold backdrop-blur-md">
             <Briefcase className="w-3.5 h-3.5 text-amber-400" />
-            <span>उत्सव जनशक्ति तथा गिग कार्यथलो · Celebration Workforce & Gig Talent Pool</span>
+            <span>उत्सव जनशक्ति तथा गिग कार्यथलो · Nepal's Open Celebration Gig Workforce</span>
           </div>
 
-          <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
+          <h1 className="font-display text-2xl sm:text-4xl font-bold tracking-tight text-white leading-tight">
             Connect Event Talent with Party Palaces, Caterers & Planners
           </h1>
 
-          <p className="text-sm sm:text-base text-stone-300 max-w-3xl leading-relaxed font-light">
-            An open, unrestricted talent pool for banquet servers, kitchen halwais, decorators, ushers, and sound technicians. Anyone can register for <strong>full-time, part-time, or weekend wedding gigs</strong>. All vendors can hire as per their requirements with a verified rating and review system for fair acknowledgement.
+          <p className="text-xs sm:text-sm text-stone-300 max-w-3xl leading-relaxed font-light">
+            No restrictions on the number of people wanting to join. Anyone can register for <strong>full-time, part-time, or weekend gigs</strong>. Vendors can select individuals or multi-select full shift crews with <strong>Nepal Government statutory minimum wage protections</strong> (श्रम ऐन २०७४) and verified peer ratings.
           </p>
 
+          {/* Statutory Compliance Badge Strip */}
+          <div className="inline-flex flex-wrap items-center gap-2 p-2 rounded-xl bg-amber-950/60 border border-amber-500/30 text-[11px] text-amber-200">
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span><strong>🇳🇵 नेपाल सरकार श्रम ऐन २०७४ न्यूनतम पारिश्रमिक पालना:</strong> रू. ६६८/८ घण्टा सिफ्ट · रू. १७,३००/मासिक · पारिश्रमिक ऐच्छिक</span>
+          </div>
+
           {/* Quick Stats Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-stone-800/80 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-3 border-t border-stone-800/80 text-xs">
             <div>
               <span className="text-amber-400 font-display text-2xl font-bold block">{eventStaffPool.length}+</span>
-              <span className="text-stone-400">Registered Candidates</span>
+              <span className="text-stone-400">Total Registered Pool</span>
             </div>
             <div>
               <span className="text-emerald-400 font-display text-2xl font-bold block">
@@ -276,12 +410,12 @@ export const EventStaffTalentPool: React.FC = () => {
               <span className="text-stone-400">Available Right Now</span>
             </div>
             <div>
-              <span className="text-amber-400 font-display text-2xl font-bold block">100% Direct</span>
-              <span className="text-stone-400">Zero Agency Deduction</span>
+              <span className="text-amber-400 font-display text-2xl font-bold block">Multiple Selection</span>
+              <span className="text-stone-400">Individual or Batch Hiring</span>
             </div>
             <div>
-              <span className="text-amber-400 font-display text-2xl font-bold block">Verified Ratings</span>
-              <span className="text-stone-400">Peer Reviews & Comments</span>
+              <span className="text-amber-400 font-display text-2xl font-bold block">3 View Options</span>
+              <span className="text-stone-400">Small (Default), Med, Large</span>
             </div>
           </div>
 
@@ -292,42 +426,123 @@ export const EventStaffTalentPool: React.FC = () => {
               className="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white rounded-xl font-bold text-xs transition-all shadow-lg shadow-amber-600/20 flex items-center gap-2"
             >
               <PlusCircle className="w-4 h-4" />
-              <span>Register for Jobs (कामको लागि दर्ता)</span>
+              <span>Register for Jobs / फरक अनुभव दर्ता</span>
             </button>
             <a
               href="#talent-grid"
               className="px-5 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-semibold text-xs transition-all backdrop-blur-md border border-white/20 flex items-center gap-2"
             >
-              <span>Browse & Hire Event Staff</span>
+              <span>Browse Workforce Pool</span>
               <ChevronRight className="w-4 h-4" />
             </a>
           </div>
         </div>
       </div>
 
-      {/* 2. Search, Filter & Availability Controls Strip */}
-      <div id="talent-grid" className="bg-white rounded-3xl border border-stone-200 shadow-xs p-6 space-y-6">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-stone-100 pb-5">
+      {/* 2. Control Toolbar: Search, Filters, Multi-Select & VIEW DENSITY SWITCHER */}
+      <div id="talent-grid" className="bg-white rounded-3xl border border-stone-200 shadow-xs p-5 sm:p-6 space-y-5">
+        
+        {/* Top Header: Title + View Switcher + Join Button */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-100 pb-4">
           <div>
-            <h2 className="font-display text-2xl font-bold text-stone-900">
-              Celebration Talent Pool ({filteredStaff.length} Candidates Available)
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-xl sm:text-2xl font-bold text-stone-900">
+                Celebration Workforce ({filteredStaff.length} Candidates)
+              </h2>
+              {selectedStaffIds.length > 0 && (
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-900 text-white text-xs font-bold animate-pulse">
+                  {selectedStaffIds.length} Selected
+                </span>
+              )}
+            </div>
             <p className="text-xs text-stone-500 mt-0.5">
-              Filter by availability, specialized skill role, wage expectation, and district. Direct WhatsApp and phone contact for instant hiring.
+              Choose individually or multiple at once for banquet and celebration shifts.
             </p>
           </div>
 
-          {/* Right Button */}
-          <button
-            onClick={() => setIsRegisterModalOpen(true)}
-            className="px-4 py-2.5 bg-stone-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-sm self-start lg:self-center shrink-0"
-          >
-            <PlusCircle className="w-4 h-4 text-amber-400" />
-            <span>Join Talent Pool (Free Registration)</span>
-          </button>
+          {/* Right Action Cluster: View Density Controls (Small Default, Medium, Large) & Register */}
+          <div className="flex flex-wrap items-center gap-2 self-start md:self-center">
+            
+            {/* View Density Switcher (SMALL DEFAULT) */}
+            <div className="flex items-center p-1 bg-stone-100 rounded-xl border border-stone-200 text-xs">
+              <button
+                type="button"
+                onClick={() => setViewDensity('SMALL')}
+                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${
+                  viewDensity === 'SMALL'
+                    ? 'bg-amber-900 text-white shadow-xs font-bold'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+                title="Small icon listing view (Default) - compact rapid scan"
+              >
+                <List className="w-3.5 h-3.5" />
+                <span>Small Icons (सानो)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewDensity('MEDIUM')}
+                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${
+                  viewDensity === 'MEDIUM'
+                    ? 'bg-amber-900 text-white shadow-xs font-bold'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+                title="Medium card grid"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>Medium (मध्यम)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewDensity('LARGE')}
+                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all ${
+                  viewDensity === 'LARGE'
+                    ? 'bg-amber-900 text-white shadow-xs font-bold'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+                title="Detailed large showcase cards"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>Large (ठूलो)</span>
+              </button>
+            </div>
+
+            {/* Select All Toggle */}
+            <button
+              type="button"
+              onClick={handleSelectAll}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition-all ${
+                selectedStaffIds.length > 0 && selectedStaffIds.length === filteredStaff.length
+                  ? 'bg-amber-100 border-amber-300 text-amber-950 font-bold'
+                  : 'bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100'
+              }`}
+            >
+              {selectedStaffIds.length === filteredStaff.length && filteredStaff.length > 0 ? (
+                <>
+                  <CheckSquare className="w-3.5 h-3.5 text-amber-900" />
+                  <span>Deselect All</span>
+                </>
+              ) : (
+                <>
+                  <Square className="w-3.5 h-3.5 text-stone-500" />
+                  <span>Select All ({filteredStaff.length})</span>
+                </>
+              )}
+            </button>
+
+            {/* Free Candidate Registration */}
+            <button
+              onClick={() => setIsRegisterModalOpen(true)}
+              className="px-4 py-2 bg-stone-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm"
+            >
+              <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
+              <span>+ Join Pool</span>
+            </button>
+          </div>
         </div>
 
-        {/* Search Bar & Fast Toggles */}
+        {/* Search Bar & District Filters */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
           <div className="sm:col-span-6 relative">
             <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -435,154 +650,432 @@ export const EventStaffTalentPool: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Candidate Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredStaff.map((staff) => {
-          const roleMeta = ROLE_LABELS[staff.primaryRole] || { en: staff.primaryRole, ne: '', icon: '👤' };
-          const availMeta = AVAILABILITY_LABELS[staff.availabilityType] || { en: staff.availabilityType, ne: '' };
+      {/* 3. DYNAMIC CANDIDATE LISTINGS BASED ON VIEW DENSITY */}
 
-          return (
-            <div
-              key={staff.id}
-              className="bg-white rounded-3xl border border-stone-200 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group"
-            >
-              <div>
-                {/* Photo & Status Banner */}
-                <div className="relative h-48 overflow-hidden bg-stone-100">
-                  <img
-                    src={staff.photo}
-                    alt={staff.fullName}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      {/* VIEW 1: SMALL ICONS / DENSE LIST (DEFAULT) */}
+      {viewDensity === 'SMALL' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+          {filteredStaff.map((staff) => {
+            const roleMeta = ROLE_LABELS[staff.primaryRole] || { en: staff.primaryRole, ne: '', icon: '👤' };
+            const isSelected = selectedStaffIds.includes(staff.id);
+            const wage = staff.expectedWageNpr || statutoryRules.minDailyShiftWageNpr;
+
+            return (
+              <div
+                key={staff.id}
+                className={`p-3.5 bg-white rounded-2xl border transition-all flex items-center justify-between gap-3 relative group ${
+                  isSelected
+                    ? 'border-amber-700 ring-2 ring-amber-700/20 shadow-sm bg-amber-50/20'
+                    : 'border-stone-200/90 shadow-2xs hover:border-amber-400 hover:shadow-xs'
+                }`}
+              >
+                {/* Left: Checkbox + Small Icon Thumbnail + Basic Info */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleSelectStaff(staff.id)}
+                    className="w-4 h-4 rounded text-amber-900 border-stone-300 focus:ring-amber-500 cursor-pointer shrink-0"
+                    title="Select candidate for bulk hiring"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/20 to-transparent" />
 
-                  {/* Availability Live Badge */}
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                    {staff.isAvailableNow ? (
-                      <span className="px-2.5 py-1 bg-emerald-700/90 backdrop-blur-md rounded-lg text-[10px] font-bold text-white flex items-center gap-1.5 border border-emerald-400/30">
-                        <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
-                        <span>Available Now</span>
-                      </span>
-                    ) : (
-                      <span className="px-2.5 py-1 bg-stone-900/80 backdrop-blur-md rounded-lg text-[10px] font-bold text-stone-300">
-                        Shift Booked
-                      </span>
-                    )}
-
-                    {staff.nidOrCitizenshipVerified && (
-                      <span className="px-2 py-1 bg-stone-900/80 backdrop-blur-md rounded-lg text-[10px] font-bold text-amber-300 flex items-center gap-1 border border-white/20">
-                        <ShieldCheck className="w-3 h-3 text-amber-400" />
-                        <span>Verified</span>
-                      </span>
-                    )}
+                  {/* Small Avatar Icon (44x44px) */}
+                  <div className="relative w-11 h-11 shrink-0">
+                    <img
+                      src={staff.photo}
+                      alt={staff.fullName}
+                      className="w-11 h-11 rounded-xl object-cover border border-stone-200 shadow-2xs"
+                    />
+                    <span
+                      className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+                        staff.isAvailableNow ? 'bg-emerald-500 animate-pulse' : 'bg-stone-400'
+                      }`}
+                      title={staff.isAvailableNow ? 'Available Right Now' : 'Shift Booked'}
+                    />
                   </div>
 
-                  {/* Shift Counter Badge */}
-                  <div className="absolute top-3 right-3 px-2 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[11px] font-bold text-stone-900 shadow">
-                    {staff.totalShiftsCompleted} Shifts Done
-                  </div>
-
-                  {/* Name Overlay */}
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-display text-lg font-bold drop-shadow-sm">{staff.fullName}</h3>
-                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500 text-stone-950 text-xs font-bold shadow">
-                        <Star className="w-3 h-3 fill-stone-950 text-stone-950" />
-                        <span>{staff.rating.toFixed(1)}</span>
-                      </div>
+                  {/* Name, Role & Wage */}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h4 className="font-bold text-xs text-stone-900 truncate">
+                        {staff.fullName}
+                      </h4>
+                      {staff.nepaliName && (
+                        <span className="text-[10px] text-stone-500 truncate hidden sm:inline">
+                          ({staff.nepaliName})
+                        </span>
+                      )}
+                      {staff.nidOrCitizenshipVerified && (
+                        <span title="NID/Citizenship Verified">
+                          <ShieldCheck className="w-3 h-3 text-amber-700 shrink-0" />
+                        </span>
+                      )}
                     </div>
-                    {staff.nepaliName && (
-                      <span className="text-xs text-stone-300 block">{staff.nepaliName}</span>
-                    )}
-                  </div>
-                </div>
 
-                {/* Content */}
-                <div className="p-4 space-y-3 text-xs">
-                  {/* Role & Availability pills */}
-                  <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-950 font-bold text-[11px] border border-amber-200/80 flex items-center gap-1">
+                    {/* Role Tag */}
+                    <div className="text-[11px] text-stone-600 font-medium flex items-center gap-1 truncate mt-0.5">
                       <span>{roleMeta.icon}</span>
-                      <span>{roleMeta.en}</span>
-                    </span>
-                    <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-[10px] font-semibold">
-                      {availMeta.en}
-                    </span>
-                  </div>
-
-                  {/* Wage & Shift */}
-                  <div className="flex items-center justify-between pt-1 border-t border-stone-100 text-stone-600">
-                    <div>
-                      <span className="text-[10px] text-stone-400 uppercase block font-semibold">Expected Wage</span>
-                      <strong className="text-stone-900 text-sm font-display">
-                        NPR {staff.expectedWageNpr.toLocaleString()}
-                      </strong>
-                      <span className="text-[10px] text-stone-500">
-                        {staff.wageType === 'PER_SHIFT' ? ' / shift' : staff.wageType === 'MONTHLY' ? ' / mo' : ' / hr'}
-                      </span>
+                      <span className="truncate">{staff.customRoleName || roleMeta.en}</span>
+                      {staff.customRoleName && (
+                        <span className="px-1.5 py-0.2 rounded text-[9px] bg-amber-100 text-amber-900 font-bold border border-amber-300">
+                          नयाँ विधा
+                        </span>
+                      )}
                     </div>
 
-                    <div className="text-right">
-                      <span className="text-[10px] text-stone-400 uppercase block font-semibold">Location</span>
-                      <span className="font-semibold text-stone-800 flex items-center gap-1 justify-end">
-                        <MapPin className="w-3 h-3 text-amber-800" />
+                    {/* Wage & Statutory Badge */}
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="text-[11px] font-bold text-amber-950 font-display">
+                        NPR {wage.toLocaleString()}
+                        <span className="text-[10px] text-stone-500 font-normal">
+                          {staff.wageType === 'PER_SHIFT' ? '/shift' : staff.wageType === 'MONTHLY' ? '/mo' : '/hr'}
+                        </span>
+                      </span>
+
+                      {staff.isGovtStatutoryWage && (
+                        <span className="px-1.5 py-0.2 rounded text-[9px] bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200">
+                          🇳🇵 श्रम ऐन न्यूनतम
+                        </span>
+                      )}
+
+                      <span className="text-[10px] text-stone-400 flex items-center gap-0.5">
+                        <MapPin className="w-2.5 h-2.5 text-stone-400" />
                         <span>{staff.district}</span>
                       </span>
                     </div>
                   </div>
+                </div>
 
-                  {/* Short Bio */}
-                  <p className="text-stone-600 line-clamp-2 leading-relaxed text-[11px]">
-                    {staff.bio}
-                  </p>
+                {/* Right: Rating & Quick Actions */}
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-950 text-[10px] font-bold">
+                    <Star className="w-2.5 h-2.5 fill-amber-700 text-amber-700" />
+                    <span>{staff.rating.toFixed(1)}</span>
+                    <span className="text-stone-400 font-normal">({staff.totalShiftsCompleted})</span>
+                  </div>
 
-                  {/* Skills tags */}
-                  <div className="flex flex-wrap gap-1 pt-1">
-                    {staff.secondarySkills.slice(0, 3).map((skill, idx) => (
-                      <span key={idx} className="px-2 py-0.5 bg-stone-50 text-stone-600 rounded text-[10px] border border-stone-200">
-                        {skill}
-                      </span>
-                    ))}
+                  <div className="flex items-center gap-1">
+                    <WhatsAppViberButtons
+                      phone={staff.whatsapp || staff.phone}
+                      messageText={`Namaste ${staff.fullName}! We found your profile on UTSAVO. We have an upcoming event shift and would like to hire you.`}
+                      variant="badges"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedStaffForDossier(staff);
+                        setIsReviewFormOpen(false);
+                      }}
+                      className="p-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs transition-colors"
+                      title="View Dossier & Reviews"
+                    >
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               </div>
+            );
+          })}
+        </div>
+      )}
 
-              {/* Action Buttons */}
-              <div className="p-4 pt-0 border-t border-stone-100 mt-2 space-y-2">
-                <div className="flex items-center justify-between text-[11px] text-stone-500 pt-2">
-                  <span>{staff.reviews.length} Verified Reviews</span>
+      {/* VIEW 2: MEDIUM CARDS */}
+      {viewDensity === 'MEDIUM' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredStaff.map((staff) => {
+            const roleMeta = ROLE_LABELS[staff.primaryRole] || { en: staff.primaryRole, ne: '', icon: '👤' };
+            const availMeta = AVAILABILITY_LABELS[staff.availabilityType] || { en: staff.availabilityType, ne: '' };
+            const isSelected = selectedStaffIds.includes(staff.id);
+            const wage = staff.expectedWageNpr || statutoryRules.minDailyShiftWageNpr;
+
+            return (
+              <div
+                key={staff.id}
+                className={`bg-white rounded-3xl border transition-all p-4 flex flex-col justify-between group ${
+                  isSelected
+                    ? 'border-amber-700 ring-2 ring-amber-700/20 shadow-md bg-amber-50/15'
+                    : 'border-stone-200 shadow-xs hover:shadow-md'
+                }`}
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelectStaff(staff.id)}
+                        className="w-4 h-4 rounded text-amber-900 border-stone-300 focus:ring-amber-500 cursor-pointer shrink-0"
+                      />
+
+                      <div className="relative w-14 h-14 shrink-0">
+                        <img
+                          src={staff.photo}
+                          alt={staff.fullName}
+                          className="w-14 h-14 rounded-2xl object-cover border border-stone-200 shadow-xs"
+                        />
+                        <span
+                          className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white ${
+                            staff.isAvailableNow ? 'bg-emerald-500 animate-pulse' : 'bg-stone-400'
+                          }`}
+                        />
+                      </div>
+
+                      <div>
+                        <h4 className="font-bold text-sm text-stone-900">{staff.fullName}</h4>
+                        {staff.nepaliName && (
+                          <span className="text-xs text-stone-500 block">{staff.nepaliName}</span>
+                        )}
+                        <span className="text-[11px] text-stone-500 flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-amber-800" />
+                          <span>{staff.district}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-100 text-amber-950 text-xs font-bold shadow-2xs">
+                      <Star className="w-3 h-3 fill-amber-700 text-amber-700" />
+                      <span>{staff.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+
+                  {/* Role, Availability & Wage */}
+                  <div className="mt-3.5 pt-3 border-t border-stone-100 space-y-2 text-xs">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-950 font-bold text-[11px] border border-amber-200/80 flex items-center gap-1">
+                        <span>{roleMeta.icon}</span>
+                        <span>{staff.customRoleName || roleMeta.en}</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-[10px] font-semibold">
+                        {availMeta.en}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 text-stone-600">
+                      <div>
+                        <span className="text-[10px] text-stone-400 uppercase block font-semibold">Expected Wage</span>
+                        <strong className="text-stone-900 text-sm font-display">
+                          NPR {wage.toLocaleString()}
+                        </strong>
+                        <span className="text-[10px] text-stone-500">
+                          {staff.wageType === 'PER_SHIFT' ? ' / shift' : staff.wageType === 'MONTHLY' ? ' / mo' : ' / hr'}
+                        </span>
+                      </div>
+
+                      {staff.isGovtStatutoryWage && (
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200">
+                          🇳🇵 श्रम ऐन न्यूनतम
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Bio snippet */}
+                    <p className="text-stone-600 line-clamp-2 text-[11px] leading-relaxed">
+                      {staff.bio}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
                   <button
+                    type="button"
                     onClick={() => {
                       setSelectedStaffForDossier(staff);
                       setIsReviewFormOpen(false);
                     }}
-                    className="text-amber-800 font-bold hover:underline flex items-center gap-1"
+                    className="text-xs text-amber-900 font-bold hover:underline"
                   >
-                    <span>View Dossier & Reviews</span>
-                    <ChevronRight className="w-3 h-3" />
+                    View Dossier ({staff.reviews.length})
                   </button>
-                </div>
 
-                <div className="flex items-center gap-2 pt-1">
-                  <WhatsAppViberButtons
-                    phone={staff.whatsapp || staff.phone}
-                    messageText={`Namaste ${staff.fullName}! We found your profile on the UTSAVO Celebration Staff Pool. We have an upcoming event shift and would like to check your availability.`}
-                    variant="badges"
-                  />
-                  <a
-                    href={`tel:${staff.phone}`}
-                    className="flex-1 py-2 px-3 bg-stone-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1"
-                  >
-                    <Phone className="w-3 h-3 text-amber-400" />
-                    <span>Call Candidate</span>
-                  </a>
+                  <div className="flex items-center gap-1.5">
+                    <WhatsAppViberButtons
+                      phone={staff.whatsapp || staff.phone}
+                      messageText={`Namaste ${staff.fullName}! We found your profile on UTSAVO. We have an upcoming event shift.`}
+                      variant="badges"
+                    />
+                    <a
+                      href={`tel:${staff.phone}`}
+                      className="p-2 bg-stone-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all"
+                      title="Call Candidate"
+                    >
+                      <Phone className="w-3 h-3 text-amber-400" />
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
+      {/* VIEW 3: LARGE DETAILED CARDS */}
+      {viewDensity === 'LARGE' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredStaff.map((staff) => {
+            const roleMeta = ROLE_LABELS[staff.primaryRole] || { en: staff.primaryRole, ne: '', icon: '👤' };
+            const availMeta = AVAILABILITY_LABELS[staff.availabilityType] || { en: staff.availabilityType, ne: '' };
+            const isSelected = selectedStaffIds.includes(staff.id);
+            const wage = staff.expectedWageNpr || statutoryRules.minDailyShiftWageNpr;
+
+            return (
+              <div
+                key={staff.id}
+                className={`bg-white rounded-3xl border transition-all overflow-hidden flex flex-col justify-between group ${
+                  isSelected
+                    ? 'border-amber-700 ring-2 ring-amber-700/20 shadow-lg bg-amber-50/10'
+                    : 'border-stone-200 shadow-xs hover:shadow-md'
+                }`}
+              >
+                <div>
+                  {/* Photo Header Banner */}
+                  <div className="relative h-48 overflow-hidden bg-stone-100">
+                    <img
+                      src={staff.photo}
+                      alt={staff.fullName}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/20 to-transparent" />
+
+                    {/* Top Checkbox & Availability */}
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <div className="p-1.5 bg-white/90 backdrop-blur-md rounded-lg flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelectStaff(staff.id)}
+                          className="w-4 h-4 rounded text-amber-900 border-stone-300 focus:ring-amber-500 cursor-pointer"
+                        />
+                      </div>
+
+                      {staff.isAvailableNow ? (
+                        <span className="px-2.5 py-1 bg-emerald-700/90 backdrop-blur-md rounded-lg text-[10px] font-bold text-white flex items-center gap-1.5 border border-emerald-400/30">
+                          <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+                          <span>Available Now</span>
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-1 bg-stone-900/80 backdrop-blur-md rounded-lg text-[10px] font-bold text-stone-300">
+                          Shift Booked
+                        </span>
+                      )}
+
+                      {staff.nidOrCitizenshipVerified && (
+                        <span className="px-2 py-1 bg-stone-900/80 backdrop-blur-md rounded-lg text-[10px] font-bold text-amber-300 flex items-center gap-1 border border-white/20">
+                          <ShieldCheck className="w-3 h-3 text-amber-400" />
+                          <span>Verified</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="absolute top-3 right-3 px-2 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[11px] font-bold text-stone-900 shadow">
+                      {staff.totalShiftsCompleted} Shifts Done
+                    </div>
+
+                    <div className="absolute bottom-3 left-3 right-3 text-white">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-display text-lg font-bold drop-shadow-sm">{staff.fullName}</h3>
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500 text-stone-950 text-xs font-bold shadow">
+                          <Star className="w-3 h-3 fill-stone-950 text-stone-950" />
+                          <span>{staff.rating.toFixed(1)}</span>
+                        </div>
+                      </div>
+                      {staff.nepaliName && (
+                        <span className="text-xs text-stone-300 block">{staff.nepaliName}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="p-5 space-y-3.5 text-xs">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-950 font-bold text-[11px] border border-amber-200/80 flex items-center gap-1">
+                        <span>{roleMeta.icon}</span>
+                        <span>{staff.customRoleName || roleMeta.en}</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-[10px] font-semibold">
+                        {availMeta.en}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 border-t border-stone-100 text-stone-600">
+                      <div>
+                        <span className="text-[10px] text-stone-400 uppercase block font-semibold">Expected Wage</span>
+                        <strong className="text-stone-900 text-sm font-display">
+                          NPR {wage.toLocaleString()}
+                        </strong>
+                        <span className="text-[10px] text-stone-500">
+                          {staff.wageType === 'PER_SHIFT' ? ' / shift' : staff.wageType === 'MONTHLY' ? ' / mo' : ' / hr'}
+                        </span>
+                      </div>
+
+                      {staff.isGovtStatutoryWage && (
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200">
+                          🇳🇵 श्रम ऐन २०७४ न्यूनतम पारिश्रमिक
+                        </span>
+                      )}
+
+                      <div className="text-right">
+                        <span className="text-[10px] text-stone-400 uppercase block font-semibold">Location</span>
+                        <span className="font-semibold text-stone-800 flex items-center gap-1 justify-end">
+                          <MapPin className="w-3 h-3 text-amber-800" />
+                          <span>{staff.district}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-stone-600 leading-relaxed text-xs">
+                      {staff.bio}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {staff.secondarySkills.map((skill, idx) => (
+                        <span key={idx} className="px-2 py-0.5 bg-stone-50 text-stone-600 rounded text-[10px] border border-stone-200">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Large Card Actions */}
+                <div className="p-5 pt-0 border-t border-stone-100 mt-2 space-y-2">
+                  <div className="flex items-center justify-between text-[11px] text-stone-500 pt-2">
+                    <span>{staff.reviews.length} Verified Reviews</span>
+                    <button
+                      onClick={() => {
+                        setSelectedStaffForDossier(staff);
+                        setIsReviewFormOpen(false);
+                      }}
+                      className="text-amber-800 font-bold hover:underline flex items-center gap-1"
+                    >
+                      <span>View Full Dossier</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-1">
+                    <WhatsAppViberButtons
+                      phone={staff.whatsapp || staff.phone}
+                      messageText={`Namaste ${staff.fullName}! We found your profile on UTSAVO. We have an upcoming event shift.`}
+                      variant="badges"
+                    />
+                    <a
+                      href={`tel:${staff.phone}`}
+                      className="flex-1 py-2.5 px-3 bg-stone-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Call Directly</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Empty State */}
       {filteredStaff.length === 0 && (
         <div className="p-12 text-center bg-stone-50 rounded-3xl border border-dashed border-stone-300 space-y-3">
           <Briefcase className="w-10 h-10 text-stone-400 mx-auto" />
@@ -599,49 +1092,219 @@ export const EventStaffTalentPool: React.FC = () => {
               setOnlyAvailableNow(false);
               setMinRating(0);
             }}
-            className="px-4 py-2 bg-amber-900 text-white rounded-xl text-xs font-semibold"
+            className="px-4 py-2 bg-stone-900 text-white rounded-xl text-xs font-bold hover:bg-black"
           >
             Reset Filters
           </button>
         </div>
       )}
 
-      {/* ======================================================== */}
-      {/* MODAL 1: CANDIDATE REGISTRATION (UNRESTRICTED)           */}
-      {/* ======================================================== */}
-      {isRegisterModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden my-8 max-h-[90vh] flex flex-col">
-            
-            {/* Header */}
-            <div className="p-6 bg-gradient-to-r from-stone-950 via-stone-900 to-amber-950 text-white flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400">
-                  <Briefcase className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-display text-xl font-bold">
-                    Register for Event Jobs & Gigs (उत्सव जनशक्ति दर्ता)
-                  </h3>
-                  <p className="text-xs text-stone-300">
-                    Join Nepal's shared celebration workforce. Available for banquet servers, kitchen staff, ushers, and decorators.
-                  </p>
-                </div>
+      {/* 4. FIXED FLOATING BULK SELECTION DOCK FOR VENDORS */}
+      {selectedStaffIds.length > 0 && (
+        <div className="fixed bottom-4 inset-x-4 max-w-4xl mx-auto z-40 bg-stone-950/95 backdrop-blur-md text-white p-3 sm:p-4 rounded-2xl border border-stone-700 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-3 animate-slide-up">
+          <div className="flex items-center gap-3">
+            <span className="px-3 py-1 bg-amber-500 text-stone-950 rounded-xl font-bold text-xs shrink-0">
+              {selectedStaffIds.length} Staff Selected
+            </span>
+            <div className="text-xs text-stone-300">
+              <span>Total Shift Cost Est: </span>
+              <strong className="text-white text-sm font-display">
+                NPR {totalSelectedShiftCost.toLocaleString()}
+              </strong>
+              <span className="text-[10px] text-amber-400 block sm:inline sm:ml-1 font-semibold">
+                (🇳🇵 Statutory Minimum Compliant)
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setIsBulkShiftModalOpen(true)}
+              className="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white rounded-xl text-xs font-bold transition-all shadow flex items-center justify-center gap-1.5"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Book / Send Collective Shift Offer</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setSelectedStaffIds([])}
+              className="px-3 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 rounded-xl text-xs font-semibold transition-colors"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 5. COLLECTIVE SHIFT BOOKING MODAL FOR MULTI-SELECTED VENDORS */}
+      {isBulkShiftModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-stone-200 p-6 space-y-5">
+            <div className="flex items-start justify-between border-b border-stone-100 pb-3">
+              <div>
+                <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider">
+                  Bulk Shift Dispatch (थोक सिफ्ट अफर)
+                </span>
+                <h3 className="font-display text-xl font-bold text-stone-900 mt-0.5">
+                  Hire {selectedStaffIds.length} Celebration Staff Members
+                </h3>
               </div>
               <button
-                onClick={() => setIsRegisterModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-stone-300 hover:text-white"
+                onClick={() => setIsBulkShiftModalOpen(false)}
+                className="p-1 rounded-full text-stone-400 hover:text-stone-700"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Form */}
-            <form onSubmit={handleRegisterSubmit} className="p-6 overflow-y-auto space-y-4 text-xs flex-1">
+            {/* Selected Candidates Summary Chips */}
+            <div>
+              <label className="text-xs font-bold text-stone-700 block mb-2">
+                Selected Team Members ({selectedStaffObjects.length}):
+              </label>
+              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 bg-stone-50 rounded-xl border border-stone-200">
+                {selectedStaffObjects.map((s) => (
+                  <span
+                    key={s.id}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg border border-stone-200 text-xs font-medium text-stone-800 shadow-2xs"
+                  >
+                    <img src={s.photo} alt={s.fullName} className="w-4 h-4 rounded-full object-cover" />
+                    <span>{s.fullName}</span>
+                    <span className="text-[10px] text-amber-800">
+                      (NPR {s.expectedWageNpr || statutoryRules.minDailyShiftWageNpr})
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Form Fields for Shift Dispatch */}
+            <div className="space-y-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">
+                    Event Date (मिति BS)
+                  </label>
+                  <input
+                    type="text"
+                    value={bulkShiftDateBS}
+                    onChange={(e) => setBulkShiftDateBS(e.target.value)}
+                    placeholder="e.g. 2081 Mangsir 20"
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-stone-700 mb-1">
+                    Shift Time (सिफ्ट)
+                  </label>
+                  <select
+                    value={bulkShiftTime}
+                    onChange={(e) => setBulkShiftTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white"
+                  >
+                    <option value="EVENING">Evening Shift (3:00 PM - 11:00 PM)</option>
+                    <option value="MORNING">Morning Shift (7:00 AM - 3:00 PM)</option>
+                    <option value="FULL_DAY">Full Day (8:00 AM - 10:00 PM)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">
+                  Venue / Party Palace Name
+                </label>
+                <input
+                  type="text"
+                  value={bulkVenueName}
+                  onChange={(e) => setBulkVenueName(e.target.value)}
+                  placeholder="e.g. The Regal Pavilion, Kathmandu"
+                  className="w-full px-3 py-2 rounded-xl border border-stone-300"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">
+                  Shift Instructions & Dress Code Notes
+                </label>
+                <textarea
+                  rows={2}
+                  value={bulkShiftNotes}
+                  onChange={(e) => setBulkShiftNotes(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-stone-300"
+                />
+              </div>
+
+              {/* Statutory Wage Guarantee Notice */}
+              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-950 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0" />
+                <span>
+                  <strong>Nepal Labour Act 2074 Statutory Compliance:</strong> Total shift payroll is NPR {totalSelectedShiftCost.toLocaleString()} (Min NPR {statutoryRules.minDailyShiftWageNpr}/shift per worker guaranteed).
+                </span>
+              </div>
+            </div>
+
+            {bulkDispatchSuccess ? (
+              <div className="p-3 bg-emerald-100 text-emerald-900 rounded-xl text-xs font-bold text-center">
+                ✓ Shift invitation dispatched successfully to team members!
+              </div>
+            ) : (
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+                <button
+                  type="button"
+                  onClick={() => setIsBulkShiftModalOpen(false)}
+                  className="px-4 py-2 text-stone-600 hover:text-stone-900 text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBulkWhatsAppDispatch}
+                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-xs shadow flex items-center gap-2"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Send WhatsApp Shift Dispatch to Team</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 6. CANDIDATE REGISTRATION MODAL (WITH OPTIONAL WAGE & "OTHER" CUSTOM CATEGORY PROPOSAL) */}
+      {isRegisterModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-stone-200 p-6 sm:p-8 space-y-6">
+            
+            <div className="flex items-start justify-between border-b border-stone-100 pb-4">
+              <div>
+                <span className="text-xs font-bold text-amber-800 uppercase tracking-wider">
+                  Open Workforce Registration (खुला जनशक्ति दर्ता)
+                </span>
+                <h3 className="font-display text-2xl font-bold text-stone-900 mt-1">
+                  Join the UTSAVO Celebration Workforce Pool
+                </h3>
+                <p className="text-xs text-stone-500 mt-1">
+                  Full-time, part-time & weekend event gigs across Nepal. No restrictions on candidate numbers.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsRegisterModalOpen(false)}
+                className="p-1 rounded-full text-stone-400 hover:text-stone-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleRegisterSubmit} className="space-y-4 text-xs">
+              
+              {/* Names */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">
-                    Full Name (पूरा नाम) *
+                    Full Name (English) *
                   </label>
                   <input
                     type="text"
@@ -666,6 +1329,7 @@ export const EventStaffTalentPool: React.FC = () => {
                 </div>
               </div>
 
+              {/* Contacts */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">
@@ -725,87 +1389,186 @@ export const EventStaffTalentPool: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">
-                    Primary Event Role *
-                  </label>
-                  <select
-                    value={primaryRole}
-                    onChange={(e) => setPrimaryRole(e.target.value as EventStaffGigRole)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  >
-                    {Object.entries(ROLE_LABELS).map(([key, val]) => (
-                      <option key={key} value={key}>
-                        {val.icon} {val.en} ({val.ne})
-                      </option>
-                    ))}
-                  </select>
+              {/* Role Selection & "OTHER" Category Proposal */}
+              <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">
+                      Primary Event Role / Category *
+                    </label>
+                    <select
+                      value={primaryRole}
+                      onChange={(e) => {
+                        const val = e.target.value as EventStaffGigRole;
+                        setPrimaryRole(val);
+                        if (val === 'OTHER_EVENT_STAFF') {
+                          setIsCustomRoleSelected(true);
+                        } else {
+                          setIsCustomRoleSelected(false);
+                        }
+                      }}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    >
+                      {Object.entries(ROLE_LABELS).map(([key, val]) => (
+                        <option key={key} value={key}>
+                          {val.icon} {val.en} ({val.ne})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">
+                      Availability / Job Type *
+                    </label>
+                    <select
+                      value={availabilityType}
+                      onChange={(e) => setAvailabilityType(e.target.value as EmploymentAvailabilityType)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    >
+                      {Object.entries(AVAILABILITY_LABELS).map(([key, val]) => (
+                        <option key={key} value={key}>
+                          {val.en} ({val.ne})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">
-                    Availability / Job Type *
-                  </label>
-                  <select
-                    value={availabilityType}
-                    onChange={(e) => setAvailabilityType(e.target.value as EmploymentAvailabilityType)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                  >
-                    <option value="WEEKEND_GIGS">Weekend Wedding Gigs (शनिबार/बिदाको गिग)</option>
-                    <option value="PART_TIME">Part-Time (अंशकालीन)</option>
-                    <option value="FULL_TIME">Full-Time (पूर्णकालीन)</option>
-                    <option value="ON_CALL_DAILY">On-Call Daily (दैनिक आवश्यकतामा)</option>
-                  </select>
-                </div>
+                {/* OTHER Category Details Input - informs Admin Console */}
+                {(isCustomRoleSelected || primaryRole === 'OTHER_EVENT_STAFF') && (
+                  <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-200 space-y-3 animate-fade-in">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-amber-950">
+                      <Sparkles className="w-4 h-4 text-amber-700" />
+                      <span>Propose New Category / फरक अनुभव विधा दर्ता गर्नुहोस्:</span>
+                    </div>
+                    <p className="text-[11px] text-amber-900 leading-relaxed">
+                      तपाईंसँग माथि उल्लिखित भन्दा फरक उत्सव अनुभव छ भने यहाँ नयाँ विधा खुलाउनुहोस्। यसले एडमिनलाई प्रणालीमा नयाँ विधा थप्न सहयोग गर्दछ।
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-semibold text-amber-950 mb-1">
+                          Proposed Category Name (English) *
+                        </label>
+                        <input
+                          type="text"
+                          required={primaryRole === 'OTHER_EVENT_STAFF'}
+                          value={customRoleTitle}
+                          onChange={(e) => setCustomRoleTitle(e.target.value)}
+                          placeholder="e.g. Traditional Aila Pourer, Live Paan Maker, Playzone Nanny"
+                          className="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-semibold text-amber-950 mb-1">
+                          Category Name in Nepali (नेपाली नाम)
+                        </label>
+                        <input
+                          type="text"
+                          value={customRoleNepaliTitle}
+                          onChange={(e) => setCustomRoleNepaliTitle(e.target.value)}
+                          placeholder="उदा: परम्परागत ऐला सत्कार, शाही पान कारीगर"
+                          className="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-semibold text-amber-950 mb-1">
+                        Explain Your Different Experience (फरक अनुभवको विवरण)
+                      </label>
+                      <input
+                        type="text"
+                        value={customRoleDescription}
+                        onChange={(e) => setCustomRoleDescription(e.target.value)}
+                        placeholder="e.g. 5 years experience serving authentic Newari ceremonial drinks or kid play supervision."
+                        className="w-full px-3 py-2 rounded-xl border border-amber-300 bg-white"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">
-                    Preferred Shift
-                  </label>
-                  <select
-                    value={shiftPreference}
-                    onChange={(e) => setShiftPreference(e.target.value as StaffShiftPreference)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white"
-                  >
-                    <option value="EVENING_SHIFT">Evening Shift (साँझको सिफ्ट)</option>
-                    <option value="MORNING_SHIFT">Morning Shift (बिहानी सिफ्ट)</option>
-                    <option value="FULL_DAY">Full Day (पूरा दिन)</option>
-                    <option value="ANY_FLEXIBLE">Any Flexible (जुनसुकै समय)</option>
-                  </select>
+              {/* WAGE SECTION: OPTIONAL WITH NEPAL GOVT STATUTORY MINIMUM RULE */}
+              <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-950">
+                    <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                    <span>Wage Rate & Statutory Protections (पारिश्रमिक तथा सरकारी मापदण्ड)</span>
+                  </div>
+                  <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                    Optional / ऐच्छिक
+                  </span>
                 </div>
 
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">
-                    Expected Wage (NPR रु.) *
-                  </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">
+                      Expected Wage (NPR रु.)
+                    </label>
+                    <input
+                      type="number"
+                      value={expectedWageInput}
+                      onChange={(e) => {
+                        setExpectedWageInput(e.target.value);
+                        if (e.target.value) setUseStatutoryWageRule(false);
+                      }}
+                      placeholder={`Min रू. ${statutoryRules.minDailyShiftWageNpr}`}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">
+                      Wage Frequency
+                    </label>
+                    <select
+                      value={wageType}
+                      onChange={(e) => setWageType(e.target.value as any)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-xs"
+                    >
+                      <option value="PER_SHIFT">Per Shift (प्रति सिफ्ट)</option>
+                      <option value="PER_HOUR">Per Hour (प्रति घण्टा)</option>
+                      <option value="MONTHLY">Monthly Salary (मासिक)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-stone-700 mb-1">
+                      Preferred Shift
+                    </label>
+                    <select
+                      value={shiftPreference}
+                      onChange={(e) => setShiftPreference(e.target.value as StaffShiftPreference)}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-xs"
+                    >
+                      <option value="EVENING_SHIFT">Evening Shift (साँझ)</option>
+                      <option value="MORNING_SHIFT">Morning Shift (बिहान)</option>
+                      <option value="FULL_DAY">Full Day (पूरा दिन)</option>
+                      <option value="ANY_FLEXIBLE">Any Flexible (जुनसुकै)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Statutory Minimum Wage Checkbox Rule */}
+                <label className="flex items-start gap-2 cursor-pointer p-2 rounded-xl bg-white border border-emerald-200 text-[11px] text-emerald-950">
                   <input
-                    type="number"
-                    required
-                    value={expectedWageNpr}
-                    onChange={(e) => setExpectedWageNpr(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300"
+                    type="checkbox"
+                    checked={useStatutoryWageRule}
+                    onChange={(e) => {
+                      setUseStatutoryWageRule(e.target.checked);
+                      if (e.target.checked) setExpectedWageInput('');
+                    }}
+                    className="mt-0.5 rounded border-emerald-400 text-emerald-800 focus:ring-emerald-500 w-4 h-4"
                   />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">
-                    Wage Frequency
-                  </label>
-                  <select
-                    value={wageType}
-                    onChange={(e) => setWageType(e.target.value as any)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white"
-                  >
-                    <option value="PER_SHIFT">Per Shift (प्रति सिफ्ट)</option>
-                    <option value="PER_HOUR">Per Hour (प्रति घण्टा)</option>
-                    <option value="MONTHLY">Monthly Salary (मासिक)</option>
-                  </select>
-                </div>
+                  <span>
+                    <strong>नेपाल सरकारको वैधानिक न्यूनतम पारिश्रमिक मापदण्ड लागू गर्नुहोस्:</strong> यदि पारिश्रमिक नतोकेमा श्रम ऐन २०७४ अनुसार (रू. {statutoryRules.minDailyShiftWageNpr}/सिफ्ट वा रू. {statutoryRules.minMonthlyWageNpr.toLocaleString()}/महिना) स्वतः सुरक्षित कायम हुनेछ।
+                  </span>
+                </label>
               </div>
 
+              {/* District & Location */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block font-semibold text-stone-700 mb-1">
@@ -839,7 +1602,7 @@ export const EventStaffTalentPool: React.FC = () => {
 
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">
-                  Short Bio & Work Experience Summary *
+                  Short Bio & Work Strengths *
                 </label>
                 <textarea
                   rows={2}
@@ -898,10 +1661,10 @@ export const EventStaffTalentPool: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl font-bold shadow-md flex items-center gap-2"
+                    className="px-6 py-2.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl font-bold shadow-md transition-all flex items-center gap-2"
                   >
-                    <CheckCircle2 className="w-4 h-4" />
-                    <span>Join Talent Pool</span>
+                    <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                    <span>Complete Registration (दर्ता गर्नुहोस्)</span>
                   </button>
                 </div>
               </div>
@@ -910,158 +1673,168 @@ export const EventStaffTalentPool: React.FC = () => {
         </div>
       )}
 
-      {/* ======================================================== */}
-      {/* MODAL 2: CANDIDATE DOSSIER, REVIEWS & RATING ENGINE      */}
-      {/* ======================================================== */}
+      {/* 7. CANDIDATE DOSSIER & VERIFIED REVIEWS MODAL */}
       {selectedStaffForDossier && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
-          <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden my-8 max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-stone-200 flex flex-col">
             
-            {/* Header */}
-            <div className="p-6 bg-gradient-to-r from-stone-950 to-stone-900 text-white flex items-start justify-between shrink-0">
-              <div className="flex items-start gap-4">
-                <div className="relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-amber-400 shrink-0">
-                  <img src={selectedStaffForDossier.photo} alt={selectedStaffForDossier.fullName} className="w-full h-full object-cover" />
-                </div>
+            {/* Header with Photo & Quick Stats */}
+            <div className="p-6 bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-white flex items-start justify-between gap-4 shrink-0">
+              <div className="flex items-center gap-4">
+                <img
+                  src={selectedStaffForDossier.photo}
+                  alt={selectedStaffForDossier.fullName}
+                  className="w-16 h-16 rounded-2xl object-cover border-2 border-amber-400/50 shadow"
+                />
                 <div>
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
                     <h3 className="font-display text-xl font-bold">{selectedStaffForDossier.fullName}</h3>
-                    {selectedStaffForDossier.nepaliName && (
-                      <span className="text-sm text-stone-300">({selectedStaffForDossier.nepaliName})</span>
+                    {selectedStaffForDossier.nidOrCitizenshipVerified && (
+                      <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-400/30">
+                        NID Verified
+                      </span>
                     )}
-                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-stone-950 text-xs font-extrabold flex items-center gap-1 shadow">
-                      <Star className="w-3.5 h-3.5 fill-stone-950" />
-                      <span>{selectedStaffForDossier.rating.toFixed(1)}</span>
-                    </span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-stone-300 mt-1">
-                    <span>{ROLE_LABELS[selectedStaffForDossier.primaryRole]?.en}</span>
-                    <span>·</span>
-                    <span>{selectedStaffForDossier.district}</span>
-                    <span>·</span>
-                    <span>{selectedStaffForDossier.experienceYears} Years Experience</span>
-                  </div>
+                  {selectedStaffForDossier.nepaliName && (
+                    <span className="text-xs text-stone-300 block">{selectedStaffForDossier.nepaliName}</span>
+                  )}
+                  <span className="text-xs text-amber-200 mt-1 block font-medium">
+                    {selectedStaffForDossier.customRoleName || ROLE_LABELS[selectedStaffForDossier.primaryRole]?.en} · {selectedStaffForDossier.district}
+                  </span>
                 </div>
               </div>
 
               <button
                 onClick={() => setSelectedStaffForDossier(null)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-stone-300 hover:text-white"
+                className="p-1 rounded-full text-stone-400 hover:text-white"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Success alert */}
-            {reviewSuccessMsg && (
-              <div className="p-3 bg-emerald-50 border-b border-emerald-200 text-emerald-900 text-xs font-semibold flex items-center gap-2 px-6">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Thank you! Your verified rating and review has been added to this worker's profile.</span>
-              </div>
-            )}
-
-            {/* Scrollable Body */}
-            <div className="p-6 overflow-y-auto space-y-6 text-xs flex-1">
+            {/* Scrollable Dossier Content */}
+            <div className="p-6 space-y-6 overflow-y-auto text-xs">
               
-              {/* Quick specs */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-stone-50 rounded-2xl border border-stone-200">
-                <div>
-                  <span className="text-[10px] text-stone-400 uppercase font-semibold block">Availability</span>
-                  <strong className="text-stone-900 font-medium">
-                    {AVAILABILITY_LABELS[selectedStaffForDossier.availabilityType]?.en}
-                  </strong>
-                </div>
-                <div>
-                  <span className="text-[10px] text-stone-400 uppercase font-semibold block">Expected Wage</span>
-                  <strong className="text-stone-900 font-display text-sm">
-                    NPR {selectedStaffForDossier.expectedWageNpr.toLocaleString()}
-                  </strong>
-                  <span className="text-[10px] text-stone-500 block">
-                    {selectedStaffForDossier.wageType === 'PER_SHIFT' ? 'per shift' : 'monthly'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-stone-400 uppercase font-semibold block">Completed Shifts</span>
-                  <strong className="text-stone-900 font-display text-sm">
-                    {selectedStaffForDossier.totalShiftsCompleted} Events
-                  </strong>
-                </div>
-                <div>
-                  <span className="text-[10px] text-stone-400 uppercase font-semibold block">Live Status</span>
-                  <span className={`inline-flex items-center gap-1 font-bold ${selectedStaffForDossier.isAvailableNow ? 'text-emerald-700' : 'text-stone-500'}`}>
-                    <span className={`w-2 h-2 rounded-full ${selectedStaffForDossier.isAvailableNow ? 'bg-emerald-500' : 'bg-stone-400'}`} />
-                    <span>{selectedStaffForDossier.isAvailableNow ? 'Available Right Now' : 'Busy on Shift'}</span>
-                  </span>
-                </div>
-              </div>
-
-              {/* Bio & Skills */}
-              <div className="space-y-2">
-                <h4 className="font-bold text-stone-900 text-sm">Candidate Overview & Background</h4>
-                <p className="text-stone-600 leading-relaxed text-xs">
+              {/* Bio & Details Grid */}
+              <div className="space-y-3">
+                <h4 className="font-bold text-stone-900 uppercase tracking-wider text-[11px]">
+                  Professional Background
+                </h4>
+                <p className="text-stone-700 leading-relaxed text-sm bg-stone-50 p-3.5 rounded-2xl border border-stone-200">
                   {selectedStaffForDossier.bio}
                 </p>
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {selectedStaffForDossier.secondarySkills.map((sk, idx) => (
-                    <span key={idx} className="px-2.5 py-1 bg-amber-50 text-amber-900 rounded-lg text-xs font-medium border border-amber-200">
-                      {sk}
-                    </span>
-                  ))}
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-stone-600">
+                  <div className="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span className="text-[10px] text-stone-400 block font-semibold">Availability</span>
+                    <strong className="text-stone-900 font-bold">
+                      {AVAILABILITY_LABELS[selectedStaffForDossier.availabilityType]?.en}
+                    </strong>
+                  </div>
+                  <div className="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span className="text-[10px] text-stone-400 block font-semibold">Expected Wage</span>
+                    <strong className="text-stone-900 font-bold font-display">
+                      NPR {(selectedStaffForDossier.expectedWageNpr || statutoryRules.minDailyShiftWageNpr).toLocaleString()}
+                    </strong>
+                    {selectedStaffForDossier.isGovtStatutoryWage && (
+                      <span className="text-[9px] text-emerald-800 font-bold block">🇳🇵 श्रम ऐन न्यूनतम</span>
+                    )}
+                  </div>
+                  <div className="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span className="text-[10px] text-stone-400 block font-semibold">Experience</span>
+                    <strong className="text-stone-900 font-bold">
+                      {selectedStaffForDossier.experienceYears} Years
+                    </strong>
+                  </div>
+                  <div className="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                    <span className="text-[10px] text-stone-400 block font-semibold">Shifts Completed</span>
+                    <strong className="text-amber-900 font-bold font-display">
+                      {selectedStaffForDossier.totalShiftsCompleted} Shifts
+                    </strong>
+                  </div>
                 </div>
               </div>
 
-              {/* Past Venues */}
-              {selectedStaffForDossier.pastVenuesWorked && selectedStaffForDossier.pastVenuesWorked.length > 0 && (
-                <div className="space-y-1 pt-1">
-                  <span className="font-bold text-stone-800 text-xs">Past Venues & Banquet Halls Worked:</span>
-                  <p className="text-stone-600 text-xs">
-                    {selectedStaffForDossier.pastVenuesWorked.join(' · ')}
-                  </p>
+              {/* Skills and Past Venues */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-2">
+                  <span className="font-bold text-stone-900 block text-[11px] uppercase tracking-wider">
+                    Specialized Skills
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedStaffForDossier.secondarySkills.map((skill, idx) => (
+                      <span key={idx} className="px-2.5 py-1 bg-white text-stone-700 rounded-lg text-xs font-medium border border-stone-200">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              )}
 
-              {/* Reviews Section */}
-              <div className="space-y-4 pt-4 border-t border-stone-200">
+                <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-2">
+                  <span className="font-bold text-stone-900 block text-[11px] uppercase tracking-wider">
+                    Past Venues Worked
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {selectedStaffForDossier.pastVenuesWorked.map((venue, idx) => (
+                      <span key={idx} className="px-2.5 py-1 bg-white text-stone-700 rounded-lg text-xs font-medium border border-stone-200 flex items-center gap-1">
+                        <Building className="w-3 h-3 text-amber-800" />
+                        <span>{venue}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Verified Reviews Section */}
+              <div className="space-y-4 pt-2 border-t border-stone-200">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-bold text-stone-900 text-sm flex items-center gap-2">
-                      <Award className="w-4 h-4 text-amber-800" />
-                      <span>Vendor Ratings & Reviews ({selectedStaffForDossier.reviews.length})</span>
+                      <span>Verified Ratings & Comments</span>
+                      <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-950 font-bold text-xs">
+                        {selectedStaffForDossier.rating.toFixed(1)} ★ ({selectedStaffForDossier.reviews.length} evaluations)
+                      </span>
                     </h4>
-                    <p className="text-xs text-stone-500">
-                      Fair feedback from Party Palace managers, head chefs, and event directors.
+                    <p className="text-[11px] text-stone-500">
+                      Evaluated by banquet managers, head chefs, and event directors.
                     </p>
                   </div>
 
                   <button
                     onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
-                    className="px-3.5 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+                    className="px-3 py-1.5 bg-stone-900 hover:bg-black text-white rounded-xl font-bold text-xs flex items-center gap-1.5 transition-colors"
                   >
-                    <Star className="w-3.5 h-3.5" />
-                    <span>{isReviewFormOpen ? 'Cancel Review' : '+ Rate & Write Review'}</span>
+                    <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Rate Candidate</span>
                   </button>
                 </div>
 
-                {/* Inline Review Form */}
+                {reviewSuccessMsg && (
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-950 rounded-xl font-semibold text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Review logged and candidate score updated!</span>
+                  </div>
+                )}
+
+                {/* Review Form Drawer */}
                 {isReviewFormOpen && (
-                  <form onSubmit={handleReviewSubmit} className="p-5 bg-stone-50 rounded-2xl border border-stone-200 space-y-4 animate-fade-in">
-                    <h5 className="font-bold text-stone-900 text-xs uppercase tracking-wide">
-                      Submit Verified Evaluation for {selectedStaffForDossier.fullName}
-                    </h5>
+                  <form onSubmit={handleReviewSubmit} className="p-4 bg-amber-50/50 rounded-2xl border border-amber-200 space-y-3 animate-fade-in">
+                    <span className="font-bold text-xs text-amber-950 block">
+                      Write an Evaluation for {selectedStaffForDossier.fullName}:
+                    </span>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="block font-semibold text-stone-700 mb-1">Overall Rating (1 - 5) *</label>
+                        <label className="block font-semibold text-stone-700 mb-1">Overall Rating (1-5)</label>
                         <select
                           value={reviewRating}
                           onChange={(e) => setReviewRating(Number(e.target.value))}
-                          className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white font-bold text-stone-900"
+                          className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white"
                         >
-                          <option value={5}>★★★★★ (5 - Excellent)</option>
-                          <option value={4}>★★★★☆ (4 - Good / Reliable)</option>
-                          <option value={3}>★★★☆☆ (3 - Average)</option>
-                          <option value={2}>★★☆☆☆ (2 - Needs Improvement)</option>
-                          <option value={1}>★☆☆☆☆ (1 - Poor Performance)</option>
+                          <option value={5}>5 Stars - Excellent (उत्कृष्ट)</option>
+                          <option value={4}>4 Stars - Very Good (धेरै राम्रो)</option>
+                          <option value={3}>3 Stars - Satisfactory (सन्तोषजनक)</option>
+                          <option value={2}>2 Stars - Needs Improvement (सुधार आवश्यक)</option>
                         </select>
                       </div>
 
@@ -1072,22 +1845,22 @@ export const EventStaffTalentPool: React.FC = () => {
                           onChange={(e) => setReviewPunctuality(Number(e.target.value))}
                           className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white"
                         >
-                          <option value={5}>5/5 - Arrived Early</option>
+                          <option value={5}>5/5 - Arrived Early (समयमै आएको)</option>
                           <option value={4}>4/5 - On Time</option>
                           <option value={3}>3/5 - Slight Delay</option>
                         </select>
                       </div>
 
                       <div>
-                        <label className="block font-semibold text-stone-700 mb-1">Grooming & Courtesy</label>
+                        <label className="block font-semibold text-stone-700 mb-1">Courtesy & Grooming</label>
                         <select
                           value={reviewCourtesy}
                           onChange={(e) => setReviewCourtesy(Number(e.target.value))}
                           className="w-full px-3 py-2 rounded-xl border border-stone-300 bg-white"
                         >
-                          <option value={5}>5/5 - Spotless Uniform & Polite</option>
-                          <option value={4}>4/5 - Neat & Courteous</option>
-                          <option value={3}>3/5 - Acceptable</option>
+                          <option value={5}>5/5 - Clean Uniform & Polite</option>
+                          <option value={4}>4/5 - Good Etiquette</option>
+                          <option value={3}>3/5 - Average</option>
                         </select>
                       </div>
                     </div>
@@ -1189,7 +1962,7 @@ export const EventStaffTalentPool: React.FC = () => {
             </div>
 
             {/* Footer Direct Contact Strip */}
-            <div className="p-6 bg-stone-50 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+            <div className="p-5 bg-stone-50 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
               <div className="text-xs text-stone-600">
                 <span>Contact candidate directly for upcoming event shifts or interviews:</span>
                 <strong className="text-stone-900 block font-mono text-sm mt-0.5">{selectedStaffForDossier.phone}</strong>

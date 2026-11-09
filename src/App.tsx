@@ -108,6 +108,7 @@ const MainShell: React.FC = () => {
   };
 
   const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
+  const [autoOpenStaffRegister, setAutoOpenStaffRegister] = useState(false);
 
   // If viewing a standalone guest invitation link (e.g. /invite/:code or from QR scan)
   if (activeInviteCode) {
@@ -140,7 +141,12 @@ const MainShell: React.FC = () => {
       <main className="flex-1 pb-16 lg:pb-0">
         {activeView === 'EXPLORE' ? (
           <div>
-            <HeroSection />
+            <HeroSection
+              onOpenStaffPool={(autoOpen) => {
+                if (autoOpen) setAutoOpenStaffRegister(true);
+                setActiveView('STAFF_POOL');
+              }}
+            />
             <VenueCatalog />
           </div>
         ) : activeView === 'DESTINATION' ? (
@@ -161,7 +167,10 @@ const MainShell: React.FC = () => {
           </div>
         ) : activeView === 'STAFF_POOL' ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <EventStaffTalentPool />
+            <EventStaffTalentPool
+              initialOpenRegister={autoOpenStaffRegister}
+              onResetInitialOpenRegister={() => setAutoOpenStaffRegister(false)}
+            />
           </div>
         ) : (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

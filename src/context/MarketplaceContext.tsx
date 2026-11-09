@@ -20,6 +20,8 @@ import {
   DestinationVendorService,
   EventStaffProfile,
   StaffReviewComment,
+  NepalGovtDirectiveItem,
+  StaffCustomRoleProposal,
 } from '../types';
 import { SEED_VENUES } from '../data/venuesData';
 import { SEED_BOOKINGS, SEED_NEGOTIATIONS, SEED_REVIEWS } from '../data/seedMarketplaceState';
@@ -27,6 +29,11 @@ import { SEED_EVENT_ORGANIZERS } from '../data/organizersData';
 import { initialCulturalVendors } from '../data/culturalVendorsData';
 import { SEED_DESTINATION_HOTELS, SEED_DESTINATION_VENDOR_SERVICES } from '../data/destinationVendorsData';
 import { SEED_EVENT_STAFF } from '../data/eventStaffData';
+import {
+  SEED_NEPAL_GOVT_DIRECTIVES,
+  NEPAL_GOVT_STATUTORY_WAGES,
+  NEPAL_GOVT_VENUE_RULES,
+} from '../data/nepalGovtRegulations';
 
 export interface SearchFilterState {
   searchQuery: string;
@@ -152,6 +159,30 @@ interface MarketplaceContextType {
   addEventStaffProfile: (profile: Omit<EventStaffProfile, 'id' | 'createdAt' | 'rating' | 'totalShiftsCompleted' | 'reviews'>) => EventStaffProfile;
   toggleStaffAvailability: (staffId: string) => void;
   addStaffReview: (staffId: string, review: Omit<StaffReviewComment, 'id' | 'createdAt'>) => void;
+  staffCustomRoles: StaffCustomRoleProposal[];
+  proposeStaffCustomRole: (proposal: Omit<StaffCustomRoleProposal, 'id' | 'createdAt' | 'status'>) => string;
+  reviewStaffCustomRole: (roleId: string, decision: 'PERMANENT' | 'TEMPORARY' | 'REJECTED', adminNotes?: string) => void;
+
+  // Nepal Government Statutory Regulatory Intelligence
+  govtDirectives: NepalGovtDirectiveItem[];
+  applyGovtDirective: (directiveId: string, updatedValue?: string) => void;
+  dismissGovtDirective: (directiveId: string) => void;
+  statutoryRules: {
+    minDailyShiftWageNpr: number;
+    minHourlyWageNpr: number;
+    minMonthlyWageNpr: number;
+    soundCurfewTime: string;
+    vatPercent: number;
+    tdsPercent: number;
+  };
+  updateStatutoryRules: (rules: Partial<{
+    minDailyShiftWageNpr: number;
+    minHourlyWageNpr: number;
+    minMonthlyWageNpr: number;
+    soundCurfewTime: string;
+    vatPercent: number;
+    tdsPercent: number;
+  }>) => void;
 }
 
 const DEFAULT_USER: UserProfile = {
@@ -464,6 +495,93 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return SEED_EVENT_STAFF;
   });
 
+  // Nepal Government Statutory Rules & Current Enforced Parameters
+  const [statutoryRules, setStatutoryRules] = useState<{
+    minDailyShiftWageNpr: number;
+    minHourlyWageNpr: number;
+    minMonthlyWageNpr: number;
+    soundCurfewTime: string;
+    vatPercent: number;
+    tdsPercent: number;
+  }>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_statutory_rules_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load statutory rules', e);
+      }
+    }
+    return {
+      minDailyShiftWageNpr: NEPAL_GOVT_STATUTORY_WAGES.DAILY_SHIFT_MIN_NPR,
+      minHourlyWageNpr: NEPAL_GOVT_STATUTORY_WAGES.HOURLY_MIN_NPR,
+      minMonthlyWageNpr: NEPAL_GOVT_STATUTORY_WAGES.MONTHLY_MIN_NPR,
+      soundCurfewTime: NEPAL_GOVT_VENUE_RULES.DAO_SOUND_CURFEW_TIME,
+      vatPercent: NEPAL_GOVT_VENUE_RULES.IRD_VAT_RATE_PERCENT,
+      tdsPercent: NEPAL_GOVT_VENUE_RULES.IRD_TDS_RATE_PERCENT,
+    };
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_statutory_rules_v1', JSON.stringify(statutoryRules));
+      } catch (e) {
+        console.warn('Failed to save statutory rules', e);
+      }
+    }
+  }, [statutoryRules]);
+
+  const updateStatutoryRules = (rules: Partial<typeof statutoryRules>) => {
+    setStatutoryRules((prev) => ({ ...prev, ...rules }));
+  };
+
+  // Nepal Government Gazette & Legal Directives
+  const [govtDirectives, setGovtDirectives] = useState<NepalGovtDirectiveItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_govt_directives_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load govt directives', e);
+      }
+    }
+    return SEED_NEPAL_GOVT_DIRECTIVES;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_govt_directives_v1', JSON.stringify(govtDirectives));
+      } catch (e) {
+        console.warn('Failed to save govt directives', e);
+      }
+    }
+  }, [govtDirectives]);
+
+  const applyGovtDirective = (directiveId: string, updatedValue?: string) => {
+    setGovtDirectives((prev) =>
+      prev.map((d) => {
+        if (d.id === directiveId) {
+          return {
+            ...d,
+            status: 'ACTIVE_ENFORCED',
+            currentEnforcedValue: updatedValue || d.proposedGazetteUpdate || d.currentEnforcedValue,
+            proposedGazetteUpdate: undefined,
+            lastScannedAt: new Date().toISOString(),
+          };
+        }
+        return d;
+      })
+    );
+  };
+
+  const dismissGovtDirective = (directiveId: string) => {
+    setGovtDirectives((prev) =>
+      prev.map((d) => (d.id === directiveId ? { ...d, status: 'DISMISSED' } : d))
+    );
+  };
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -477,8 +595,22 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const addEventStaffProfile = (
     profile: Omit<EventStaffProfile, 'id' | 'createdAt' | 'rating' | 'totalShiftsCompleted' | 'reviews'>
   ): EventStaffProfile => {
+    // If worker did not declare custom wage, default to official Nepal Government statutory minimum
+    const hasCustomWage = typeof profile.expectedWageNpr === 'number' && profile.expectedWageNpr > 0;
+    const defaultStatutoryWage =
+      profile.wageType === 'MONTHLY'
+        ? statutoryRules.minMonthlyWageNpr
+        : profile.wageType === 'PER_HOUR'
+        ? statutoryRules.minHourlyWageNpr
+        : statutoryRules.minDailyShiftWageNpr;
+
+    const finalWage = hasCustomWage ? profile.expectedWageNpr : defaultStatutoryWage;
+
     const newStaff: EventStaffProfile = {
       ...profile,
+      expectedWageNpr: finalWage,
+      isGovtStatutoryWage: !hasCustomWage,
+      wageDeclaredByUser: hasCustomWage,
       id: `staff-${Date.now()}`,
       rating: 5.0,
       totalShiftsCompleted: 0,
@@ -518,6 +650,115 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
             totalShiftsCompleted: staff.totalShiftsCompleted + 1,
             reviews: updatedReviews,
           };
+        }
+        return staff;
+      })
+    );
+  };
+
+  // Staff Custom Role Proposals (अन्य नयाँ भूमिका / विधा)
+  const [staffCustomRoles, setStaffCustomRoles] = useState<StaffCustomRoleProposal[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_staff_custom_roles_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load staff custom roles', e);
+      }
+    }
+    return [
+      {
+        id: 'staff-role-prop-01',
+        proposedRoleName: 'Live Paan & Saunf Counter Artisan',
+        proposedNepaliName: 'शाही पान तथा मसला कारीगर',
+        submittedByStaffName: 'Rajesh Chaurasia',
+        staffPhone: '+977-9841998877',
+        description: 'Specializes in fresh Banarasi sweet paan, meetha paan, fire paan, and organic mukhwas for wedding receptions.',
+        status: 'PERMANENT',
+        createdAt: '2024-10-15',
+        reviewedAt: '2024-10-16',
+        adminNotes: 'Highly requested celebration booth artisan. Approved permanently across Nepal.',
+      },
+      {
+        id: 'staff-role-prop-02',
+        proposedRoleName: 'Traditional Newari Aila / Chyang Pourer (Anthe)',
+        proposedNepaliName: 'ऐला / थ्वँ (छ्याङ) सत्कार सहयोगी (अन्थे)',
+        submittedByStaffName: 'Rabin Shakya',
+        staffPhone: '+977-9851088776',
+        description: 'Pours ceremonial authentic Newari aila from anti brass kettle into salicha for traditional bhoj banquets.',
+        status: 'PERMANENT',
+        createdAt: '2024-11-01',
+        reviewedAt: '2024-11-02',
+        adminNotes: 'Essential for Newari cultural feasts. Approved permanently.',
+      },
+      {
+        id: 'staff-role-prop-03',
+        proposedRoleName: 'Kids Celebration Playzone & Bouncy Caretaker',
+        proposedNepaliName: 'बालबालिका खेलकुद तथा मनोरञ्जन हेरचाहकर्ता',
+        submittedByStaffName: 'Anjana Thapa',
+        staffPhone: '+977-9801223344',
+        description: 'Supervises toddler play corners, bouncy castles, and face painting during 5-hour family wedding banquets.',
+        status: 'PENDING',
+        createdAt: '2024-11-05',
+        adminNotes: 'New category proposal under admin review.',
+      },
+    ];
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_staff_custom_roles_v1', JSON.stringify(staffCustomRoles));
+      } catch (e) {
+        console.warn('Failed to save staff custom roles', e);
+      }
+    }
+  }, [staffCustomRoles]);
+
+  const proposeStaffCustomRole = (
+    proposal: Omit<StaffCustomRoleProposal, 'id' | 'createdAt' | 'status'>
+  ): string => {
+    const id = `staff-role-prop-${Date.now()}`;
+    const newProposal: StaffCustomRoleProposal = {
+      ...proposal,
+      id,
+      status: 'PENDING',
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+    setStaffCustomRoles((prev) => [newProposal, ...prev]);
+    return id;
+  };
+
+  const reviewStaffCustomRole = (
+    roleId: string,
+    decision: 'PERMANENT' | 'TEMPORARY' | 'REJECTED',
+    adminNotes?: string
+  ) => {
+    setStaffCustomRoles((prev) =>
+      prev.map((role) => {
+        if (role.id === roleId) {
+          return {
+            ...role,
+            status: decision,
+            reviewedAt: new Date().toISOString().split('T')[0],
+            adminNotes: adminNotes || role.adminNotes,
+          };
+        }
+        return role;
+      })
+    );
+
+    // Also update staff in talent pool with this proposed role
+    setEventStaffPool((prev) =>
+      prev.map((staff) => {
+        if (staff.customRoleName) {
+          const target = staffCustomRoles.find((r) => r.id === roleId);
+          if (target && target.proposedRoleName.toLowerCase() === staff.customRoleName.toLowerCase()) {
+            return {
+              ...staff,
+              customRoleStatus: decision,
+            };
+          }
         }
         return staff;
       })
@@ -915,6 +1156,14 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         addEventStaffProfile,
         toggleStaffAvailability,
         addStaffReview,
+        govtDirectives,
+        applyGovtDirective,
+        dismissGovtDirective,
+        statutoryRules,
+        updateStatutoryRules,
+        staffCustomRoles,
+        proposeStaffCustomRole,
+        reviewStaffCustomRole,
       }}
     >
       {children}

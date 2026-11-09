@@ -32,9 +32,14 @@ import {
   Compass,
   Mountain,
   Tag,
+  PlusCircle,
 } from 'lucide-react';
 
-export const HeroSection: React.FC = () => {
+interface HeroSectionProps {
+  onOpenStaffPool?: (autoOpenRegister?: boolean) => void;
+}
+
+export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStaffPool }) => {
   const { t, language } = useLanguage();
   const { filters, setFilters, resetFilters, venues, setActiveModal, openVenueOnboarding } = useMarketplace();
 
@@ -620,8 +625,54 @@ export const HeroSection: React.FC = () => {
           </div>
         </div>
 
+        {/* Front Page Celebration Workforce & Gig Employment Pool Banner */}
+        <div className="max-w-5xl mx-auto mt-6 p-4 sm:p-5 bg-gradient-to-r from-amber-950 via-stone-900 to-amber-900 rounded-2xl text-white shadow-xl border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+          <div className="flex items-start gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center shrink-0">
+              <Users className="w-5 h-5 text-amber-300" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-amber-300 uppercase tracking-wider">
+                  {language === 'ne' ? 'उत्सव जनशक्ति कार्यथलो (रोजगारी अवसर)' : 'Celebration Gig Workforce Pool'}
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/30">
+                  {language === 'ne' ? '🇳🇵 श्रम ऐन २०७४ न्यूनतम पारिश्रमिक पालना' : '🇳🇵 Labour Act 2074 Min Wage Protected'}
+                </span>
+              </div>
+              <h3 className="font-display text-base sm:text-lg font-bold text-white mt-0.5">
+                {language === 'ne' ? 'पार्टी प्यालेस तथा उत्सवमा काम खोज्दै हुनुहुन्छ?' : 'Looking for Banquet, Waiter, Kitchen or Event Gigs?'}
+              </h3>
+              <p className="text-xs text-stone-300 mt-1 max-w-xl leading-relaxed">
+                {language === 'ne'
+                  ? 'अंशकालीन, पूर्णकालीन वा बिदाका दिनमा काम गर्न खुला जनशक्तिमा नाम दर्ता गर्नुहोस्। सर्भर, बारटेन्डर, हलुवाई सहयोगी, स्वागत टोली तथा अन्य फरक अनुभव भएका सबैलाई स्वागत छ।'
+                  : 'Join our open celebration workforce pool for party palaces & caterers across Nepal. Full-time, part-time & weekend shifts for Waiters, Chefs, Ushers, Decor & custom event roles.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto shrink-0">
+            <button
+              type="button"
+              onClick={() => onOpenStaffPool?.(true)}
+              className="w-full sm:w-auto px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-amber-950 rounded-xl text-xs font-bold transition-all shadow hover:scale-[1.02] flex items-center justify-center gap-1.5 whitespace-nowrap"
+            >
+              <PlusCircle className="w-4 h-4 text-amber-950" />
+              <span>{language === 'ne' ? 'कामदारको रूपमा दर्ता हुनुहोस्' : '+ Join Employment Pool'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenStaffPool?.(false)}
+              className="w-full sm:w-auto px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition-all border border-white/20 flex items-center justify-center gap-1.5 whitespace-nowrap"
+            >
+              <span>{language === 'ne' ? 'उपलब्ध जनशक्ति हेर्नुहोस्' : 'Browse Talent Pool'}</span>
+              <ChevronRight className="w-3.5 h-3.5 text-amber-300" />
+            </button>
+          </div>
+        </div>
+
         {/* Venue Operator Self-Service Registration Banner */}
-        <div className="max-w-5xl mx-auto mt-6 p-3.5 bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 rounded-xl text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="max-w-5xl mx-auto mt-4 p-3.5 bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 rounded-xl text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-amber-500/20 border border-amber-400/30 flex items-center justify-center shrink-0">
               <Building className="w-4 h-4 text-amber-300" />

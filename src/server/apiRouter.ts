@@ -251,3 +251,81 @@ Please provide a structured, inspiring, highly practical destination blueprint w
   }
 });
 
+// 5. Nepal Government Regulatory Compliance & Gazette Intelligence Endpoint
+apiRouter.post('/regulatory-compliance-intelligence', async (req, res) => {
+  try {
+    const { category, specificQuery } = req.body || {};
+
+    const prompt = `
+You are the Nepal Government Regulatory Compliance Engine for UTSAVO (Nepal's Celebration & Party Palace Marketplace).
+Search the latest verified Nepal Government legal acts, gazette notices (नेपाल राजपत्र), ministry directives, and municipal circulars concerning:
+1. LABOUR ACT 2074 (श्रम ऐन २०७४) & MINIMUM WAGE: Verify statutory minimum wage notifications by the Ministry of Labour, Employment and Social Security (current statutory baseline: NPR 17,300/month, NPR 668/day shift, NPR 89/hour), overtime rules (1.5x for >8 hours), and temporary/gig worker protections.
+2. DAO SOUND POLLUTION & CURFEW: District Administration Office (DAO Kathmandu, Lalitpur, Bhaktapur) notifications regarding party palace sound curfew (mandatory cutoff at 10:00 PM / 22:00 hrs) and decibel restrictions for DJs, brass bands, and outdoor speakers.
+3. INLAND REVENUE DEPARTMENT (IRD): Value Added Tax Act 2052 & Finance Acts regarding 13% VAT for banquet catering services and 1.5% TDS on venue lease/services.
+4. FOOD SAFETY & QUALITY ACT 2081 (खाद्य स्वच्छता तथा गुणस्तर ऐन २०८१): Department of Food Technology and Quality Control (DFTQC) standards for mass banquets, drinking water testing, and kitchen hygiene.
+
+Specific Focus query: ${specificQuery || 'Latest Nepal Gazette circulars regarding minimum wages, party palace noise curfew, and banquet VAT/TDS'}
+
+Provide an authoritative compliance report for UTSAVO's Super Admin with:
+A. Current Enforced Legal Rules & Gazette Numbers
+B. Recent or Proposed Circular Updates (with effective dates if any)
+C. Direct Impact on UTSAVO Platform (Wages, Contracts, Run-of-Show, VAT)
+D. Actionable Recommendation for Platform Admin (Whether to Apply or Maintain)
+`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: prompt,
+      config: {
+        tools: [{ googleSearch: {} }],
+        systemInstruction:
+          'You are a senior legal compliance advisor specializing in Nepal laws (Labour Act 2074, DAO Directives, IRD VAT, Food Safety Act 2081). Provide clear, verified, well-cited legal summaries in both English and Nepali terms.',
+      },
+    });
+
+    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+    const webSources = groundingChunks
+      .filter((c: any) => c.web)
+      .map((c: any) => ({
+        title: c.web.title,
+        uri: c.web.uri,
+      }));
+
+    res.json({
+      status: 'success',
+      report: response.text || '',
+      sources: webSources,
+      timestamp: new Date().toISOString(),
+      statutoryDefaults: {
+        minShiftWageNpr: 668,
+        minHourlyWageNpr: 89,
+        minMonthlyWageNpr: 17300,
+        soundCurfewTime: '22:00 (10:00 PM)',
+        vatPercent: 13,
+        tdsPercent: 1.5,
+      },
+    });
+  } catch (err: any) {
+    console.error('Regulatory Compliance Error:', err);
+    res.json({
+      status: 'fallback',
+      report: `### 🇳🇵 नेपाल सरकार वैधानिक मापदण्ड तथा राजपत्र अद्यावधिक विश्लेषण (UTSAVO Statutory Compliance Overview)\n\n**१. श्रम ऐन २०७४ तथा न्यूनतम पारिश्रमिक मापदण्ड (Labour Act 2074):**\n- श्रम, रोजगार तथा सामाजिक सुरक्षा मन्त्रालयको राजपत्र सूचना अनुसार नेपाल सरकारद्वारा तोकिएको न्यूनतम पारिश्रमिक **मासिक रू. १७,३००** (आधारभूत रू. १०,८२० + महँगी भत्ता रू. ६,४८०) हो।\n- दैनिक सिफ्ट (८ घण्टा) को लागि न्यूनतम पारिश्रमिक **रू. ६६८** र प्रतिघण्टा **रू. ८९** कायम गरिएको छ।\n- UTSAVO को नियम: कुनै पनि पार्टी प्यालेस वा क्याटररले कामदारलाई रू. ६६८ भन्दा कम भुक्तानी गर्न पाउने छैनन्। पारिश्रमिक नतोकेका कामदारलाई यो नियम स्वतः लागू हुन्छ।\n\n**२. जिल्ला प्रशासन कार्यालय ध्वनि नियन्त्रण तथा रात्रीकालीन सुरक्षा (DAO Sound Curfew):**\n- काठमाडौँ तथा ललितपुर जिल्ला प्रशासन कार्यालयको आदेश अनुसार आवासीय क्षेत्रका पार्टी प्यालेस तथा ब्यान्क्वेटहरूमा **राति १०:०० बजे (२२:००)** पछि डिजे, लाउडस्पिकर र बाजा पूर्ण रूपमा बन्द गर्नुपर्नेछ।\n- UTSAVO को कार्यान्वयन: प्रत्येक डिजिटल सम्झौता र रन-अफ-शोमा १०:०० बजे साउन्ड कट-अफ अनिवार्य शर्तको रूपमा राखिएको छ।\n\n**३. आन्तरिक राजस्व विभाग (IRD VAT & TDS Compliance):**\n- पार्टी प्यालेस तथा क्याटरिङ सेवामा **१३% भ्याट** र सेवा भुक्तानीमा **१.५% टीडीएस** अनिवार्य रूपमा कट्टी गरी प्यान बिलिङ गर्नुपर्नेछ।\n\n**४. खाद्य स्वच्छता तथा गुणस्तर ऐन, २०८१ (Food Safety & Quality Act 2081):**\n- ब्यान्क्वेट भान्सामा पिउने पानीको ल्याब परीक्षण र खानाको तापक्रम मापदण्ड पालना हुनुपर्नेछ।`,
+      sources: [
+        { title: 'Ministry of Labour, Employment and Social Security (MoLESS)', uri: 'https://moless.gov.np' },
+        { title: 'Inland Revenue Department Nepal (IRD)', uri: 'https://ird.gov.np' },
+        { title: 'District Administration Office Kathmandu (DAO)', uri: 'https://daokathmandu.moha.gov.np' },
+        { title: 'Department of Food Technology and Quality Control (DFTQC)', uri: 'https://dftqc.gov.np' },
+      ],
+      timestamp: new Date().toISOString(),
+      statutoryDefaults: {
+        minShiftWageNpr: 668,
+        minHourlyWageNpr: 89,
+        minMonthlyWageNpr: 17300,
+        soundCurfewTime: '22:00 (10:00 PM)',
+        vatPercent: 13,
+        tdsPercent: 1.5,
+      },
+    });
+  }
+});
+
