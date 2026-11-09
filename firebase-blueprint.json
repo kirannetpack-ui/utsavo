@@ -1,0 +1,147 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile with role and contact information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "name": { "type": "string", "maxLength": 100, "description": "Display name" },
+        "phone": { "type": "string", "maxLength": 30, "description": "Phone number" },
+        "role": { "type": "string", "enum": ["CUSTOMER", "VENUE_OWNER", "SUPER_ADMIN", "FINANCE_ADMIN"], "description": "User role" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Booking": {
+      "title": "Booking Document",
+      "description": "Party palace event booking record",
+      "type": "object",
+      "properties": {
+        "bookingRef": { "type": "string", "maxLength": 32, "description": "Unique booking reference" },
+        "customerId": { "type": "string", "maxLength": 128, "description": "Customer UID" },
+        "customerName": { "type": "string", "maxLength": 100, "description": "Customer name" },
+        "customerPhone": { "type": "string", "maxLength": 30, "description": "Customer phone" },
+        "venueId": { "type": "string", "maxLength": 128, "description": "Venue ID" },
+        "venueName": { "type": "string", "maxLength": 150, "description": "Venue name" },
+        "hallId": { "type": "string", "maxLength": 128, "description": "Hall ID" },
+        "eventType": { "type": "string", "maxLength": 50, "description": "Event type" },
+        "eventDateBS": { "type": "string", "maxLength": 50, "description": "Date in Bikram Sambat" },
+        "eventDateAD": { "type": "string", "maxLength": 50, "description": "Date in Gregorian" },
+        "shift": { "type": "string", "maxLength": 20, "description": "Shift" },
+        "guestCount": { "type": "number", "description": "Number of guests" },
+        "totalAmountNpr": { "type": "number", "description": "Total consideration in NPR" },
+        "depositPaidNpr": { "type": "number", "description": "Deposit paid in NPR" },
+        "status": { "type": "string", "enum": ["ON_HOLD", "CONFIRMED", "COMPLETED", "CANCELLED"], "description": "Booking status" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["bookingRef", "customerId", "venueId", "status"]
+    },
+    "Negotiation": {
+      "title": "Negotiation Thread",
+      "description": "Structured counter-offer negotiation",
+      "type": "object",
+      "properties": {
+        "venueId": { "type": "string", "maxLength": 128, "description": "Venue ID" },
+        "customerId": { "type": "string", "maxLength": 128, "description": "Customer UID" },
+        "customerName": { "type": "string", "maxLength": 100, "description": "Customer name" },
+        "status": { "type": "string", "maxLength": 30, "description": "Negotiation status" },
+        "currentVersion": { "type": "number", "description": "Version number" },
+        "updatedAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["venueId", "customerId", "status"]
+    },
+    "Review": {
+      "title": "Verified Review",
+      "description": "Post-event verified feedback",
+      "type": "object",
+      "properties": {
+        "venueId": { "type": "string", "maxLength": 128, "description": "Venue ID" },
+        "bookingRef": { "type": "string", "maxLength": 32, "description": "Booking Reference" },
+        "customerName": { "type": "string", "maxLength": 100, "description": "Customer name" },
+        "overallRating": { "type": "number", "description": "1 to 5 rating" },
+        "comment": { "type": "string", "maxLength": 1000, "description": "Review text" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["venueId", "overallRating", "comment"]
+    },
+    "DestinationInquiry": {
+      "title": "Destination Celebration Inquiry",
+      "description": "Global client inquiry for destination wedding or celebration in Nepal",
+      "type": "object",
+      "properties": {
+        "inquiryRef": { "type": "string", "maxLength": 32, "description": "Reference number" },
+        "clientName": { "type": "string", "maxLength": 100, "description": "Client name" },
+        "clientEmail": { "type": "string", "format": "email", "description": "Client email" },
+        "clientCountryOfResidence": { "type": "string", "maxLength": 100, "description": "Country" },
+        "targetDestination": { "type": "string", "maxLength": 150, "description": "Destination region" },
+        "estimatedGuests": { "type": "number", "description": "Guest count" },
+        "budgetAmount": { "type": "number", "description": "Budget figure" },
+        "budgetCurrency": { "type": "string", "maxLength": 10, "description": "Currency code" },
+        "status": { "type": "string", "enum": ["SUBMITTED", "CONCIERGE_CONTACTED", "ITINERARY_CUSTOMIZED", "CONFIRMED"], "description": "Inquiry status" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["inquiryRef", "clientName", "clientEmail", "targetDestination"]
+    },
+    "DigitalInvitation": {
+      "title": "Digital Nimantrana Card",
+      "description": "Digital invitation and RSVP configuration with kitchen headcount synchronization",
+      "type": "object",
+      "properties": {
+        "invitationCode": { "type": "string", "maxLength": 32, "description": "Code" },
+        "hostName": { "type": "string", "maxLength": 100, "description": "Host name" },
+        "celebrantsTitle": { "type": "string", "maxLength": 120, "description": "Celebrants" },
+        "venueName": { "type": "string", "maxLength": 150, "description": "Venue name" },
+        "dateBS": { "type": "string", "maxLength": 50, "description": "BS Date" },
+        "templateId": { "type": "string", "maxLength": 50, "description": "Template motif" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["invitationCode", "hostName", "celebrantsTitle", "venueName"]
+    },
+    "CulturalVendor": {
+      "title": "Cultural Artist & Vendor Profile",
+      "description": "Panche Baja, Dhime Baja, Purohits, Photographers, and Attire vendors",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 150, "description": "Vendor or ensemble name" },
+        "category": { "type": "string", "maxLength": 60, "description": "Vendor category" },
+        "district": { "type": "string", "maxLength": 50, "description": "District" },
+        "phone": { "type": "string", "maxLength": 30, "description": "Contact phone" },
+        "startingPriceNpr": { "type": "number", "description": "Starting rate in NPR" },
+        "rating": { "type": "number", "description": "Rating score" }
+      },
+      "required": ["name", "category", "phone"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User account profiles"
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Party palace event reservations"
+    },
+    "/negotiations/{negotiationId}": {
+      "schema": "Negotiation",
+      "description": "Commercial negotiation threads"
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Verified venue reviews"
+    },
+    "/destinationInquiries/{inquiryId}": {
+      "schema": "DestinationInquiry",
+      "description": "Destination wedding and occasion celebration inquiries"
+    },
+    "/invitations/{invitationId}": {
+      "schema": "DigitalInvitation",
+      "description": "Digital invitations and RSVPs"
+    },
+    "/culturalVendors/{vendorId}": {
+      "schema": "CulturalVendor",
+      "description": "Cultural artist and ensemble profiles"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "UTSAVO — Nepal's Smart Celebration Marketplace",
+  "description": "Multi-vendor event venue and party palace discovery, Hindu Panchanga auspicious date calendar, menu customization, structured negotiation, and booking platform across Nepal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
