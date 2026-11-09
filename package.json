@@ -9,7 +9,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "git:push": "bash push_to_github.sh",
+    "git:commit": "git add -A && git commit -m"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
