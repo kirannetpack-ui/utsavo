@@ -20,8 +20,8 @@ import {
 } from 'lucide-react';
 
 interface MobileAppNavBarProps {
-  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL';
-  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL') => void;
+  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE';
+  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE') => void;
   onOpenFeatures?: () => void;
 }
 

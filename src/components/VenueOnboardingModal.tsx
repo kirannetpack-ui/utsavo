@@ -10,6 +10,7 @@ import { useMarketplace } from '../context/MarketplaceContext';
 import { CateringPackage, HallSpace, Venue, VerificationStatus } from '../types';
 import { NEPAL_PROVINCES } from '../data/nepalGeography';
 import { VenueImageVisual } from './VenueImageVisual';
+import { NepalDistrictSelector, NepalProvinceSelector } from './NepalLocationSelector';
 import {
   Building2,
   MapPin,
@@ -525,46 +526,35 @@ export const VenueOnboardingModal: React.FC<VenueOnboardingModalProps> = ({ isOp
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-stone-700 block mb-1">
-                      {language === 'ne' ? 'प्रदेश (Province) *' : 'Province *'}
-                    </label>
-                    <select
+                    <NepalProvinceSelector
+                      label={language === 'ne' ? 'प्रदेश (Province) *' : 'Province *'}
                       value={formData.province || 'Bagmati Province'}
-                      onChange={(e) => {
-                        const newProv = e.target.value;
-                        const pData = NEPAL_PROVINCES.find((p) => p.name === newProv);
-                        const firstDistrict = pData ? pData.districts[0].name : '';
+                      onChange={(newProv) => {
                         setFormData({
                           ...formData,
                           province: newProv,
-                          district: firstDistrict,
                         });
                       }}
-                      className="w-full text-xs bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-stone-900 focus:outline-none focus:ring-1 focus:ring-amber-800"
-                    >
-                      {NEPAL_PROVINCES.map((p) => (
-                        <option key={p.id} value={p.name}>
-                          {language === 'ne' ? p.nepaliName : p.name}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="Type or select province..."
+                      required
+                    />
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-stone-700 block mb-1">
-                      {language === 'ne' ? 'जिल्ला (District) *' : 'District *'}
-                    </label>
-                    <select
+                    <NepalDistrictSelector
+                      label={language === 'ne' ? 'जिल्ला (District) *' : 'District *'}
                       value={formData.district || ''}
-                      onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                      className="w-full text-xs bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-stone-900 focus:outline-none focus:ring-1 focus:ring-amber-800"
-                    >
-                      {availableDistricts.map((d) => (
-                        <option key={d.name} value={d.name}>
-                          {language === 'ne' ? d.nepaliName : d.name}
-                        </option>
-                      ))}
-                    </select>
+                      selectedProvince={formData.province}
+                      onChange={(dist, prov) => {
+                        setFormData({
+                          ...formData,
+                          district: dist,
+                          ...(prov && !formData.province ? { province: prov } : {}),
+                        });
+                      }}
+                      placeholder="Type or pick from 77 districts..."
+                      required
+                    />
                   </div>
 
                   <div>

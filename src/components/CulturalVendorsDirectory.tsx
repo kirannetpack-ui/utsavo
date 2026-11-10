@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { RealtimeAvailabilityCalendar } from './RealtimeAvailabilityCalendar';
+import { NepalDistrictSelector, NepalProvinceSelector } from './NepalLocationSelector';
 
 interface CulturalVendorsDirectoryProps {
   onBackToExplore?: () => void;
@@ -849,18 +850,32 @@ export const CulturalVendorsDirectory: React.FC<CulturalVendorsDirectoryProps> =
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="font-semibold text-stone-700 block mb-1">District *</label>
-                    <input
-                      type="text"
-                      required
-                      value={newVendor.district}
-                      onChange={(e) => setNewVendor({ ...newVendor, district: e.target.value })}
-                      placeholder="e.g. Kaski / Kathmandu"
-                      className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                    <label className="font-semibold text-stone-700 block mb-1">Province (प्रदेश - Select or Type)</label>
+                    <NepalProvinceSelector
+                      value={newVendor.province}
+                      onChange={(prov) => setNewVendor({ ...newVendor, province: prov })}
+                      inputClassName="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none text-xs"
                     />
                   </div>
+                  <div>
+                    <label className="font-semibold text-stone-700 block mb-1">District (७७ जिल्ला वा टाइप गर्नुहोस्) *</label>
+                    <NepalDistrictSelector
+                      value={newVendor.district}
+                      onChange={(dist) => setNewVendor({ ...newVendor, district: dist })}
+                      provinceFilter={newVendor.province}
+                      onSelectProvince={(prov: string) => {
+                        if (!newVendor.province || newVendor.province !== prov) {
+                          setNewVendor((prev) => ({ ...prev, province: prov }));
+                        }
+                      }}
+                      inputClassName="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="font-semibold text-stone-700 block mb-1">Years of Exp</label>
                     <input

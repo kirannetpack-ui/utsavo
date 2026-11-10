@@ -25,6 +25,7 @@ import {
   SocialCelebrationPost,
   UserPanchangaPreferences,
   AuspiciousPushAlert,
+  ExcessFoodRescuePledge,
 } from '../types';
 import { PANCHANGA_AUSPICIOUS_MUHURATS } from '../data/panchangaCalendar';
 import { SEED_VENUES } from '../data/venuesData';
@@ -34,6 +35,7 @@ import { initialCulturalVendors } from '../data/culturalVendorsData';
 import { SEED_DESTINATION_HOTELS, SEED_DESTINATION_VENDOR_SERVICES } from '../data/destinationVendorsData';
 import { SEED_EVENT_STAFF } from '../data/eventStaffData';
 import { SEED_SOCIAL_CELEBRATION_POSTS } from '../data/socialCelebrationData';
+import { SEED_FOOD_RESCUE_PLEDGES } from '../data/socialCauseFoodData';
 import { sanitizeText, sanitizeUrl } from '../utils/security';
 import {
   SEED_NEPAL_GOVT_DIRECTIVES,
@@ -209,6 +211,12 @@ interface MarketplaceContextType {
   clearAllAlerts: () => void;
   simulatePushAlert: (specificMuhuratId?: string) => void;
   unreadAlertsCount: number;
+
+  // Social Cause: Annapurna Surplus Feast Food Rescue (Strict Voluntary Client Consent)
+  foodRescuePledges: ExcessFoodRescuePledge[];
+  addFoodRescuePledge: (pledge: Omit<ExcessFoodRescuePledge, 'id' | 'createdAt' | 'temperatureAndSafetyChecked' | 'cleanStorageBoxesSuppliedByUtsavo'>) => ExcessFoodRescuePledge;
+  updateFoodRescueConsent: (pledgeId: string, consentGiven: boolean, declaration?: string) => void;
+  updateFoodRescueStatus: (pledgeId: string, status: ExcessFoodRescuePledge['status'], notes?: string, beneficiariesFed?: number) => void;
 }
 
 export const DEFAULT_PANCHANGA_PREFS: UserPanchangaPreferences = {
@@ -643,8 +651,28 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     const finalWage = hasCustomWage ? profile.expectedWageNpr : defaultStatutoryWage;
 
+    // Calculate Age & Child Labour Compliance Verification (Nepal Child Labour Prohibition Act 2056 & Children's Act 2075)
+    let calculatedAge = profile.ageYears;
+    if (profile.dateOfBirth) {
+      const birthDate = new Date(profile.dateOfBirth);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      calculatedAge = age;
+    }
+    const isAdult = typeof calculatedAge === 'number' && calculatedAge >= 18;
+
     const newStaff: EventStaffProfile = {
       ...profile,
+      dateOfBirth: profile.dateOfBirth,
+      ageYears: calculatedAge,
+      childLabourCompliantVerified: isAdult,
+      ageVerificationBadge: isAdult
+        ? `Verified Legal Adult (${calculatedAge} yrs) · Bal Shram Nishedh Act Compliant`
+        : 'Underage Restricted (< 18 yrs) · Banquet Shift Restricted',
       expectedWageNpr: finalWage,
       isGovtStatutoryWage: !hasCustomWage,
       wageDeclaredByUser: hasCustomWage,
@@ -1067,6 +1095,79 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const unreadAlertsCount = pushAlerts.filter((a) => !a.isRead).length;
 
+  // Social Cause: Annapurna Surplus Feast Food Rescue (Strict Voluntary Client Consent Driven)
+  const [foodRescuePledges, setFoodRescuePledges] = useState<ExcessFoodRescuePledge[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_food_rescue_pledges_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load food rescue pledges', e);
+      }
+    }
+    return SEED_FOOD_RESCUE_PLEDGES;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_food_rescue_pledges_v1', JSON.stringify(foodRescuePledges));
+      } catch (e) {
+        console.warn('Failed to save food rescue pledges', e);
+      }
+    }
+  }, [foodRescuePledges]);
+
+  const addFoodRescuePledge = (
+    pledge: Omit<ExcessFoodRescuePledge, 'id' | 'createdAt' | 'temperatureAndSafetyChecked' | 'cleanStorageBoxesSuppliedByUtsavo'>
+  ): ExcessFoodRescuePledge => {
+    const newPledge: ExcessFoodRescuePledge = {
+      ...pledge,
+      id: `food-pledge-${Date.now()}`,
+      temperatureAndSafetyChecked: true,
+      cleanStorageBoxesSuppliedByUtsavo: true,
+      createdAt: new Date().toISOString(),
+    };
+    setFoodRescuePledges((prev) => [newPledge, ...prev]);
+    return newPledge;
+  };
+
+  const updateFoodRescueConsent = (pledgeId: string, consentGiven: boolean, declaration?: string) => {
+    setFoodRescuePledges((prev) =>
+      prev.map((p) =>
+        p.id === pledgeId
+          ? {
+              ...p,
+              clientConsentGiven: consentGiven,
+              clientConsentTimestamp: consentGiven ? new Date().toISOString() : undefined,
+              status: consentGiven ? 'CONSENT_GRANTED' : 'CONSENT_WITHDRAWN',
+              clientConsentDeclaration: declaration || p.clientConsentDeclaration,
+            }
+          : p
+      )
+    );
+  };
+
+  const updateFoodRescueStatus = (
+    pledgeId: string,
+    status: ExcessFoodRescuePledge['status'],
+    notes?: string,
+    beneficiariesFed?: number
+  ) => {
+    setFoodRescuePledges((prev) =>
+      prev.map((p) =>
+        p.id === pledgeId
+          ? {
+              ...p,
+              status,
+              recipientStoryNotes: notes !== undefined ? notes : p.recipientStoryNotes,
+              beneficiariesFedCount: beneficiariesFed !== undefined ? beneficiariesFed : p.beneficiariesFedCount,
+            }
+          : p
+      )
+    );
+  };
+
   const resetFilters = () => {
     setFilters(DEFAULT_FILTERS);
   };
@@ -1480,6 +1581,10 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         clearAllAlerts,
         simulatePushAlert,
         unreadAlertsCount,
+        foodRescuePledges,
+        addFoodRescuePledge,
+        updateFoodRescueConsent,
+        updateFoodRescueStatus,
       }}
     >
       {children}

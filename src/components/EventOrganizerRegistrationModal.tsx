@@ -10,6 +10,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { EventOrganizer, OrganizerSpecialization, OrganizerSuccessStandard } from '../types';
 import { NEPAL_PROVINCES } from '../data/nepalGeography';
+import { NepalProvinceSelector, NepalDistrictSelector } from './NepalLocationSelector';
 import {
   Sparkles,
   Building2,
@@ -447,44 +448,32 @@ export const EventOrganizerRegistrationModal: React.FC<EventOrganizerRegistratio
 
                   <div>
                     <label className="text-xs font-semibold text-stone-700 block mb-1">
-                      {language === 'ne' ? 'प्रदेश (Province)' : 'Province'}
+                      {language === 'ne' ? 'प्रदेश छान्नुहोस् वा टाइप गर्नुहोस्' : 'Province (Select or Type)'}
                     </label>
-                    <select
-                      value={formData.province}
-                      onChange={(e) => {
-                        const newProv = e.target.value;
-                        const pData = NEPAL_PROVINCES.find((p) => p.name === newProv);
-                        setFormData({
-                          ...formData,
-                          province: newProv,
-                          district: pData && pData.districts.length > 0 ? pData.districts[0].name : formData.district,
-                        });
-                      }}
-                      className="w-full text-xs bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-stone-900"
-                    >
-                      {NEPAL_PROVINCES.map((p) => (
-                        <option key={p.id} value={p.name}>
-                          {p.name} ({p.nepaliName})
-                        </option>
-                      ))}
-                    </select>
+                    <NepalProvinceSelector
+                      value={formData.province || 'Bagmati Province'}
+                      onChange={(prov) => setFormData({ ...formData, province: prov })}
+                      language={language}
+                      inputClassName="w-full text-xs bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-stone-900 focus:outline-none focus:ring-1 focus:ring-amber-800"
+                    />
                   </div>
 
                   <div>
                     <label className="text-xs font-semibold text-stone-700 block mb-1">
-                      {language === 'ne' ? 'जिल्ला (District)' : 'District'}
+                      {language === 'ne' ? '७७ जिल्ला छान्नुहोस् वा टाइप गर्नुहोस्' : 'District (Any of 77 Districts or Type)'}
                     </label>
-                    <select
-                      value={formData.district}
-                      onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                      className="w-full text-xs bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-stone-900"
-                    >
-                      {availableDistricts.map((d) => (
-                        <option key={d} value={d}>
-                          {d}
-                        </option>
-                      ))}
-                    </select>
+                    <NepalDistrictSelector
+                      value={formData.district || 'Kathmandu'}
+                      onChange={(dist) => setFormData({ ...formData, district: dist })}
+                      provinceFilter={formData.province}
+                      onSelectProvince={(prov: string) => {
+                        if (!formData.province || formData.province !== prov) {
+                          setFormData((prev) => ({ ...prev, province: prov }));
+                        }
+                      }}
+                      language={language}
+                      inputClassName="w-full text-xs bg-stone-50 border border-stone-300 rounded-xl px-3 py-2 text-stone-900 focus:outline-none focus:ring-1 focus:ring-amber-800"
+                    />
                   </div>
 
                   <div className="md:col-span-2">

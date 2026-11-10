@@ -16,6 +16,7 @@ import { useMarketplace } from '../context/MarketplaceContext';
 import { NEPAL_PROVINCES } from '../data/nepalGeography';
 import { PANCHANGA_AUSPICIOUS_MUHURATS } from '../data/panchangaCalendar';
 import { EventType } from '../types';
+import { NepalDistrictSelector, NepalProvinceSelector } from './NepalLocationSelector';
 import {
   MapPin,
   Calendar,
@@ -253,56 +254,32 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStaffPool }) => 
             {/* Quick Top Controls (Always visible for fast selection: Location, Event Type, Guests) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1 border-t border-stone-100">
               
-              {/* Quick Field 1: Province */}
+              {/* Quick Field 1: Province (All 7 Provinces selectable or typeable) */}
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-stone-600 flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-amber-700" />
-                  <span>{language === 'ne' ? 'प्रदेश (Province)' : 'Province'}</span>
-                </label>
-                <select
+                <NepalProvinceSelector
+                  label={language === 'ne' ? 'प्रदेश (Province)' : 'Province'}
                   value={selectedProvince}
-                  onChange={(e) => {
-                    setSelectedProvince(e.target.value);
-                    setSelectedDistrict('');
-                  }}
-                  className="w-full text-xs font-medium bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-2 text-stone-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
-                >
-                  <option value="">{language === 'ne' ? 'सबै प्रदेश (All Provinces)' : 'All 7 Provinces'}</option>
-                  {NEPAL_PROVINCES.map((p) => (
-                    <option key={p.id} value={p.name}>
-                      {language === 'ne' ? p.nepaliName : p.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(p) => setSelectedProvince(p)}
+                  includeAllOption
+                  allOptionLabel={language === 'ne' ? 'सबै प्रदेश (All Provinces)' : 'All 7 Provinces'}
+                  placeholder={language === 'ne' ? 'प्रदेश टाइप वा छनोट...' : 'Type or pick state...'}
+                />
               </div>
 
-              {/* Quick Field 2: District */}
+              {/* Quick Field 2: District (All 77 districts selectable or typeable) */}
               <div className="space-y-1">
-                <label className="text-[11px] font-semibold text-stone-600 flex items-center gap-1">
-                  <Compass className="w-3 h-3 text-amber-700" />
-                  <span>{language === 'ne' ? 'जिल्ला (District)' : 'District'}</span>
-                </label>
-                <select
+                <NepalDistrictSelector
+                  label={language === 'ne' ? 'जिल्ला (District)' : 'District'}
                   value={selectedDistrict}
-                  onChange={(e) => setSelectedDistrict(e.target.value)}
-                  disabled={!selectedProvince}
-                  className="w-full text-xs font-medium bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-2 text-stone-800 focus:outline-none focus:ring-1 focus:ring-amber-800 disabled:opacity-50"
-                >
-                  <option value="">
-                    {selectedProvince
-                      ? language === 'ne'
-                        ? 'जिल्ला छान्नुहोस्'
-                        : 'Select District'
-                      : language === 'ne'
-                      ? 'पहिला प्रदेश रोज्नुहोस्'
-                      : 'Choose Province first'}
-                  </option>
-                  {availableDistricts.map((d) => (
-                    <option key={d.name} value={d.name}>
-                      {language === 'ne' ? d.nepaliName : d.name}
-                    </option>
-                  ))}
-                </select>
+                  selectedProvince={selectedProvince}
+                  onChange={(district, province) => {
+                    setSelectedDistrict(district);
+                    if (province && !selectedProvince) {
+                      setSelectedProvince(province);
+                    }
+                  }}
+                  placeholder={language === 'ne' ? '७७ वटै जिल्ला टाइप वा छनोट...' : 'Type or pick from 77 districts...'}
+                />
               </div>
 
               {/* Quick Field 3: Celebration Type */}

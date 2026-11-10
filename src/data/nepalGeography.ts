@@ -517,3 +517,69 @@ export function getAdjacentDistricts(districtName: string): string[] {
   }
   return [];
 }
+
+/**
+ * Authoritative complete list of all 77 districts across Nepal
+ */
+export const ALL_77_DISTRICTS: Array<{
+  name: string;
+  nepaliName: string;
+  provinceName: string;
+  provinceNepaliName: string;
+}> = NEPAL_PROVINCES.flatMap((province) =>
+  province.districts.map((district) => ({
+    name: district.name,
+    nepaliName: district.nepaliName,
+    provinceName: province.name,
+    provinceNepaliName: province.nepaliName,
+  }))
+);
+
+/**
+ * Authoritative list of all 7 provinces of Nepal
+ */
+export const ALL_7_PROVINCES: Array<{
+  id: number;
+  name: string;
+  nepaliName: string;
+}> = NEPAL_PROVINCES.map((p) => ({
+  id: p.id,
+  name: p.name,
+  nepaliName: p.nepaliName,
+}));
+
+/**
+ * Resilient lookup finding a district by English or Nepali name
+ */
+export function findDistrictByName(query: string) {
+  if (!query) return null;
+  const q = query.trim().toLowerCase();
+  return (
+    ALL_77_DISTRICTS.find(
+      (d) =>
+        d.name.toLowerCase() === q ||
+        d.nepaliName === query.trim() ||
+        d.name.toLowerCase().includes(q) ||
+        d.nepaliName.includes(query.trim())
+    ) || null
+  );
+}
+
+/**
+ * Resilient lookup finding a province by English or Nepali name or number
+ */
+export function findProvinceByName(query: string) {
+  if (!query) return null;
+  const q = query.trim().toLowerCase();
+  return (
+    ALL_7_PROVINCES.find(
+      (p) =>
+        p.name.toLowerCase() === q ||
+        p.nepaliName === query.trim() ||
+        p.name.toLowerCase().includes(q) ||
+        p.nepaliName.includes(query.trim()) ||
+        `province ${p.id}`.toLowerCase() === q
+    ) || null
+  );
+}
+

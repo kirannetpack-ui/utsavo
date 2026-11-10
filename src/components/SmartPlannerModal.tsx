@@ -10,6 +10,7 @@ import { NEPAL_PROVINCES } from '../data/nepalGeography';
 import { PANCHANGA_AUSPICIOUS_MUHURATS } from '../data/panchangaCalendar';
 import { EventType } from '../types';
 import { X, Sparkles, ArrowRight, RotateCcw, Check, ChevronRight, HelpCircle } from 'lucide-react';
+import { NepalDistrictSelector, NepalProvinceSelector } from './NepalLocationSelector';
 
 export const SmartPlannerModal: React.FC = () => {
   const { language } = useLanguage();
@@ -31,6 +32,7 @@ export const SmartPlannerModal: React.FC = () => {
   const [needMandap, setNeedMandap] = useState<boolean>(true);
   const [needGenset, setNeedGenset] = useState<boolean>(true);
   const [parkingCarsRequired, setParkingCarsRequired] = useState<number>(80);
+  const [wantFoodRescueConsent, setWantFoodRescueConsent] = useState<boolean>(false);
 
   if (activeModal !== 'SMART_PLANNER') return null;
 
@@ -145,40 +147,29 @@ export const SmartPlannerModal: React.FC = () => {
 
               <div>
                 <label className="text-xs font-bold text-stone-700 block mb-2">
-                  2. {language === 'ne' ? 'कहाँ आयोजना गर्न चाहनुहुन्छ? (प्रदेश र जिल्ला)' : 'Where in Nepal do you want to organize it?'}
+                  2. {language === 'ne' ? 'कहाँ आयोजना गर्न चाहनुहुन्छ? (प्रदेश र जिल्ला)' : 'Where in Nepal do you want to organize it? (Choose or type)'}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <span className="text-[11px] text-stone-500 block mb-1">Province</span>
-                    <select
+                    <NepalProvinceSelector
+                      label="Province (प्रदेश)"
                       value={selectedProvince}
-                      onChange={(e) => {
-                        setSelectedProvince(e.target.value);
-                        setSelectedDistrict('');
-                      }}
-                      className="w-full text-xs font-medium bg-stone-50 border border-stone-200 rounded-lg p-2.5 text-stone-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
-                    >
-                      {NEPAL_PROVINCES.map((p) => (
-                        <option key={p.id} value={p.name}>
-                          {language === 'ne' ? p.nepaliName : p.name}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(p) => setSelectedProvince(p)}
+                      placeholder="Type or pick state..."
+                    />
                   </div>
 
                   <div>
-                    <span className="text-[11px] text-stone-500 block mb-1">District</span>
-                    <select
+                    <NepalDistrictSelector
+                      label="District (जिल्ला)"
                       value={selectedDistrict}
-                      onChange={(e) => setSelectedDistrict(e.target.value)}
-                      className="w-full text-xs font-medium bg-stone-50 border border-stone-200 rounded-lg p-2.5 text-stone-800 focus:outline-none focus:ring-1 focus:ring-amber-800"
-                    >
-                      {availableDistricts.map((d) => (
-                        <option key={d.name} value={d.name}>
-                          {language === 'ne' ? d.nepaliName : d.name}
-                        </option>
-                      ))}
-                    </select>
+                      selectedProvince={selectedProvince}
+                      onChange={(d, prov) => {
+                        setSelectedDistrict(d);
+                        if (prov && !selectedProvince) setSelectedProvince(prov);
+                      }}
+                      placeholder="Type or pick from 77 districts..."
+                    />
                   </div>
                 </div>
               </div>
@@ -290,6 +281,29 @@ export const SmartPlannerModal: React.FC = () => {
                     />
                     <span>{language === 'ne' ? '१००% पावर ब्याकअप जेनेरेटर सुनिश्चित हुनुपर्ने' : 'Uninterrupted Generator Power Backup'}</span>
                   </label>
+
+                  <div className="pt-2 border-t border-stone-200">
+                    <label className="flex items-start gap-2 text-xs text-stone-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={wantFoodRescueConsent}
+                        onChange={(e) => setWantFoodRescueConsent(e.target.checked)}
+                        className="rounded text-rose-800 focus:ring-rose-700 mt-0.5"
+                      />
+                      <span>
+                        <strong className="text-rose-950 font-bold block">
+                          {language === 'ne'
+                            ? '✨ अन्नपूर्णा सेवा (स्वेच्छिक): बाँकी रहेको भोजन वृद्धआश्रम वा संस्थामार्फत वितरण गर्ने'
+                            : '✨ Social Cause (Optional): Pledge surplus feast food to verified shelters with consent'}
+                        </strong>
+                        <span className="text-[11px] text-stone-500 block mt-0.5 leading-snug">
+                          {language === 'ne'
+                            ? 'क्लाइन्टको पूर्ण सहमतिमा मात्र ताजा भान्साको भोजन संकलन गरिनेछ (नितान्त ऐच्छिक)।'
+                            : '100% voluntary client consent: Untouched kitchen food dispatched safely under DFTQC norms.'}
+                        </span>
+                      </span>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>

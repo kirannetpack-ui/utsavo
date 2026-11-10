@@ -56,6 +56,7 @@ import {
 } from 'lucide-react';
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
 import { createDestinationInquiryMessage } from '../utils/communication';
+import { NepalDistrictSelector } from './NepalLocationSelector';
 
 interface DestinationCelebrationHubProps {
   onBackToExplore?: () => void;
@@ -1048,15 +1049,13 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
 
                     <div>
                       <label className="block font-semibold text-stone-700 mb-1">
-                        Specific Place / Landmark *
+                        Specific Place / District (७७ जिल्ला वा टाइप गर्नुहोस्) *
                       </label>
-                      <input
-                        type="text"
-                        required
+                      <NepalDistrictSelector
                         value={hotelLocation}
-                        onChange={(e) => setHotelLocation(e.target.value)}
-                        placeholder="e.g. Sarangkot Ridge, Pokhara"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        onChange={(dist) => setHotelLocation(dist)}
+                        placeholder="e.g. Kaski / Mustang / Chitwan (Type or pick)..."
+                        inputClassName="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                       />
                     </div>
 
@@ -1303,15 +1302,13 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
 
                     <div>
                       <label className="block font-semibold text-stone-700 mb-1">
-                        Place / Landing Hub *
+                        Landing Hub / District (७७ जिल्ला वा टाइप गर्नुहोस्) *
                       </label>
-                      <input
-                        type="text"
-                        required
+                      <NepalDistrictSelector
                         value={servicePlaceName}
-                        onChange={(e) => setServicePlaceName(e.target.value)}
-                        placeholder="e.g. Muktinath Shrines & Jomsom Hub"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                        onChange={(dist) => setServicePlaceName(dist)}
+                        placeholder="e.g. Mustang / Solukhumbu / Kaski (Type or pick)..."
+                        inputClassName="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                       />
                     </div>
                   </div>

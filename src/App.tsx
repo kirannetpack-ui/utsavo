@@ -35,6 +35,7 @@ import { Footer } from './components/Footer';
 import { EventStaffTalentPool } from './components/EventStaffTalentPool';
 import { VenueQuickPeekDrawer } from './components/VenueQuickPeekDrawer';
 import { AuspiciousPushNotificationToast } from './components/AuspiciousPushNotificationToast';
+import { ExcessFoodRescueSocialCause } from './components/ExcessFoodRescueSocialCause';
 
 const MainShell: React.FC = () => {
   const {
@@ -48,11 +49,11 @@ const MainShell: React.FC = () => {
     setQuickPeekVenueId,
   } = useMarketplace();
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL'>(() => {
+  const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const view = params.get('view')?.toUpperCase();
-      if (view === 'NIMANTRANA' || view === 'DESTINATION' || view === 'VENDORS' || view === 'ORGANIZERS' || view === 'DASHBOARD' || view === 'STAFF_POOL') {
+      if (view === 'NIMANTRANA' || view === 'DESTINATION' || view === 'VENDORS' || view === 'ORGANIZERS' || view === 'DASHBOARD' || view === 'STAFF_POOL' || view === 'SOCIAL_CAUSE') {
         return view as any;
       }
     }
@@ -183,6 +184,8 @@ const MainShell: React.FC = () => {
               onResetInitialOpenRegister={() => setAutoOpenStaffRegister(false)}
             />
           </div>
+        ) : activeView === 'SOCIAL_CAUSE' ? (
+          <ExcessFoodRescueSocialCause onBackToExplore={() => setActiveView('EXPLORE')} />
         ) : (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {currentUser.role === 'CUSTOMER' && (

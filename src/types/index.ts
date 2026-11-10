@@ -864,6 +864,10 @@ export interface EventStaffProfile {
   district: string;
   preferredLocalities: string[];
   isAvailableNow: boolean;
+  dateOfBirth?: string; // YYYY-MM-DD (DOB for Child Labour Prohibition verification)
+  ageYears?: number;
+  childLabourCompliantVerified: boolean; // Verified >= 18 under Nepal Child Labour Prohibition Act 2056 & Children's Act 2075
+  ageVerificationBadge?: string;
   experienceYears: number;
   pastVenuesWorked: string[];
   rating: number;
@@ -981,5 +985,41 @@ export interface AuspiciousPushAlert {
   urgencyLevel: 'HIGH' | 'MEDIUM' | 'NORMAL';
   matchedPreferenceReason?: string;
 }
+
+// -------------------------------------------------------------
+// SOCIAL CAUSE: ANNAPURNA SURPLUS FEAST FOOD RESCUE & RECOVERY
+// (Strict voluntary client consent driven - Nepal DFTQC compliant)
+// -------------------------------------------------------------
+export type FoodDistributionPartnerType = 
+  | 'UTSAVO_DIRECT_RESCUE'
+  | 'REGISTERED_ORGANIZATION'
+  | 'LOCAL_SHELTER_ASHRAM';
+
+export interface ExcessFoodRescuePledge {
+  id: string;
+  eventId?: string;
+  celebrationTitle: string;
+  venueName: string;
+  venueDistrict: string;
+  clientHostName: string;
+  clientPhone: string;
+  clientConsentGiven: boolean; // MANDATORY: Explicit client consent
+  clientConsentTimestamp?: string;
+  clientConsentDeclaration: string;
+  partnerType: FoodDistributionPartnerType;
+  organizationName: string; // e.g. "UTSAVO Annapurna Seva", "Food for Life Nepal", "Manav Sewa Ashram", "Rokpa Nepal"
+  estimatedSurplusPortions: number; // e.g. 50-150 portions
+  foodCategory: 'VEGETARIAN_SATVIK' | 'TRADITIONAL_NEPALI_FEAST' | 'BUFFET_VARIETY' | 'SWEETS_MITHAI';
+  eventEndTime: string;
+  safeWindowHours: number; // typically 2-3 hours
+  status: 'PENDING_CONSENT' | 'CONSENT_GRANTED' | 'SCHEDULED_FOR_RESCUE' | 'DISPATCHED' | 'SAFELY_SERVED' | 'CONSENT_WITHDRAWN';
+  temperatureAndSafetyChecked: boolean;
+  cleanStorageBoxesSuppliedByUtsavo: boolean;
+  recipientStoryNotes?: string;
+  beneficiariesFedCount?: number;
+  acknowledgementReceiptId?: string;
+  createdAt: string;
+}
+
 
 
