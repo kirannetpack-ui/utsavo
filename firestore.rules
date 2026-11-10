@@ -138,6 +138,14 @@ service cloud.firestore {
     match /test/{docId} {
       allow read, write: if true;
     }
+
+    // 9. Social Celebration Posts & Authentic Photo Wall
+    match /social_posts/{postId} {
+      allow get, list: if true; // Public celebration wall browsing
+      allow create: if true;    // Public celebration sharing with client-side sanitization
+      allow update: if true;    // Like counter increments
+      allow delete: if isAdmin();
+    }
   }
 }
 

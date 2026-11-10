@@ -911,3 +911,40 @@ export interface NepalGovtDirectiveItem {
   lastScannedAt: string;
 }
 
+// -------------------------------------------------------------
+// SOCIAL CELEBRATION WALL & AUTHENTIC TESTIMONIALS
+// -------------------------------------------------------------
+export interface SocialCelebrationPhoto {
+  url: string;
+  caption?: string;
+  tag?: 'STAGE_MANDAP' | 'DINING_BUFFET' | 'ENTRANCE' | 'COUPLE_PORTRAIT' | 'CANDID' | 'VENUE_EXTERIOR';
+}
+
+export interface SocialCelebrationPost {
+  id: string;
+  venueId: string;
+  venueName: string;
+  venueDistrict: string;
+  venueLocality?: string;
+  eventType: EventType;
+  celebrationTitle: string;        // e.g. "Rohan & Sneha's Traditional Vivah & Grand Reception"
+  hostName: string;                // e.g. "Rohan Shakya"
+  hostRole: string;                // e.g. "Groom", "Bride", "Father of Bride", "Bratabandha Parent"
+  reviewQuote: string;             // Concise memorable quote
+  detailedStory?: string;          // Full experiential testimonial
+  overallRating: number;           // 1 to 5 (e.g. 5.0)
+  cateringRating?: number;         // 1 to 5
+  hospitalityRating?: number;      // 1 to 5
+  eventDateBS: string;             // e.g. "2081 Mangsir 18"
+  eventDateAD: string;             // e.g. "2024-12-03"
+  guestCount: number;              // e.g. 550
+  photos: SocialCelebrationPhoto[];
+  coverPhoto: string;
+  verifiedBooking: boolean;        // True if verified via UTSAVO escrow or PAN invoice
+  likesCount: number;
+  userLiked?: boolean;
+  cateringHighlights?: string[];   // e.g. ["Live Jalebi Counter", "Hyderabadi Biryani", "Traditional Samay Baji"]
+  tags: string[];                  // e.g. ["#KathmanduWedding", "#GrandBallroom", "#ValetParking"]
+  createdAt: string;
+}
+

@@ -8,6 +8,15 @@ import { GoogleGenAI } from '@google/genai';
 
 export const apiRouter = Router();
 
+// Ongoing Security: Defensive HTTP Headers & Input Guardrails
+apiRouter.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+
 // Shared GoogleGenAI client (reads GEMINI_API_KEY from environment)
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,

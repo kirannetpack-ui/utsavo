@@ -33,9 +33,19 @@ import { OfflineIndicator } from './components/OfflineIndicator';
 import { MobileAppNavBar } from './components/MobileAppNavBar';
 import { Footer } from './components/Footer';
 import { EventStaffTalentPool } from './components/EventStaffTalentPool';
+import { VenueQuickPeekDrawer } from './components/VenueQuickPeekDrawer';
 
 const MainShell: React.FC = () => {
-  const { currentUser, activeModal, setActiveModal, openOrganizerRegistration } = useMarketplace();
+  const {
+    currentUser,
+    activeModal,
+    setActiveModal,
+    openOrganizerRegistration,
+    venues,
+    setSelectedVenue,
+    quickPeekVenueId,
+    setQuickPeekVenueId,
+  } = useMarketplace();
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
   const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL'>(() => {
     if (typeof window !== 'undefined') {
@@ -218,6 +228,17 @@ const MainShell: React.FC = () => {
       <SmartPlannerModal />
       <PanchangaCalendarModal />
       <VenueDetailModal />
+      <VenueQuickPeekDrawer
+        venue={venues.find((v) => v.id === quickPeekVenueId) || null}
+        onClose={() => setQuickPeekVenueId(null)}
+        onInspectFullDetails={(v) => {
+          setSelectedVenue(v);
+        }}
+        onStartNegotiation={(v) => {
+          setSelectedVenue(v);
+          setActiveModal('SMART_PLANNER');
+        }}
+      />
       <NegotiationDrawer />
       <BookingAgreementModal />
       <PaymentModal />

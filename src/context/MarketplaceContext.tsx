@@ -22,6 +22,7 @@ import {
   StaffReviewComment,
   NepalGovtDirectiveItem,
   StaffCustomRoleProposal,
+  SocialCelebrationPost,
 } from '../types';
 import { SEED_VENUES } from '../data/venuesData';
 import { SEED_BOOKINGS, SEED_NEGOTIATIONS, SEED_REVIEWS } from '../data/seedMarketplaceState';
@@ -29,6 +30,8 @@ import { SEED_EVENT_ORGANIZERS } from '../data/organizersData';
 import { initialCulturalVendors } from '../data/culturalVendorsData';
 import { SEED_DESTINATION_HOTELS, SEED_DESTINATION_VENDOR_SERVICES } from '../data/destinationVendorsData';
 import { SEED_EVENT_STAFF } from '../data/eventStaffData';
+import { SEED_SOCIAL_CELEBRATION_POSTS } from '../data/socialCelebrationData';
+import { sanitizeText, sanitizeUrl } from '../utils/security';
 import {
   SEED_NEPAL_GOVT_DIRECTIVES,
   NEPAL_GOVT_STATUTORY_WAGES,
@@ -183,6 +186,15 @@ interface MarketplaceContextType {
     vatPercent: number;
     tdsPercent: number;
   }>) => void;
+
+  // Social Celebration Wall (वास्तविक उत्सव अनुभव पर्खाल)
+  socialPosts: SocialCelebrationPost[];
+  addSocialPost: (post: Omit<SocialCelebrationPost, 'id' | 'createdAt' | 'likesCount'>) => SocialCelebrationPost;
+  likeSocialPost: (postId: string) => void;
+
+  // Maximum Information at Minimum Touchable - 1-Tap Quick Peek
+  quickPeekVenueId: string | null;
+  setQuickPeekVenueId: (venueId: string | null) => void;
 }
 
 const DEFAULT_USER: UserProfile = {
@@ -765,6 +777,82 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     );
   };
 
+  // -------------------------------------------------------------
+  // SOCIAL CELEBRATION WALL STATE & PERSISTENCE
+  // -------------------------------------------------------------
+  const [socialPosts, setSocialPosts] = useState<SocialCelebrationPost[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_social_posts_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load social posts', e);
+      }
+    }
+    return SEED_SOCIAL_CELEBRATION_POSTS;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_social_posts_v1', JSON.stringify(socialPosts));
+      } catch (e) {
+        console.warn('Failed to save social posts', e);
+      }
+    }
+  }, [socialPosts]);
+
+  const addSocialPost = (
+    post: Omit<SocialCelebrationPost, 'id' | 'createdAt' | 'likesCount'>
+  ): SocialCelebrationPost => {
+    const id = `post-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    // Defensive input sanitization
+    const sanitizedPhotos = (post.photos || []).map((p) => ({
+      ...p,
+      url: sanitizeUrl(p.url, 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80'),
+      caption: p.caption ? sanitizeText(p.caption, 200) : undefined,
+    }));
+
+    const sanitizedPost: SocialCelebrationPost = {
+      ...post,
+      id,
+      celebrationTitle: sanitizeText(post.celebrationTitle, 150),
+      hostName: sanitizeText(post.hostName, 100),
+      hostRole: sanitizeText(post.hostRole, 60),
+      reviewQuote: sanitizeText(post.reviewQuote, 400),
+      detailedStory: post.detailedStory ? sanitizeText(post.detailedStory, 2000) : undefined,
+      coverPhoto: sanitizeUrl(post.coverPhoto, sanitizedPhotos[0]?.url || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=80'),
+      photos: sanitizedPhotos,
+      tags: (post.tags || []).map((t) => sanitizeText(t, 40)),
+      cateringHighlights: (post.cateringHighlights || []).map((c) => sanitizeText(c, 60)),
+      likesCount: 1,
+      userLiked: true,
+      createdAt: new Date().toISOString(),
+    };
+
+    setSocialPosts((prev) => [sanitizedPost, ...prev]);
+    return sanitizedPost;
+  };
+
+  const likeSocialPost = (postId: string) => {
+    setSocialPosts((prev) =>
+      prev.map((post) => {
+        if (post.id === postId) {
+          const isLiked = !!post.userLiked;
+          return {
+            ...post,
+            userLiked: !isLiked,
+            likesCount: isLiked ? Math.max(0, post.likesCount - 1) : post.likesCount + 1,
+          };
+        }
+        return post;
+      })
+    );
+  };
+
+  // 1-Tap Quick Peek State
+  const [quickPeekVenueId, setQuickPeekVenueId] = useState<string | null>(null);
+
   const resetFilters = () => {
     setFilters(DEFAULT_FILTERS);
   };
@@ -1164,6 +1252,11 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         staffCustomRoles,
         proposeStaffCustomRole,
         reviewStaffCustomRole,
+        socialPosts,
+        addSocialPost,
+        likeSocialPost,
+        quickPeekVenueId,
+        setQuickPeekVenueId,
       }}
     >
       {children}

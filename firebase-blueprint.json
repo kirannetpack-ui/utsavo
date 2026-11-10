@@ -112,6 +112,24 @@
         "rating": { "type": "number", "description": "Rating score" }
       },
       "required": ["name", "category", "phone"]
+    },
+    "SocialCelebrationPost": {
+      "title": "Social Celebration Wall Story",
+      "description": "User-uploaded celebration story, photos, and authentic venue testimonials",
+      "type": "object",
+      "properties": {
+        "venueId": { "type": "string", "maxLength": 128, "description": "Venue ID" },
+        "venueName": { "type": "string", "maxLength": 150, "description": "Venue name" },
+        "celebrationTitle": { "type": "string", "maxLength": 150, "description": "Celebration title" },
+        "hostName": { "type": "string", "maxLength": 100, "description": "Host name" },
+        "hostRole": { "type": "string", "maxLength": 60, "description": "Host role" },
+        "reviewQuote": { "type": "string", "maxLength": 400, "description": "Key testimonial quote" },
+        "overallRating": { "type": "number", "description": "Overall rating 1 to 5" },
+        "guestCount": { "type": "number", "description": "Guest headcount" },
+        "verifiedBooking": { "type": "boolean", "description": "Verified booking flag" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      },
+      "required": ["venueId", "celebrationTitle", "hostName", "reviewQuote", "overallRating"]
     }
   },
   "firestore": {
@@ -142,6 +160,10 @@
     "/culturalVendors/{vendorId}": {
       "schema": "CulturalVendor",
       "description": "Cultural artist and ensemble profiles"
+    },
+    "/social_posts/{postId}": {
+      "schema": "SocialCelebrationPost",
+      "description": "Social celebration photos and testimonials"
     }
   }
 }
