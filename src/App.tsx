@@ -34,6 +34,7 @@ import { MobileAppNavBar } from './components/MobileAppNavBar';
 import { Footer } from './components/Footer';
 import { EventStaffTalentPool } from './components/EventStaffTalentPool';
 import { VenueQuickPeekDrawer } from './components/VenueQuickPeekDrawer';
+import { AuspiciousPushNotificationToast } from './components/AuspiciousPushNotificationToast';
 
 const MainShell: React.FC = () => {
   const {
@@ -223,6 +224,11 @@ const MainShell: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* Auspicious Push Notification Toast (Simulated Native Alerts) */}
+      <AuspiciousPushNotificationToast
+        onNavigateToCatalog={() => setActiveView('EXPLORE')}
+      />
 
       {/* Interactive Modals & Drawers */}
       <SmartPlannerModal />

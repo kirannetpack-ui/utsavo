@@ -37,7 +37,10 @@ import {
   Flame,
   Check,
   X,
-  Columns
+  Columns,
+  Bell,
+  Play,
+  Compass,
 } from 'lucide-react';
 
 interface CustomerDashboardProps {
@@ -65,6 +68,14 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
     removeSavedVendor,
     customerDashboardTab,
     setCustomerDashboardTab,
+    pushAlerts,
+    simulatePushAlert,
+    panchangaPreferences,
+    updatePanchangaPreferences,
+    markAlertAsRead,
+    clearAllAlerts,
+    setFilters,
+    unreadAlertsCount,
   } = useMarketplace();
 
   // Internal tab state synced with context
@@ -174,6 +185,26 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                 }`}
               >
                 {totalSavedCount}
+              </span>
+            </button>
+
+            {/* TAB 4: Auspicious Panchanga Alerts */}
+            <button
+              onClick={() => setActiveTab('ALERTS')}
+              className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                activeTab === 'ALERTS'
+                  ? 'bg-amber-900 text-white shadow-sm font-bold'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Bell className={`w-3.5 h-3.5 ${activeTab === 'ALERTS' ? 'text-amber-300' : 'text-amber-800'}`} />
+              <span>{language === 'ne' ? 'शुभ साइत सूचना' : 'Panchanga Alerts'}</span>
+              <span
+                className={`ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                  unreadAlertsCount > 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-stone-200 text-stone-700'
+                }`}
+              >
+                {pushAlerts.length}
               </span>
             </button>
           </div>
@@ -904,6 +935,167 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
             </div>
           )}
 
+        </div>
+      )}
+
+      {/* TAB 4: AUSPICIOUS PANCHANGA ALERTS & PROFILE PREFERENCES */}
+      {activeTab === 'ALERTS' && (
+        <div className="space-y-6">
+          {/* Header Card with Simulation Button */}
+          <div className="bg-gradient-to-r from-amber-900 via-stone-900 to-amber-950 rounded-3xl p-6 text-white shadow-lg border border-amber-500/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 rounded-full text-amber-300 text-xs font-semibold mb-2 border border-amber-400/40">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Smart Panchanga Push Notification Engine</span>
+              </div>
+              <h3 className="font-serif font-bold text-xl sm:text-2xl text-white">
+                Auspicious Dates Alerts & Profile Preferences
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-300 mt-1 max-w-xl">
+                Automatically alerts you to upcoming Sarva Siddhi wedding Lagnas, sacred Bratabandha Muhurats, and Pasni dates matching your profile's preferred months.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => simulatePushAlert()}
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-1.5 shadow-md transition-all whitespace-nowrap"
+              >
+                <Play className="w-4 h-4 fill-stone-950" />
+                <span>Simulate Push Alert</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Preferences Summary Bar */}
+          <div className="bg-white rounded-2xl border border-stone-200/90 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-1">
+              <div className="text-xs font-bold text-stone-800 uppercase tracking-wider">
+                Current Panchanga Preferences in Profile
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5 text-xs text-stone-600">
+                <span className="font-medium">Planning:</span>
+                {panchangaPreferences.eventTypes.map((et) => (
+                  <span key={et} className="px-2 py-0.5 bg-amber-100 text-amber-900 rounded-md font-semibold text-[11px]">
+                    {et}
+                  </span>
+                ))}
+                <span className="text-stone-300">•</span>
+                <span className="font-medium">Months:</span>
+                {panchangaPreferences.preferredMonthsBS.map((mo) => (
+                  <span key={mo} className="px-2 py-0.5 bg-stone-100 text-stone-800 rounded-md font-medium text-[11px]">
+                    {mo}
+                  </span>
+                ))}
+                <span className="text-stone-300">•</span>
+                <span className="text-stone-500 font-medium">{panchangaPreferences.leadTimeDays} days notice</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setActiveModal('PANCHANGA_CALENDAR')}
+              className="text-xs font-semibold text-amber-800 hover:text-amber-950 underline self-start sm:self-auto"
+            >
+              Open Panchanga Calendar →
+            </button>
+          </div>
+
+          {/* Matched Alerts Grid */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs text-stone-500 px-1">
+              <span>{pushAlerts.length} upcoming auspicious alerts generated</span>
+              {pushAlerts.length > 0 && (
+                <button
+                  onClick={clearAllAlerts}
+                  className="text-stone-400 hover:text-red-700 font-medium flex items-center gap-1"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Clear alerts</span>
+                </button>
+              )}
+            </div>
+
+            {pushAlerts.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-3xl border border-stone-200 p-6">
+                <Bell className="w-10 h-10 text-stone-300 mx-auto mb-2" />
+                <h4 className="font-bold text-stone-800 text-sm">No Alerts in Queue</h4>
+                <p className="text-xs text-stone-500 mt-1 max-w-sm mx-auto">
+                  Click 'Simulate Push Alert' above to trigger an instant simulated notification for upcoming auspicious Muhurats.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {pushAlerts.map((alert) => (
+                  <div
+                    key={alert.id}
+                    className={`rounded-2xl border p-4 transition-all flex flex-col justify-between ${
+                      alert.isRead
+                        ? 'bg-white border-stone-200'
+                        : 'bg-amber-50/70 border-amber-300/80 shadow-sm ring-1 ring-amber-400/20'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-950 border border-amber-200">
+                          {alert.eventType}
+                        </span>
+                        <span className="text-xs font-bold text-amber-900 font-serif">
+                          {alert.dateBS} ({alert.dateAD})
+                        </span>
+                      </div>
+
+                      <h4 className="font-serif font-bold text-sm text-stone-900">
+                        {language === 'ne' ? alert.titleNepali : alert.title}
+                      </h4>
+                      <p className="text-xs text-stone-600 mt-1 leading-relaxed">
+                        {language === 'ne' ? alert.messageNepali : alert.message}
+                      </p>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2 bg-stone-50 p-2.5 rounded-xl border border-stone-200 text-[11px] text-stone-700">
+                        <div className="truncate">Tithi: <strong>{alert.tithi}</strong></div>
+                        <div className="truncate">Window: <strong>{alert.auspiciousTime}</strong></div>
+                      </div>
+
+                      {alert.matchedPreferenceReason && (
+                        <div className="text-[11px] text-amber-800 mt-2 font-medium">
+                          ✓ {alert.matchedPreferenceReason}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
+                      <button
+                        onClick={() => {
+                          markAlertAsRead(alert.id);
+                          setFilters((prev) => ({
+                            ...prev,
+                            dateBS: alert.dateBS,
+                            eventType: alert.eventType,
+                          }));
+                          if (onNavigateView) {
+                            onNavigateView('EXPLORE');
+                          }
+                        }}
+                        className="flex-1 bg-amber-900 hover:bg-amber-950 text-white font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      >
+                        <Building2 className="w-3.5 h-3.5 text-amber-300" />
+                        <span>Find Party Palaces</span>
+                      </button>
+
+                      {!alert.isRead && (
+                        <button
+                          onClick={() => markAlertAsRead(alert.id)}
+                          className="px-3 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl text-xs font-medium"
+                        >
+                          Mark Read
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

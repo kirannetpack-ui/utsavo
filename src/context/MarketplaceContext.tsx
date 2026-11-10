@@ -23,7 +23,10 @@ import {
   NepalGovtDirectiveItem,
   StaffCustomRoleProposal,
   SocialCelebrationPost,
+  UserPanchangaPreferences,
+  AuspiciousPushAlert,
 } from '../types';
+import { PANCHANGA_AUSPICIOUS_MUHURATS } from '../data/panchangaCalendar';
 import { SEED_VENUES } from '../data/venuesData';
 import { SEED_BOOKINGS, SEED_NEGOTIATIONS, SEED_REVIEWS } from '../data/seedMarketplaceState';
 import { SEED_EVENT_ORGANIZERS } from '../data/organizersData';
@@ -141,8 +144,8 @@ interface MarketplaceContextType {
   isVendorSaved: (vendorId: string) => boolean;
   removeSavedVenue: (venueId: string) => void;
   removeSavedVendor: (vendorId: string) => void;
-  customerDashboardTab: 'BOOKINGS' | 'NEGOTIATIONS' | 'SAVED';
-  setCustomerDashboardTab: (tab: 'BOOKINGS' | 'NEGOTIATIONS' | 'SAVED') => void;
+  customerDashboardTab: 'BOOKINGS' | 'NEGOTIATIONS' | 'SAVED' | 'ALERTS';
+  setCustomerDashboardTab: (tab: 'BOOKINGS' | 'NEGOTIATIONS' | 'SAVED' | 'ALERTS') => void;
 
   // Cultural Artists & Custom Category Proposals
   culturalVendors: CulturalVendor[];
@@ -195,7 +198,28 @@ interface MarketplaceContextType {
   // Maximum Information at Minimum Touchable - 1-Tap Quick Peek
   quickPeekVenueId: string | null;
   setQuickPeekVenueId: (venueId: string | null) => void;
+
+  // Panchanga Auspicious Push Notification System (Simulated Local State)
+  panchangaPreferences: UserPanchangaPreferences;
+  updatePanchangaPreferences: (prefs: Partial<UserPanchangaPreferences>) => void;
+  pushAlerts: AuspiciousPushAlert[];
+  activePushToast: AuspiciousPushAlert | null;
+  dismissPushToast: () => void;
+  markAlertAsRead: (alertId: string) => void;
+  clearAllAlerts: () => void;
+  simulatePushAlert: (specificMuhuratId?: string) => void;
+  unreadAlertsCount: number;
 }
+
+export const DEFAULT_PANCHANGA_PREFS: UserPanchangaPreferences = {
+  enabled: true,
+  eventTypes: ['WEDDING', 'BRATABANDHA', 'PASNI'],
+  preferredMonthsBS: ['Mangsir', 'Magh', 'Falgun', 'Baishakh'],
+  leadTimeDays: 30,
+  pushSoundEnabled: true,
+  autoCheckOnLaunch: true,
+  minUrgencyLevel: 'ALL',
+};
 
 const DEFAULT_USER: UserProfile = {
   id: 'usr-current',
@@ -205,6 +229,7 @@ const DEFAULT_USER: UserProfile = {
   role: 'CUSTOMER',
   avatar: '',
   assignedVenueId: 'venue-regal-pavilion-ktm',
+  panchangaPreferences: DEFAULT_PANCHANGA_PREFS,
 };
 
 const DEFAULT_FILTERS: SearchFilterState = {
@@ -245,7 +270,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [activeModal, setActiveModal] = useState<'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER'>('NONE');
   const [activeNegotiationId, setActiveNegotiationId] = useState<string | null>(null);
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
-  const [customerDashboardTab, setCustomerDashboardTab] = useState<'BOOKINGS' | 'NEGOTIATIONS' | 'SAVED'>('BOOKINGS');
+  const [customerDashboardTab, setCustomerDashboardTab] = useState<'BOOKINGS' | 'NEGOTIATIONS' | 'SAVED' | 'ALERTS'>('BOOKINGS');
 
   // Bookmarking: Saved Venues & Event Vendors
   const [savedVenueIds, setSavedVenueIds] = useState<string[]>(() => {
@@ -853,6 +878,195 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
   // 1-Tap Quick Peek State
   const [quickPeekVenueId, setQuickPeekVenueId] = useState<string | null>(null);
 
+  // -------------------------------------------------------------
+  // PANCHANGA PREFERENCES & PUSH NOTIFICATION STATE SIMULATION
+  // -------------------------------------------------------------
+  const [panchangaPreferences, setPanchangaPreferences] = useState<UserPanchangaPreferences>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_panchanga_prefs_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load panchanga preferences', e);
+      }
+    }
+    return DEFAULT_PANCHANGA_PREFS;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_panchanga_prefs_v1', JSON.stringify(panchangaPreferences));
+      } catch (e) {
+        console.warn('Failed to save panchanga preferences', e);
+      }
+    }
+  }, [panchangaPreferences]);
+
+  const updatePanchangaPreferences = (prefs: Partial<UserPanchangaPreferences>) => {
+    setPanchangaPreferences((prev) => {
+      const updated = { ...prev, ...prefs };
+      setCurrentUser((user) => ({
+        ...user,
+        panchangaPreferences: updated,
+      }));
+      return updated;
+    });
+  };
+
+  // Sound chime helper
+  const playAuspiciousChime = () => {
+    if (typeof window === 'undefined') return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const ctx = new AudioContextClass();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 note
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5 note
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.85);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.85);
+    } catch {
+      // Audio might require user interaction in strict environments
+    }
+  };
+
+  // Seed Push Alerts
+  const [pushAlerts, setPushAlerts] = useState<AuspiciousPushAlert[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_push_alerts_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load push alerts', e);
+      }
+    }
+    return [
+      {
+        id: 'alert-mangsir-18',
+        muhuratId: 'muhurat-w-2',
+        title: '🔔 Upcoming Auspicious Wedding Muhurat (शुभ विवाह साइत)',
+        titleNepali: 'मंसिर १८ — गुरु आदित्य योग विवाह लगन',
+        message: 'Upcoming prime wedding date in Nepal (2081 Mangsir 18). Recommended booking party palaces now.',
+        messageNepali: 'तपाईंको मंसिर विवाह प्राथमिकता अनुसार मंसिर १८ गते अति शुभ लग्न परेको छ। पार्टी प्यालेस बुक गर्नुहोस्।',
+        dateBS: '2081 Mangsir 18',
+        dateAD: '2024-12-03',
+        tithi: 'Dwitiya (द्वितीया)',
+        nakshatra: 'Mool (मूल)',
+        eventType: 'WEDDING',
+        auspiciousTime: '11:00 AM - 04:30 PM',
+        significance: 'Highly auspicious Lagna under Guru Aditya Yoga. Peak party palace booking demand.',
+        isRead: false,
+        timestamp: new Date().toISOString(),
+        urgencyLevel: 'HIGH',
+        matchedPreferenceReason: 'Matched preference: Wedding (विवाह) & Mangsir month',
+      },
+      {
+        id: 'alert-magh-22-basanta',
+        muhuratId: 'muhurat-w-4',
+        title: '🌸 Basanta Panchami Auspicious Alert (श्रीपञ्चमी)',
+        titleNepali: 'माघ २२ — वसन्त पञ्चमी (अति शुभ अबुझ साइत)',
+        message: '2081 Magh 22 is Saraswati Puja — universally auspicious for all celebrations without horoscope matching.',
+        messageNepali: 'माघ २२ गते सरस्वती पूजा तथा वसन्त पञ्चमी — विवाह तथा पास्नीको लागि स्वतः शुभ साइत।',
+        dateBS: '2081 Magh 22',
+        dateAD: '2025-02-04',
+        tithi: 'Panchami (वसन्त पञ्चमी / श्रीपञ्चमी)',
+        nakshatra: 'Revati (रेवती)',
+        eventType: 'WEDDING',
+        auspiciousTime: 'Abhijit Muhurat (11:45 AM - 12:35 PM)',
+        significance: 'Universally auspicious day requiring no astrological horoscope matching.',
+        isRead: false,
+        timestamp: new Date(Date.now() - 86400000).toISOString(),
+        urgencyLevel: 'HIGH',
+        matchedPreferenceReason: 'Matched preference: Wedding & Magh month',
+      },
+    ];
+  });
+
+  const [activePushToast, setActivePushToast] = useState<AuspiciousPushAlert | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_push_alerts_v1', JSON.stringify(pushAlerts));
+      } catch (e) {
+        console.warn('Failed to save push alerts', e);
+      }
+    }
+  }, [pushAlerts]);
+
+  const dismissPushToast = () => {
+    setActivePushToast(null);
+  };
+
+  const markAlertAsRead = (alertId: string) => {
+    setPushAlerts((prev) =>
+      prev.map((a) => (a.id === alertId ? { ...a, isRead: true } : a))
+    );
+  };
+
+  const clearAllAlerts = () => {
+    setPushAlerts([]);
+    setActivePushToast(null);
+  };
+
+  const simulatePushAlert = (specificMuhuratId?: string) => {
+    // Pick an auspicious muhurat matching preferences or specific one
+    let targetMuhurat = specificMuhuratId
+      ? PANCHANGA_AUSPICIOUS_MUHURATS.find((m) => m.id === specificMuhuratId)
+      : null;
+
+    if (!targetMuhurat) {
+      // Find one matching preferred event types or months
+      const matching = PANCHANGA_AUSPICIOUS_MUHURATS.filter((m) => {
+        const matchesType = panchangaPreferences.eventTypes.includes(m.eventType);
+        const matchesMonth = panchangaPreferences.preferredMonthsBS.some((mo) => m.dateBS.includes(mo));
+        return matchesType || matchesMonth;
+      });
+      // Pick random or cycle
+      const pool = matching.length > 0 ? matching : PANCHANGA_AUSPICIOUS_MUHURATS;
+      const randomIndex = Math.floor(Math.random() * pool.length);
+      targetMuhurat = pool[randomIndex];
+    }
+
+    if (!targetMuhurat) return;
+
+    const newAlert: AuspiciousPushAlert = {
+      id: `alert-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      muhuratId: targetMuhurat.id,
+      title: `🔔 Auspicious ${targetMuhurat.eventType} Alert: ${targetMuhurat.dateBS}`,
+      titleNepali: `${targetMuhurat.dateBS} — शुभ ${targetMuhurat.eventType === 'WEDDING' ? 'विवाह लगन' : targetMuhurat.eventType === 'BRATABANDHA' ? 'व्रतबन्ध साइत' : 'उत्सव मुहूर्त'}`,
+      message: `${targetMuhurat.tithi} • ${targetMuhurat.nakshatra}. Auspicious window: ${targetMuhurat.auspiciousTime}`,
+      messageNepali: `${targetMuhurat.significance}`,
+      dateBS: targetMuhurat.dateBS,
+      dateAD: targetMuhurat.dateAD,
+      tithi: targetMuhurat.tithi,
+      nakshatra: targetMuhurat.nakshatra,
+      eventType: targetMuhurat.eventType,
+      auspiciousTime: targetMuhurat.auspiciousTime,
+      significance: targetMuhurat.significance,
+      isRead: false,
+      timestamp: new Date().toISOString(),
+      urgencyLevel: 'HIGH',
+      matchedPreferenceReason: `Matched profile preferences (${targetMuhurat.eventType} in ${targetMuhurat.dateBS.split(' ')[1] || 'Nepal'})`,
+    };
+
+    setPushAlerts((prev) => [newAlert, ...prev]);
+    setActivePushToast(newAlert);
+
+    if (panchangaPreferences.pushSoundEnabled) {
+      playAuspiciousChime();
+    }
+  };
+
+  const unreadAlertsCount = pushAlerts.filter((a) => !a.isRead).length;
+
   const resetFilters = () => {
     setFilters(DEFAULT_FILTERS);
   };
@@ -1257,6 +1471,15 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         likeSocialPost,
         quickPeekVenueId,
         setQuickPeekVenueId,
+        panchangaPreferences,
+        updatePanchangaPreferences,
+        pushAlerts,
+        activePushToast,
+        dismissPushToast,
+        markAlertAsRead,
+        clearAllAlerts,
+        simulatePushAlert,
+        unreadAlertsCount,
       }}
     >
       {children}

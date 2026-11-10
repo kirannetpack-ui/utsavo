@@ -22,6 +22,7 @@ export interface UserProfile {
   organization?: string;
   assignedVenueId?: string;
   assignedOrganizerId?: string;
+  panchangaPreferences?: UserPanchangaPreferences;
 }
 
 export type EventType = 
@@ -947,4 +948,38 @@ export interface SocialCelebrationPost {
   tags: string[];                  // e.g. ["#KathmanduWedding", "#GrandBallroom", "#ValetParking"]
   createdAt: string;
 }
+
+// -------------------------------------------------------------
+// PANCHANGA PREFERENCES & AUSPICIOUS PUSH NOTIFICATIONS
+// -------------------------------------------------------------
+export interface UserPanchangaPreferences {
+  enabled: boolean;
+  eventTypes: EventType[];
+  preferredMonthsBS: string[];     // e.g. ['Mangsir', 'Magh', 'Falgun', 'Baishakh']
+  leadTimeDays: number;            // e.g. 7, 14, 30 days before the Muhurat
+  pushSoundEnabled: boolean;
+  autoCheckOnLaunch: boolean;
+  minUrgencyLevel: 'ALL' | 'HIGH_DEMAND_ONLY';
+}
+
+export interface AuspiciousPushAlert {
+  id: string;
+  muhuratId: string;
+  title: string;
+  titleNepali: string;
+  message: string;
+  messageNepali: string;
+  dateBS: string;                  // e.g. "2081 Mangsir 18"
+  dateAD: string;                  // e.g. "2024-12-03"
+  tithi: string;                   // e.g. "Dwitiya (द्वितीया)"
+  nakshatra: string;               // e.g. "Mool (मूल)"
+  eventType: EventType;
+  auspiciousTime: string;          // e.g. "11:00 AM - 04:30 PM"
+  significance: string;
+  isRead: boolean;
+  timestamp: string;
+  urgencyLevel: 'HIGH' | 'MEDIUM' | 'NORMAL';
+  matchedPreferenceReason?: string;
+}
+
 

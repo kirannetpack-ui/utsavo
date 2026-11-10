@@ -7,11 +7,12 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { UserRole } from '../types';
-import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Tag, Music, UtensilsCrossed, FileText, Layers, Bookmark, Briefcase } from 'lucide-react';
+import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Tag, Music, UtensilsCrossed, FileText, Layers, Bookmark, Briefcase, Bell } from 'lucide-react';
 import { auth, loginWithGoogle, logoutUser, testFirestoreConnection } from '../firebase/config';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { BrandLogo } from './BrandLogo';
 import { PWAInstallButton } from './PWAInstallButton';
+import { AuspiciousNotificationCenter } from './AuspiciousNotificationCenter';
 
 interface HeaderProps {
   activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL';
@@ -39,8 +40,10 @@ export const Header: React.FC<HeaderProps> = ({
     savedVendorIds,
     customerDashboardTab,
     setCustomerDashboardTab,
+    unreadAlertsCount,
   } = useMarketplace();
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const [isNotificationCenterOpen, setIsNotificationCenterOpen] = useState(false);
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
 
   useEffect(() => {
@@ -192,6 +195,21 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Zone 3: 1 Primary Action + Role/Language/Firebase Controls */}
           <div className="flex items-center gap-2 shrink-0">
+            {/* Auspicious Panchanga Push Alert Notification Bell */}
+            <button
+              onClick={() => setIsNotificationCenterOpen(true)}
+              className="relative p-2 text-stone-700 hover:text-amber-900 hover:bg-stone-100 rounded-lg transition-colors cursor-pointer"
+              title="Auspicious Panchanga Alerts (शुभ साइत सूचना)"
+              aria-label="Panchanga notifications"
+            >
+              <Bell className="w-4 h-4 text-amber-800" />
+              {unreadAlertsCount > 0 && (
+                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-red-600 text-white font-bold text-[10px] flex items-center justify-center shadow-xs animate-pulse">
+                  {unreadAlertsCount}
+                </span>
+              )}
+            </button>
+
             {/* PWA Install Button */}
             <PWAInstallButton variant="header" />
 
@@ -418,6 +436,13 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
       </div>
+
+      {/* Auspicious Notification Center Drawer */}
+      <AuspiciousNotificationCenter
+        isOpen={isNotificationCenterOpen}
+        onClose={() => setIsNotificationCenterOpen(false)}
+        onNavigateToExplore={() => setActiveView('EXPLORE')}
+      />
     </header>
   );
 };
