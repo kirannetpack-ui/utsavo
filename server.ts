@@ -38,9 +38,28 @@ async function startServer() {
       server: {
         middlewareMode: true,
         hmr: false,
+        ws: false,
       },
       appType: 'spa',
     });
+
+    // Prevent @vite/client from opening an HMR WebSocket connection in reverse-proxy/disabled-HMR environments
+    app.get('/@vite/client', async (_req, res, next) => {
+      try {
+        const result = await vite.transformRequest('/@vite/client');
+        if (!result) return next();
+        const patchedCode = result.code
+          .replace(
+            /transport\.connect\(createHMRHandler\(handleMessage\)\);?/g,
+            '/* HMR WebSocket connection disabled */'
+          )
+          .replace(/wsTransport\.send\(data\)/g, 'Promise.resolve()');
+        res.status(200).set({ 'Content-Type': 'application/javascript' }).end(patchedCode);
+      } catch (err) {
+        next(err);
+      }
+    });
+
     app.use(vite.middlewares);
 
     // Fallback for HTML5 client-side routing (e.g. /invite/UTS-INV-8921)
