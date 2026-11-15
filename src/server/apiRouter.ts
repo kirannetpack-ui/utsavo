@@ -3,8 +3,8 @@
  * Shared across standalone server (AI Studio dev) and Vercel serverless deployment
  */
 
-import { Router } from 'express';
-import { GoogleGenAI } from '@google/genai';
+import { Router, type Response } from 'express';
+import { GoogleGenAI, Type } from '@google/genai';
 
 export const apiRouter = Router();
 
@@ -228,7 +228,7 @@ Please provide a structured, inspiring, highly practical destination blueprint w
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-4-hydrogen',
       contents: prompt,
       config: {
         tools: [{ googleSearch: {} }],
@@ -256,6 +256,74 @@ Please provide a structured, inspiring, highly practical destination blueprint w
       error: err.message || 'Failed to source destination intelligence',
       fallbackText:
         'Nepal offers world-renowned destination celebration venues. For Pokhara and Annapurna, peak seasons are September-December and February-May. International guests can obtain 15/30/90-day visas on arrival at Kathmandu (TIA) or Pokhara International Airport. Luxury banquet resorts in Pokhara and Kathmandu provide full Vedic mandap setups, sound rigs with quiet curfew at 10:30 PM, and chartered helicopter flights to Annapurna or Everest.',
+    });
+  }
+});
+
+// 5B. Celebrations Outside Nepal (International Worldwide Arrangement & Concierge Sourcing)
+apiRouter.post('/destination-outside-nepal-sourcing', async (req, res) => {
+  try {
+    const dossier = req.body || {};
+
+    const prompt = `
+You are UTSAVO's Executive International Celebration Director. A client wants to host an unforgettable celebration OUTSIDE OF NEPAL.
+Using live Google Search grounding, research practical hospitality, visa, cultural ceremony, and memorable experiential arrangements for the target country & city below.
+
+Client Gathered Dossier:
+- Lead Host: ${dossier.clientName || 'Valued Host'}
+- Target Country & City Abroad: ${dossier.targetCityOrRegion || 'Phuket'}, ${dossier.targetCountry || 'Thailand'}
+- Origin Hubs: ${dossier.originCities || 'Kathmandu, London, Sydney'}
+- Guest Passport Nationalities: ${dossier.guestPassportNationalities || 'Nepali, UK, US'} (Group Visa Concierge Needed: ${dossier.needGroupVisaConcierge ? 'Yes' : 'No'})
+- Occasion & Days: ${dossier.celebrationType || 'Destination Wedding'} (${dossier.celebrationDaysCount || 3} Days)
+- Preferred Dates / Muhurat: ${dossier.preferredDateWindowAD || 'Flexible peak season'} ${dossier.auspiciousMuhuratReferenceBS ? `(Muhurat: ${dossier.auspiciousMuhuratReferenceBS})` : ''}
+- Guests & Rooms: ${dossier.estimatedGuests || 150} guests · ${dossier.roomBlockCount || 60} hotel rooms
+- Venue Setting Archetype: ${dossier.accommodationArchetype || '5-Star Beachfront Resort'}
+- Ceremonial Rituals: ${(dossier.ceremonialRitualsIncluded || []).join(', ') || 'Mehndi, Sangeet, Baraat, Vedic Vivah, Reception'}
+- Cultural Bridge From Nepal: Panche Baja/Troupe (${dossier.culturalBridgeNeeds?.flyPancheBajaOrFolkTroupe ? 'Yes' : 'No'}), Puja Samagri Shipping (${dossier.culturalBridgeNeeds?.shipPujaSamagriAndAttire ? 'Yes' : 'No'}), Bilingual Acharya (${dossier.culturalBridgeNeeds?.bilingualVedicOrBuddhistPriest ? 'Yes' : 'No'}), 4K Broadcast to Nepal (${dossier.culturalBridgeNeeds?.liveBroadcastBackToNepal ? 'Yes' : 'No'})
+- Culinary Design: Dietary (${(dossier.culinaryDesign?.dietaryProfiles || []).join(', ')}), Fly Maharaj Chef (${dossier.culinaryDesign?.flyNepaliMaharajChef ? 'Yes' : 'No'}), Signature Counters (${dossier.culinaryDesign?.signatureCounters || 'Nepali & International Fusion'})
+- Signature Unforgettable Moments: ${(dossier.memorableSignatureExperiences || []).join(', ') || 'Grand Baraat, Welcome Hampers, Excursion'}
+- Love Story / Aesthetic Theme: ${dossier.loveStoryOrMilestoneTheme || 'Timeless family heritage'} (${dossier.aestheticColorPalette || 'Crimson & Gold'})
+- Target Budget: ${dossier.currency || 'USD'} ${dossier.budgetAmount || '45,000'}
+- Special Dreams: ${dossier.specialDreamsAndNotes || 'Create lifelong memories'}
+
+Provide a structured, inspiring, actionable arrangement blueprint with these 5 sections:
+1. PASSPORTS, GROUP VISAS & FLIGHT CORRIDOR FROM NEPAL/DIASPORA: Practical entry/visa rules for Nepali & international passport holders traveling to ${dossier.targetCountry || 'the destination'}, best connecting airlines from TIA Kathmandu, and group room-block attrition tips.
+2. RECOMMENDED 5-STAR & ICONIC VENUE SETTINGS: Specific star-hotel / resort / palace tiers in ${dossier.targetCityOrRegion || 'the destination'} suited for ${(dossier.estimatedGuests || 150)} guests, local Vedic fire/Havan permits, and evening sound curfew laws.
+3. CULTURAL BRIDGE & CULINARY EXECUTION ABROAD: Step-by-step plan for flying/sourcing Panchai Baja & Bilingual Priest, shipping wedding Puja Samagri & Dhaka/silk wardrobes cleanly through customs, and executing the requested culinary counters.
+4. SIGNATURE WOW-MOMENT & MEMORY PRODUCTION TIMELINE: Multi-day experiential flow integrating their theme, requested unforgettable moments, and family livestream back to Nepal.
+5. ESTIMATED BUDGET ALLOCATION MATRIX: Transparent percentage & ${dossier.currency || 'USD'} estimate across Hotel Room Block, Banquet & Beverage, Decor & Sound Rig, Artists/Priest Travel, and Guest Excursions.
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-4-hydrogen',
+      contents: prompt,
+      config: {
+        tools: [{ googleSearch: {} }],
+        systemInstruction:
+          'You are UTSAVO Executive International Celebration Director helping Nepali diaspora and global clients host extraordinary weddings and milestones outside Nepal. Be practical, accurate on international venue/fire/visa logistics, and deeply creative.',
+      },
+    });
+
+    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+    const webSources = groundingChunks
+      .filter((c: any) => c.web)
+      .map((c: any) => ({
+        title: c.web.title,
+        uri: c.web.uri,
+      }));
+
+    res.json({
+      text: response.text || '',
+      sources: webSources,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error('Outside-Nepal Destination Sourcing Error:', err);
+    const { targetCityOrRegion = 'Selected Global City', targetCountry = 'International Destination', currency = 'USD', budgetAmount = 45000, estimatedGuests = 150 } = req.body || {};
+    res.json({
+      text: `### Global Celebration Arrangement Blueprint: ${targetCityOrRegion}, ${targetCountry}\n\n**1. Travel, Visas & Flight Corridors**\n- Coordinated group arrivals from Kathmandu (TIA) and global diaspora hubs (London, New York, Sydney, Dubai).\n- Dedicated sponsor invitation letters prepared for Nepali passport holders 60–90 days prior, alongside airport meet-and-greet greeters and VIP coach transfers.\n\n**2. Star-Hotel & Sacred Ceremony Compliance**\n- Shortlisting 5-star beachfront, palace, or boutique buyout properties for ${estimatedGuests} guests with private outdoor lawns and air-conditioned late-night afterparty ballrooms.\n- Securing venue-approved smokeless copper Havan Kund permits and pre-cleared sound curfews.\n\n**3. Cultural Bridge & Culinary Design**\n- Dedicated Nepali Maharaj culinary team coordination with live Momo/Thakali/Chaat stations plus strict vegetarian/Jain kitchen separation.\n- Priority luggage allocation for Puja Samagri, Dhaka Topi welcome kits, and bilingual English/Sanskrit Vedic Acharya.\n\n**4. Unforgettable Memory Production**\n- Welcome suite hampers upon check-in, grand signature arrival procession, curated excursion afternoon, and 4K multi-camera broadcast for elders back in Nepal.\n\n**5. Budget Allocation Benchmark (${currency} ${Number(budgetAmount).toLocaleString()})**\n- 42% Venue Buyout & Banquet · 22% Room Blocks & Transfers · 18% Floral/Mandap/AV Production · 10% Artists/Priest/Culinary Fly-In · 8% Wow Moments & Excursions.`,
+      sources: [],
+      timestamp: new Date().toISOString(),
     });
   }
 });
@@ -337,4 +405,931 @@ D. Actionable Recommendation for Platform Admin (Whether to Apply or Maintain)
     });
   }
 });
+
+// 6. AI Negotiation Summary Endpoint (gemini-4-hydrogen structured JSON)
+apiRouter.post('/negotiation-summary', async (req, res) => {
+  const thread = req.body?.thread;
+  if (!thread || !Array.isArray(thread.versions) || thread.versions.length === 0) {
+    return res.status(400).json({ error: 'A valid negotiation thread with versions is required.' });
+  }
+
+  const versions = thread.versions as Array<any>;
+  const messages = Array.isArray(thread.messages) ? thread.messages : [];
+  const firstOffer = versions[0];
+  const latestOffer = versions[versions.length - 1];
+
+  const perPlateDelta = (latestOffer.proposedPerPlateNpr || 0) - (firstOffer.proposedPerPlateNpr || 0);
+  const hallDelta = (latestOffer.hallRentalNpr || 0) - (firstOffer.hallRentalNpr || 0);
+  const totalDelta = (latestOffer.totalNpr || 0) - (firstOffer.totalNpr || 0);
+
+  const buildDeterministicSummary = () => {
+    const isAccepted = thread.status === 'ACCEPTED';
+    const isRejected = thread.status === 'REJECTED';
+
+    const priceProgressionSummary =
+      versions.length === 1
+        ? `Single-version quotation at NPR ${Number(latestOffer.proposedPerPlateNpr).toLocaleString()}/plate and NPR ${Number(latestOffer.hallRentalNpr).toLocaleString()} hall rental for ${latestOffer.guestCount} guests (Total incl. 10% SC + 13% VAT: NPR ${Number(latestOffer.totalNpr).toLocaleString()}).`
+        : `Across ${versions.length} recorded versions, per-plate pricing moved from NPR ${Number(firstOffer.proposedPerPlateNpr).toLocaleString()} (v1) to NPR ${Number(latestOffer.proposedPerPlateNpr).toLocaleString()} (v${latestOffer.version}) [${perPlateDelta >= 0 ? '+' : ''}NPR ${perPlateDelta.toLocaleString()}/plate], while hall rental adjusted from NPR ${Number(firstOffer.hallRentalNpr).toLocaleString()} to NPR ${Number(latestOffer.hallRentalNpr).toLocaleString()} [${hallDelta >= 0 ? '+' : ''}NPR ${hallDelta.toLocaleString()}]. Final total moved by ${totalDelta >= 0 ? '+' : ''}NPR ${totalDelta.toLocaleString()} to NPR ${Number(latestOffer.totalNpr).toLocaleString()} inclusive of 10% service charge and 13% VAT.`;
+
+    const timelineHighlights = versions.map(
+      (v) =>
+        `v${v.version} (${v.senderRole === 'CUSTOMER' ? 'Customer' : 'Venue Operator'}): Proposed NPR ${Number(v.proposedPerPlateNpr).toLocaleString()}/plate · Hall NPR ${Number(v.hallRentalNpr).toLocaleString()} · ${v.guestCount} guests · Total NPR ${Number(v.totalNpr).toLocaleString()}${v.specialRequests ? ` — Note: "${v.specialRequests}"` : ''}`
+    );
+
+    const agreedTermsList: string[] = [
+      `Event Date & Shift: ${latestOffer.dateBS} BS (${latestOffer.dateAD} AD) · ${latestOffer.shift} Shift · ${latestOffer.guestCount} guaranteed guests`,
+      `Commercial Rate: NPR ${Number(latestOffer.proposedPerPlateNpr).toLocaleString()}/plate + NPR ${Number(latestOffer.hallRentalNpr).toLocaleString()} hall rental (incl. 10% SC & 13% IRD VAT)`,
+      ...(Array.isArray(latestOffer.includedAmenities) && latestOffer.includedAmenities.length > 0
+        ? [`Included Amenities (${latestOffer.includedAmenities.length}): ${latestOffer.includedAmenities.join(', ')}`]
+        : []),
+    ];
+    if (latestOffer.specialRequests) {
+      agreedTermsList.push(`Recorded Concessions / Special Terms: ${latestOffer.specialRequests}`);
+    }
+
+    return {
+      executiveOverview: isAccepted
+        ? `Both ${thread.customerName} and ${thread.venueName} mutually finalized Enquiry #${thread.enquiryId} at Version ${latestOffer.version} for a binding total of NPR ${Number(latestOffer.totalNpr).toLocaleString()} (25% escrow deposit: NPR ${Math.round(Number(latestOffer.totalNpr) * 0.25).toLocaleString()}). All counter-offers and concessions remain locked in the permanent audit record.`
+        : isRejected
+        ? `Negotiation #${thread.enquiryId} between ${thread.customerName} and ${thread.venueName} closed after ${versions.length} offer version(s) without final acceptance. The full commercial history remains preserved for reference.`
+        : `Negotiation #${thread.enquiryId} between ${thread.customerName} and ${thread.venueName} is currently active at Version ${latestOffer.version} (${String(thread.status).replace(/_/g, ' ')}) with a current proposed total of NPR ${Number(latestOffer.totalNpr).toLocaleString()} across ${versions.length} recorded offer(s).`,
+      priceProgressionSummary,
+      concessionsAndAgreedTerms: agreedTermsList,
+      transparentAuditHighlights: timelineHighlights,
+      fairnessAndReadinessNote: isAccepted
+        ? 'Terms are mutually ratified and ready for digital contract execution and 25% escrow deposit settlement under Nepal Contract Act 2056.'
+        : 'Both customer and venue operator can review every counter-offer delta below before locking final terms or submitting another counter-proposal.',
+      generatedWith: 'UTSAVO Deterministic Audit Synthesizer',
+      generatedAt: new Date().toISOString(),
+    };
+  };
+
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      return res.json(buildDeterministicSummary());
+    }
+
+    const serializedVersions = versions.map((v) => ({
+      version: v.version,
+      senderRole: v.senderRole,
+      senderName: v.senderName,
+      timestamp: v.timestamp,
+      dateBS: v.dateBS,
+      dateAD: v.dateAD,
+      shift: v.shift,
+      guestCount: v.guestCount,
+      proposedPerPlateNpr: v.proposedPerPlateNpr,
+      hallRentalNpr: v.hallRentalNpr,
+      subtotalNpr: v.subtotalNpr,
+      serviceChargeNpr: v.serviceChargeNpr,
+      vatNpr: v.vatNpr,
+      totalNpr: v.totalNpr,
+      includedAmenities: v.includedAmenities || [],
+      specialRequests: v.specialRequests || '',
+      notes: v.notes || '',
+    }));
+
+    const serializedMessages = messages.map((m: any) => ({
+      senderRole: m.senderRole,
+      senderName: m.senderName,
+      text: m.text,
+      timestamp: m.timestamp,
+    }));
+
+    const prompt = `
+Analyze the following structured banquet negotiation thread on UTSAVO (Nepal's party palace & event marketplace) and produce an impartial, crystal-clear negotiation summary record for BOTH the customer and the venue vendor.
+
+Thread Metadata:
+- Enquiry ID: ${thread.enquiryId}
+- Venue: ${thread.venueName}
+- Customer: ${thread.customerName}
+- Event Type: ${thread.eventType}
+- Current Status: ${thread.status}
+- Current Active Version: v${thread.currentVersion}
+
+Offer Versions History (chronological):
+${JSON.stringify(serializedVersions, null, 2)}
+
+Discussion Messages:
+${JSON.stringify(serializedMessages, null, 2)}
+
+Strictly summarize ONLY the facts, NPR amounts, concessions, amenities, and dates present in the data above. Do not invent numbers.
+`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-4-hydrogen',
+      contents: prompt,
+      config: {
+        systemInstruction:
+          'You are an impartial commercial agreement auditor for UTSAVO Nepal. Produce concise, factual summaries reconciling counter-offers, price deltas in NPR, concessions, and agreed terms so both customer and vendor share a single source of truth.',
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            executiveOverview: {
+              type: Type.STRING,
+              description: '2-3 sentence impartial overview of negotiation outcome or current standing, citing Enquiry ID, parties, version count, and total NPR.',
+            },
+            priceProgressionSummary: {
+              type: Type.STRING,
+              description: 'Clear summary of how per-plate rates, hall rental, and total NPR changed from initial proposal to latest/accepted offer.',
+            },
+            concessionsAndAgreedTerms: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: 'List of agreed commercial rates, complimentary concessions, included amenities, date/shift, and tax structure.',
+            },
+            transparentAuditHighlights: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: 'Chronological bullet summary of each offer version and major discussion concession.',
+            },
+            fairnessAndReadinessNote: {
+              type: Type.STRING,
+              description: '1 concise impartial note on agreement transparency and readiness for formal contract/escrow.',
+            },
+          },
+          required: [
+            'executiveOverview',
+            'priceProgressionSummary',
+            'concessionsAndAgreedTerms',
+            'transparentAuditHighlights',
+            'fairnessAndReadinessNote',
+          ],
+        },
+      },
+    });
+
+    const parsed = JSON.parse((response.text || '{}').trim());
+    return res.json({
+      executiveOverview: parsed.executiveOverview || buildDeterministicSummary().executiveOverview,
+      priceProgressionSummary:
+        parsed.priceProgressionSummary || buildDeterministicSummary().priceProgressionSummary,
+      concessionsAndAgreedTerms:
+        Array.isArray(parsed.concessionsAndAgreedTerms) && parsed.concessionsAndAgreedTerms.length > 0
+          ? parsed.concessionsAndAgreedTerms
+          : buildDeterministicSummary().concessionsAndAgreedTerms,
+      transparentAuditHighlights:
+        Array.isArray(parsed.transparentAuditHighlights) && parsed.transparentAuditHighlights.length > 0
+          ? parsed.transparentAuditHighlights
+          : buildDeterministicSummary().transparentAuditHighlights,
+      fairnessAndReadinessNote:
+        parsed.fairnessAndReadinessNote || buildDeterministicSummary().fairnessAndReadinessNote,
+      generatedWith: 'Gemini 4 Hydrogen Agreement Auditor',
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error('Negotiation Summary Error:', err);
+    return res.json(buildDeterministicSummary());
+  }
+});
+
+// 7. AI-Driven Smart Venue Matcher Endpoint (Top 3 Party Palaces in Nepal)
+apiRouter.post('/smart-venue-matcher', async (req, res) => {
+  const rawPrefs = req.body?.preferences || {};
+  const rawVenues = req.body?.venues;
+
+  if (!Array.isArray(rawVenues) || rawVenues.length === 0) {
+    return res.status(400).json({ error: 'A non-empty venues list is required for matching.' });
+  }
+
+  // Sanitize & normalize incoming preferences
+  const eventType = String(rawPrefs.eventType || 'WEDDING').slice(0, 40);
+  const province = String(rawPrefs.province || '').trim().slice(0, 80);
+  const district = String(rawPrefs.district || '').trim().slice(0, 80);
+  const guestCount = Math.max(20, Math.min(5000, Number(rawPrefs.guestCount) || 300));
+  const budgetMode: 'TOTAL_NPR' | 'PER_PLATE_NPR' =
+    rawPrefs.budgetMode === 'PER_PLATE_NPR' ? 'PER_PLATE_NPR' : 'TOTAL_NPR';
+  const budgetAmountNpr = Math.max(
+    budgetMode === 'PER_PLATE_NPR' ? 400 : 50000,
+    Math.min(50000000, Number(rawPrefs.budgetAmountNpr) || (budgetMode === 'PER_PLATE_NPR' ? 1800 : 800000))
+  );
+  const spaceStyle = String(rawPrefs.spaceStyle || 'ANY').slice(0, 40);
+  const requireMandap = Boolean(rawPrefs.requireMandap);
+  const requirePowerBackup = Boolean(rawPrefs.requirePowerBackup);
+  const requireParking100Plus = Boolean(rawPrefs.requireParking100Plus);
+  const requireOutsidePlanners = Boolean(rawPrefs.requireOutsidePlanners);
+  const requireWheelchairAccess = Boolean(rawPrefs.requireWheelchairAccess);
+  const specialNotes = String(rawPrefs.specialNotes || '').trim().slice(0, 500);
+
+  // Normalize venue snapshots & compute exact NPR estimate incl. 10% SC + 13% IRD VAT
+  const venueSummaries = rawVenues.slice(0, 60).map((v: any) => {
+    const catering = Number(v.cateringStartingNpr) || 1200;
+    const rental = Number(v.baseRentalStartingNpr) || 0;
+    const subtotal = catering * guestCount + rental;
+    const serviceCharge = Math.round(subtotal * 0.1);
+    const vat = Math.round((subtotal + serviceCharge) * 0.13);
+    const estimatedTotalNpr = subtotal + serviceCharge + vat;
+
+    return {
+      id: String(v.id || ''),
+      name: String(v.name || ''),
+      nepaliName: String(v.nepaliName || ''),
+      province: String(v.province || ''),
+      district: String(v.district || ''),
+      locality: String(v.locality || ''),
+      tagline: String(v.tagline || ''),
+      minGuests: Number(v.minGuests) || 50,
+      maxGuests: Number(v.maxGuests) || 500,
+      cateringStartingNpr: catering,
+      baseRentalStartingNpr: rental,
+      estimatedTotalNpr,
+      rating: Number(v.rating) || 4.5,
+      reviewCount: Number(v.reviewCount) || 0,
+      parkingCapacityCars: Number(v.parkingCapacityCars) || 0,
+      hasPowerBackup: Boolean(v.hasPowerBackup),
+      hasMandapSetup: Boolean(v.hasMandapSetup),
+      hasWheelchairAccess: Boolean(v.hasWheelchairAccess),
+      hasLiveMusicPermit: Boolean(v.hasLiveMusicPermit),
+      hasVipLounge: Boolean(v.hasVipLounge),
+      allowsOutsideOrganizers: Boolean(v.allowsOutsideOrganizers),
+      hallTypes: Array.isArray(v.hallTypes) ? v.hallTypes.map(String) : [],
+      hallNames: Array.isArray(v.hallNames) ? v.hallNames.map(String) : [],
+      activeOfferTitle: v.activeOfferTitle ? String(v.activeOfferTitle) : '',
+    };
+  }).filter((v) => v.id && v.name);
+
+  const venueById = new Map(venueSummaries.map((v) => [v.id, v]));
+
+  // Deterministic multi-factor ranking fallback & validator
+  const scoreVenueDeterministically = (v: typeof venueSummaries[number]) => {
+    let score = 0;
+    const reasons: string[] = [];
+
+    // 1. Capacity match (0-30 pts)
+    if (guestCount >= v.minGuests && guestCount <= v.maxGuests) {
+      score += 30;
+      reasons.push(`Fits ${guestCount} guests comfortably (${v.minGuests}–${v.maxGuests} pax capacity)`);
+    } else if (guestCount < v.minGuests) {
+      const gap = v.minGuests - guestCount;
+      score += Math.max(5, 20 - Math.round(gap / 20));
+      reasons.push(`Spacious halls (${v.minGuests}–${v.maxGuests} pax); minimum guarantee ${v.minGuests} guests`);
+    } else {
+      const overflow = guestCount - v.maxGuests;
+      score += Math.max(0, 14 - Math.round(overflow / 25));
+    }
+
+    // 2. Location match (0-30 pts)
+    if (district) {
+      if (v.district.toLowerCase() === district.toLowerCase() || v.locality.toLowerCase().includes(district.toLowerCase())) {
+        score += 30;
+        reasons.push(`Located directly in ${v.locality}, ${v.district}`);
+      } else if (province && v.province.toLowerCase() === province.toLowerCase()) {
+        score += 18;
+        reasons.push(`In preferred ${v.province} (${v.district})`);
+      }
+    } else if (province) {
+      if (v.province.toLowerCase() === province.toLowerCase()) {
+        score += 25;
+        reasons.push(`Located in ${v.province} (${v.locality}, ${v.district})`);
+      }
+    } else {
+      score += 15;
+    }
+
+    // 3. Budget fit (0-28 pts)
+    const compareMetric = budgetMode === 'PER_PLATE_NPR' ? v.cateringStartingNpr : v.estimatedTotalNpr;
+    const ratio = compareMetric / budgetAmountNpr;
+    if (ratio <= 1.0) {
+      score += 28;
+      reasons.push(
+        budgetMode === 'PER_PLATE_NPR'
+          ? `Starting rate NPR ${v.cateringStartingNpr.toLocaleString()}/plate fits your NPR ${budgetAmountNpr.toLocaleString()} target`
+          : `Estimated total NPR ${v.estimatedTotalNpr.toLocaleString()} (incl. SC & VAT) fits within your NPR ${budgetAmountNpr.toLocaleString()} budget`
+      );
+    } else if (ratio <= 1.18) {
+      score += 18;
+      reasons.push(
+        budgetMode === 'PER_PLATE_NPR'
+          ? `NPR ${v.cateringStartingNpr.toLocaleString()}/plate is within negotiable range of your target`
+          : `Estimated NPR ${v.estimatedTotalNpr.toLocaleString()} is slightly above budget and open to counter-offer`
+      );
+    } else {
+      score += Math.max(0, 10 - Math.round((ratio - 1.18) * 15));
+    }
+
+    // 4. Space style & required facilities (0-20 pts)
+    if (spaceStyle !== 'ANY' && v.hallTypes.includes(spaceStyle)) {
+      score += 8;
+      reasons.push(`Offers requested ${spaceStyle.replace(/_/g, ' ').toLowerCase()} setting`);
+    }
+    if (requireMandap && v.hasMandapSetup) {
+      score += 5;
+      reasons.push('Vedic Mandap & Homa fire setup approved');
+    }
+    if (requirePowerBackup && v.hasPowerBackup) {
+      score += 4;
+      reasons.push('100% generator power backup');
+    }
+    if (requireParking100Plus && v.parkingCapacityCars >= 100) {
+      score += 4;
+      reasons.push(`${v.parkingCapacityCars}+ dedicated car parking bays`);
+    }
+    if (requireOutsidePlanners && v.allowsOutsideOrganizers) {
+      score += 4;
+      reasons.push('Welcomes outside event management teams');
+    }
+    if (requireWheelchairAccess && v.hasWheelchairAccess) {
+      score += 3;
+      reasons.push('Step-free wheelchair accessible halls');
+    }
+
+    // 5. Verified quality & active promos
+    score += Math.round(v.rating * 2);
+    if (v.activeOfferTitle) {
+      score += 3;
+      reasons.push(`Active offer: ${v.activeOfferTitle}`);
+    }
+
+    return { venue: v, score, reasons };
+  };
+
+  const buildSingleDeterministicRecommendation = (
+    v: typeof venueSummaries[number],
+    rank: number,
+    reasons: string[]
+  ) => {
+    const budgetTargetText =
+      budgetMode === 'PER_PLATE_NPR'
+        ? `NPR ${budgetAmountNpr.toLocaleString()}/plate`
+        : `NPR ${budgetAmountNpr.toLocaleString()} total`;
+
+    const isWithinBudget =
+      budgetMode === 'PER_PLATE_NPR'
+        ? v.cateringStartingNpr <= budgetAmountNpr
+        : v.estimatedTotalNpr <= budgetAmountNpr;
+
+    return {
+      rank,
+      venueId: v.id,
+      fitSummary: `${v.name} in ${v.locality}, ${v.district} accommodates ${v.minGuests}–${v.maxGuests} guests across ${v.hallNames.slice(0, 2).join(' & ') || 'its banquet spaces'}, making it a strong match for your ${guestCount}-guest ${eventType.replace(/_/g, ' ').toLowerCase()}.`,
+      budgetBreakdownNote: `Est. NPR ${v.estimatedTotalNpr.toLocaleString()} total (from NPR ${v.cateringStartingNpr.toLocaleString()}/plate + NPR ${v.baseRentalStartingNpr.toLocaleString()} hall rental + 10% SC & 13% IRD VAT) — ${
+        isWithinBudget ? `within your ${budgetTargetText} target.` : `above your ${budgetTargetText} baseline; counter-offer recommended.`
+      }`,
+      matchedHighlights:
+        reasons.length > 0
+          ? reasons.slice(0, 4)
+          : [
+              `Verified ${v.rating.toFixed(1)}★ rating across ${v.reviewCount} reviews`,
+              `${v.parkingCapacityCars} cars parking & ${v.hasPowerBackup ? '100% power backup' : 'city power supply'}`,
+              `Starting from NPR ${v.cateringStartingNpr.toLocaleString()}/plate`,
+            ],
+      tradeoffOrTip: v.activeOfferTitle
+        ? `Negotiation tip: Apply active venue offer (${v.activeOfferTitle}) or propose a counter-offer in the Negotiation Drawer.`
+        : `Planning tip: Confirm 10:00 PM DAO sound curfew compliance and lock 25% escrow deposit early for auspicious Panchanga dates.`,
+    };
+  };
+
+  const buildDeterministicMatches = () => {
+    const ranked = venueSummaries
+      .map(scoreVenueDeterministically)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+
+    const locationLabel = district || province || 'all provinces in Nepal';
+    const budgetLabel =
+      budgetMode === 'PER_PLATE_NPR'
+        ? `NPR ${budgetAmountNpr.toLocaleString()}/plate`
+        : `NPR ${budgetAmountNpr.toLocaleString()} total`;
+
+    return {
+      matcherOverview: `Evaluated ${venueSummaries.length} verified UTSAVO party palaces across ${locationLabel} for a ${guestCount}-guest ${eventType.replace(/_/g, ' ').toLowerCase()} targeting ${budgetLabel}. Below are the top ${ranked.length} ranked matches including estimated 10% service charge and 13% Nepal VAT.`,
+      recommendations: ranked.map((item, idx) =>
+        buildSingleDeterministicRecommendation(item.venue, idx + 1, item.reasons)
+      ),
+      generatedWith: 'UTSAVO Multi-Factor Venue Ranker',
+      generatedAt: new Date().toISOString(),
+    };
+  };
+
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      return res.json(buildDeterministicMatches());
+    }
+
+    const prompt = `
+You are UTSAVO's Smart Venue Matcher for Nepal's party palaces and banquet halls.
+Select and rank the TOP 3 best-fit party palaces ONLY from the verified venue catalog JSON below based on the user's event preferences and budget.
+
+User Event Preferences & Budget:
+- Occasion / Event Type: ${eventType}
+- Preferred Location: ${district ? `${district} District` : 'Any District'}${province ? `, ${province}` : ' (All Nepal)'}
+- Expected Guest Count: ${guestCount} guests
+- Budget Constraint: ${
+      budgetMode === 'PER_PLATE_NPR'
+        ? `Max NPR ${budgetAmountNpr.toLocaleString()} per plate`
+        : `Target total budget NPR ${budgetAmountNpr.toLocaleString()} (inclusive of hall, catering, 10% SC, and 13% IRD VAT)`
+    }
+- Preferred Hall/Space Style: ${spaceStyle}
+- Mandatory/Desired Facilities: ${[
+      requireMandap ? 'Vedic Mandap & Homa setup' : null,
+      requirePowerBackup ? '100% Generator Power Backup' : null,
+      requireParking100Plus ? '100+ Car Parking' : null,
+      requireOutsidePlanners ? 'Outside Event Planners Allowed' : null,
+      requireWheelchairAccess ? 'Wheelchair Accessibility' : null,
+    ]
+      .filter(Boolean)
+      .join(', ') || 'Flexible'}
+- Additional Notes: ${specialNotes || 'None specified'}
+
+Verified Nepal Party Palaces Catalog (each includes pre-computed estimatedTotalNpr for ${guestCount} guests incl. 10% SC & 13% VAT):
+${JSON.stringify(venueSummaries, null, 2)}
+
+Rules:
+1. Return AT MOST 3 distinct venues (or fewer if fewer than 3 exist in the catalog).
+2. Every venueId MUST match an exact "id" from the catalog above. Never invent venues or numbers.
+3. Prioritize guest capacity fit, location match, and budget alignment, then amenities and rating.
+4. Keep explanations practical, warm, and tailored to Nepal event logistics (Baraat/parking, Mandap fire permits, DAO sound curfew, negotiation tips).
+`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-4-hydrogen',
+      contents: prompt,
+      config: {
+        systemInstruction:
+          'You are UTSAVO Smart Venue Matcher helping families and planners in Nepal pick the top 3 best-fit party palaces based strictly on verified venue data, guest count, and NPR budget.',
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            matcherOverview: {
+              type: Type.STRING,
+              description:
+                '2-sentence summary explaining how the top 3 party palaces were matched to the user preferences, district/province, guest count, and NPR budget.',
+            },
+            recommendations: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  rank: { type: Type.INTEGER },
+                  venueId: { type: Type.STRING },
+                  fitSummary: {
+                    type: Type.STRING,
+                    description: '2 concise sentences explaining why this palace fits the occasion, capacity, and location.',
+                  },
+                  budgetBreakdownNote: {
+                    type: Type.STRING,
+                    description: 'Transparent budget fit note citing estimatedTotalNpr, per-plate rate, and whether it fits or needs negotiation.',
+                  },
+                  matchedHighlights: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING },
+                    description: '3 to 4 crisp factual highlights matching the user requirements.',
+                  },
+                  tradeoffOrTip: {
+                    type: Type.STRING,
+                    description: '1 practical tip, concession opportunity, or tradeoff to keep in mind.',
+                  },
+                },
+                required: [
+                  'rank',
+                  'venueId',
+                  'fitSummary',
+                  'budgetBreakdownNote',
+                  'matchedHighlights',
+                  'tradeoffOrTip',
+                ],
+              },
+            },
+          },
+          required: ['matcherOverview', 'recommendations'],
+        },
+      },
+    });
+
+    const parsed = JSON.parse((response.text || '{}').trim());
+    const deterministic = buildDeterministicMatches();
+
+    // Validate & deduplicate returned venueIds against real catalog
+    const seenIds = new Set<string>();
+    const validRecommendations: any[] = [];
+
+    if (Array.isArray(parsed.recommendations)) {
+      for (const rec of parsed.recommendations) {
+        const vid = String(rec?.venueId || '');
+        if (!vid || !venueById.has(vid) || seenIds.has(vid)) continue;
+        seenIds.add(vid);
+        validRecommendations.push({
+          rank: validRecommendations.length + 1,
+          venueId: vid,
+          fitSummary: String(rec.fitSummary || ''),
+          budgetBreakdownNote: String(rec.budgetBreakdownNote || ''),
+          matchedHighlights: Array.isArray(rec.matchedHighlights)
+            ? rec.matchedHighlights.slice(0, 4).map(String)
+            : [],
+          tradeoffOrTip: String(rec.tradeoffOrTip || ''),
+        });
+        if (validRecommendations.length >= 3) break;
+      }
+    }
+
+    // Backfill up to 3 from deterministic matches if Gemini returned fewer than 3 valid IDs
+    for (const fallbackRec of deterministic.recommendations) {
+      if (validRecommendations.length >= 3) break;
+      if (!seenIds.has(fallbackRec.venueId)) {
+        seenIds.add(fallbackRec.venueId);
+        validRecommendations.push({
+          ...fallbackRec,
+          rank: validRecommendations.length + 1,
+        });
+      }
+    }
+
+    return res.json({
+      matcherOverview: parsed.matcherOverview || deterministic.matcherOverview,
+      recommendations: validRecommendations,
+      generatedWith: 'Gemini 4 Hydrogen Smart Venue Matcher',
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error('Smart Venue Matcher Error:', err);
+    return res.json(buildDeterministicMatches());
+  }
+});
+
+// ============================================================================
+// 8. Real-Time Favorite Venue Availability & Cancellation Notification Broker (SSE)
+// ============================================================================
+
+interface ServerFavoriteVenueAlert {
+  id: string;
+  venueId: string;
+  venueName: string;
+  district: string;
+  locality: string;
+  alertKind: 'PANCHANGA_DATE_OPEN' | 'LAST_MINUTE_CANCELLATION';
+  title: string;
+  message: string;
+  dateBS: string;
+  dateAD: string;
+  shift: 'MORNING' | 'DAY' | 'EVENING' | 'FULL_DAY';
+  hallName?: string;
+  tithi?: string;
+  nakshatra?: string;
+  auspiciousTime?: string;
+  discountOrIncentiveNote?: string;
+  sourceBookingRef?: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
+const sseClients = new Set<Response>();
+
+let favoriteVenueAlertsStore: ServerFavoriteVenueAlert[] = [
+  {
+    id: 'fav-alert-seed-1',
+    venueId: 'venue-regal-pavilion-ktm',
+    venueName: 'The Regal Pavilion & Heritage Banquet',
+    district: 'Kathmandu',
+    locality: 'Naxal (Near Narayanhiti)',
+    alertKind: 'LAST_MINUTE_CANCELLATION',
+    title: 'Last-Minute Evening Slot Released at The Regal Pavilion',
+    message:
+      'Booking #UTS-2081-4890 was released by the prior host. Grand Kailash Ballroom is now immediately open for 2081 Mangsir 14 (Trayodashi Vivah Muhurat) Evening Shift.',
+    dateBS: '2081 Mangsir 14',
+    dateAD: '2024-11-29',
+    shift: 'EVENING',
+    hallName: 'Grand Kailash Ballroom',
+    tithi: 'Trayodashi (त्रयोदशी)',
+    nakshatra: 'Rohini (रोहिणी)',
+    auspiciousTime: '04:30 PM - 10:30 PM',
+    discountOrIncentiveNote: 'Priority Express Rebooking · 10% Deposit Transfer Fee Waived',
+    sourceBookingRef: 'UTS-2081-4890',
+    createdAt: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
+    isRead: false,
+  },
+  {
+    id: 'fav-alert-seed-2',
+    venueId: 'venue-lalitpur-royal-palace',
+    venueName: 'Lalitpur Royal Heritage Palace',
+    district: 'Lalitpur',
+    locality: 'Jhamsikhel / Patan',
+    alertKind: 'PANCHANGA_DATE_OPEN',
+    title: 'Basanta Panchami Shubha Lagna Open at Lalitpur Royal Palace',
+    message:
+      'Universal auspicious Abhijit Muhurat on Basanta Panchami (2081 Magh 22) has verified Day Shift availability across Patan Imperial Courtyard.',
+    dateBS: '2081 Magh 22',
+    dateAD: '2025-02-04',
+    shift: 'DAY',
+    hallName: 'Patan Imperial Courtyard',
+    tithi: 'Panchami (वसन्त पञ्चमी)',
+    nakshatra: 'Revati (रेवती)',
+    auspiciousTime: 'Abhijit Muhurat (11:45 AM - 12:35 PM)',
+    discountOrIncentiveNote: 'Complimentary Vedic Mandap Floral Arch for Favorite Watchers',
+    createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    isRead: false,
+  },
+  {
+    id: 'fav-alert-seed-3',
+    venueId: 'venue-pokhara-lakeside-resort',
+    venueName: 'Pokhara Lakeside Himalayan Resort & Banquet',
+    district: 'Kaski',
+    locality: 'Phewa Lakeside',
+    alertKind: 'PANCHANGA_DATE_OPEN',
+    title: 'Spring Vivah Muhurat Open at Pokhara Lakeside Resort',
+    message:
+      'Newly confirmed clear evening schedule for 2081 Falgun 08 (Saptami • Anuradha Nakshatra) with Phewa Sunset Lawn access.',
+    dateBS: '2081 Falgun 08',
+    dateAD: '2025-02-20',
+    shift: 'EVENING',
+    hallName: 'Annapurna & Phewa Sunset Lawn',
+    tithi: 'Saptami (सप्तमी)',
+    nakshatra: 'Anuradha (अनुराधा)',
+    auspiciousTime: '01:00 PM - 06:00 PM',
+    discountOrIncentiveNote: 'Lakeside Ferry Welcome & Couple Sunset Boating Included',
+    createdAt: new Date(Date.now() - 1000 * 60 * 95).toISOString(),
+    isRead: true,
+  },
+  {
+    id: 'fav-alert-seed-4',
+    venueId: 'venue-bhaktapur-durbar-banquet',
+    venueName: 'Bhaktapur Durbar Banquet & Juju Dhau Pavilion',
+    district: 'Bhaktapur',
+    locality: 'Suryabinayak / Durbar Marg',
+    alertKind: 'LAST_MINUTE_CANCELLATION',
+    title: 'Freed Pushya Nakshatra Slot at Bhaktapur Durbar Banquet',
+    message:
+      'Hold expired on Suryabinayak Main Hall for 2081 Falgun 14 Morning Shift (Trayodashi • Pushya Nakshatra). Ideal for Bratabandha or intimate Vivah.',
+    dateBS: '2081 Falgun 14',
+    dateAD: '2025-02-26',
+    shift: 'MORNING',
+    hallName: 'Suryabinayak Main Hall',
+    tithi: 'Trayodashi (त्रयोदशी)',
+    nakshatra: 'Pushya (पुष्य नक्षत्र)',
+    auspiciousTime: '08:00 AM - 12:30 PM',
+    discountOrIncentiveNote: 'Complimentary Juju Dhau Welcome Service',
+    sourceBookingRef: 'UTS-2081-3918-HOLD',
+    createdAt: new Date(Date.now() - 1000 * 60 * 140).toISOString(),
+    isRead: false,
+  },
+];
+
+function broadcastSseEvent(eventName: string, data: unknown) {
+  const frame = `event: ${eventName}\ndata: ${JSON.stringify(data)}\n\n`;
+  for (const client of sseClients) {
+    try {
+      client.write(frame);
+    } catch {
+      sseClients.delete(client);
+    }
+  }
+}
+
+// SSE subscription endpoint
+apiRouter.get('/favorite-venue-alerts/stream', (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders?.();
+
+  sseClients.add(res);
+
+  // Initial authoritative snapshot so clients synchronize cleanly on connect/reconnect
+  res.write(
+    `event: init\ndata: ${JSON.stringify({
+      alerts: favoriteVenueAlertsStore,
+      connectedClients: sseClients.size,
+      serverTime: new Date().toISOString(),
+    })}\n\n`
+  );
+
+  // Proxy keep-alive comment only (never emits synthetic alerts)
+  const keepAliveTimer = setInterval(() => {
+    try {
+      res.write(`: keepalive ${Date.now()}\n\n`);
+    } catch {
+      clearInterval(keepAliveTimer);
+      sseClients.delete(res);
+    }
+  }, 25000);
+
+  req.on('close', () => {
+    clearInterval(keepAliveTimer);
+    sseClients.delete(res);
+  });
+});
+
+// REST snapshot getter
+apiRouter.get('/favorite-venue-alerts', (_req, res) => {
+  res.json({ alerts: favoriteVenueAlertsStore });
+});
+
+// Publish a real-time alert (e.g. booking cancellation or venue slot release) and broadcast via SSE
+apiRouter.post('/favorite-venue-alerts/publish', (req, res) => {
+  const body = req.body || {};
+  const venueId = String(body.venueId || '').trim();
+  const venueName = String(body.venueName || '').trim();
+  const alertKind: ServerFavoriteVenueAlert['alertKind'] =
+    body.alertKind === 'LAST_MINUTE_CANCELLATION' ? 'LAST_MINUTE_CANCELLATION' : 'PANCHANGA_DATE_OPEN';
+  const dateBS = String(body.dateBS || '').trim();
+  const dateAD = String(body.dateAD || '').trim();
+  const shift: ServerFavoriteVenueAlert['shift'] =
+    body.shift === 'MORNING' || body.shift === 'DAY' || body.shift === 'EVENING' || body.shift === 'FULL_DAY'
+      ? body.shift
+      : 'DAY';
+
+  if (!venueId || !venueName || !dateBS) {
+    return res.status(400).json({ error: 'venueId, venueName, and dateBS are required.' });
+  }
+
+  const incomingId = String(body.id || '').trim();
+  const existing = favoriteVenueAlertsStore.find(
+    (a) =>
+      (incomingId && a.id === incomingId) ||
+      (a.venueId === venueId &&
+        a.alertKind === alertKind &&
+        a.dateBS === dateBS &&
+        a.shift === shift &&
+        (!body.sourceBookingRef || a.sourceBookingRef === body.sourceBookingRef))
+  );
+
+  if (existing) {
+    return res.json({ alert: existing, deduplicated: true });
+  }
+
+  const newAlert: ServerFavoriteVenueAlert = {
+    id: incomingId || `fav-alert-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    venueId,
+    venueName,
+    district: String(body.district || 'Kathmandu'),
+    locality: String(body.locality || ''),
+    alertKind,
+    title:
+      String(body.title || '').trim() ||
+      (alertKind === 'LAST_MINUTE_CANCELLATION'
+        ? `Last-Minute Cancellation Opening at ${venueName}`
+        : `New Panchanga Date Open at ${venueName}`),
+    message:
+      String(body.message || '').trim() ||
+      (alertKind === 'LAST_MINUTE_CANCELLATION'
+        ? `A prior reservation${body.sourceBookingRef ? ` (#${body.sourceBookingRef})` : ''} was cancelled, opening ${dateBS} (${shift} Shift)${body.hallName ? ` at ${body.hallName}` : ''}.`
+        : `${venueName} has verified availability on auspicious Panchanga date ${dateBS} (${shift} Shift)${body.hallName ? ` · ${body.hallName}` : ''}.`),
+    dateBS,
+    dateAD: dateAD || '2025-02-20',
+    shift,
+    hallName: body.hallName ? String(body.hallName) : undefined,
+    tithi: body.tithi ? String(body.tithi) : undefined,
+    nakshatra: body.nakshatra ? String(body.nakshatra) : undefined,
+    auspiciousTime: body.auspiciousTime ? String(body.auspiciousTime) : undefined,
+    discountOrIncentiveNote: body.discountOrIncentiveNote
+      ? String(body.discountOrIncentiveNote)
+      : undefined,
+    sourceBookingRef: body.sourceBookingRef ? String(body.sourceBookingRef) : undefined,
+    createdAt: new Date().toISOString(),
+    isRead: false,
+  };
+
+  favoriteVenueAlertsStore = [newAlert, ...favoriteVenueAlertsStore].slice(0, 60);
+  broadcastSseEvent('alert:created', { alert: newAlert });
+
+  return res.status(201).json({ alert: newAlert, deduplicated: false });
+});
+
+// Deterministic server scan comparing favorited venues against bookings + Panchanga Muhurats
+apiRouter.post('/favorite-venue-alerts/scan-availability', (req, res) => {
+  const favoriteVenues = Array.isArray(req.body?.favoriteVenues) ? req.body.favoriteVenues : [];
+  const bookings = Array.isArray(req.body?.bookings) ? req.body.bookings : [];
+  const muhurats = Array.isArray(req.body?.muhurats) ? req.body.muhurats : [];
+
+  if (favoriteVenues.length === 0) {
+    return res.json({ discoveredAlerts: [], newlyDiscovered: 0 });
+  }
+
+  const discoveredAlerts: ServerFavoriteVenueAlert[] = [];
+
+  // 1. Check any cancelled bookings at favorite venues not yet alerted
+  for (const b of bookings) {
+    if (discoveredAlerts.length >= 2) break;
+    if (b?.status !== 'CANCELLED') continue;
+    const fav = favoriteVenues.find((v: any) => v.id === b.venueId);
+    if (!fav) continue;
+
+    const alreadySent = favoriteVenueAlertsStore.some(
+      (a) =>
+        a.venueId === fav.id &&
+        a.alertKind === 'LAST_MINUTE_CANCELLATION' &&
+        a.dateBS === b.eventDateBS &&
+        a.shift === b.shift
+    );
+    if (alreadySent) continue;
+
+    const created: ServerFavoriteVenueAlert = {
+      id: `fav-alert-scan-cxl-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      venueId: String(fav.id),
+      venueName: String(fav.name),
+      district: String(fav.district || 'Kathmandu'),
+      locality: String(fav.locality || ''),
+      alertKind: 'LAST_MINUTE_CANCELLATION',
+      title: `Cancelled Booking Slot Open at ${fav.name}`,
+      message: `Booking #${b.bookingRef || 'RELEASED'} for ${b.eventDateBS} (${b.shift} Shift) is cancelled and ready for instant booking.`,
+      dateBS: String(b.eventDateBS),
+      dateAD: String(b.eventDateAD || ''),
+      shift: b.shift || 'DAY',
+      hallName: b.hallName ? String(b.hallName) : fav.hallNames?.[0],
+      discountOrIncentiveNote: 'Fast-Track Replacement Slot · Immediate Escrow Transfer',
+      sourceBookingRef: b.bookingRef ? String(b.bookingRef) : undefined,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+    };
+
+    favoriteVenueAlertsStore = [created, ...favoriteVenueAlertsStore].slice(0, 60);
+    discoveredAlerts.push(created);
+    broadcastSseEvent('alert:created', { alert: created });
+  }
+
+  // 2. Check open Panchanga Muhurat dates across favorite venues without confirmed/hold collisions
+  const candidateShifts: Array<ServerFavoriteVenueAlert['shift']> = ['EVENING', 'DAY', 'MORNING'];
+  for (const fav of favoriteVenues) {
+    if (discoveredAlerts.length >= 2) break;
+    for (const m of muhurats) {
+      if (discoveredAlerts.length >= 2) break;
+      for (const shift of candidateShifts) {
+        const hasBooking = bookings.some(
+          (b: any) =>
+            b.venueId === fav.id &&
+            b.eventDateBS === m.dateBS &&
+            b.shift === shift &&
+            b.status !== 'CANCELLED'
+        );
+        if (hasBooking) continue;
+
+        const alreadyAlerted = favoriteVenueAlertsStore.some(
+          (a) => a.venueId === fav.id && a.dateBS === m.dateBS && a.shift === shift
+        );
+        if (alreadyAlerted) continue;
+
+        const created: ServerFavoriteVenueAlert = {
+          id: `fav-alert-scan-pan-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          venueId: String(fav.id),
+          venueName: String(fav.name),
+          district: String(fav.district || 'Kathmandu'),
+          locality: String(fav.locality || ''),
+          alertKind: 'PANCHANGA_DATE_OPEN',
+          title: `Open ${m.eventType || 'Subha'} Panchanga Slot at ${fav.name}`,
+          message: `Verified open ${shift.toLowerCase()} shift on ${m.dateBS} (${m.tithi} • ${m.nakshatra})${fav.hallNames?.[0] ? ` in ${fav.hallNames[0]}` : ''}.`,
+          dateBS: String(m.dateBS),
+          dateAD: String(m.dateAD),
+          shift,
+          hallName: fav.hallNames?.[0],
+          tithi: String(m.tithi || ''),
+          nakshatra: String(m.nakshatra || ''),
+          auspiciousTime: String(m.auspiciousTime || ''),
+          discountOrIncentiveNote: 'Matched Your Saved Favorite Venue & Panchanga Calendar',
+          createdAt: new Date().toISOString(),
+          isRead: false,
+        };
+
+        favoriteVenueAlertsStore = [created, ...favoriteVenueAlertsStore].slice(0, 60);
+        discoveredAlerts.push(created);
+        broadcastSseEvent('alert:created', { alert: created });
+        break;
+      }
+      if (discoveredAlerts.length >= 2) break;
+    }
+  }
+
+  return res.json({
+    discoveredAlerts,
+    newlyDiscovered: discoveredAlerts.length,
+    checkedAt: new Date().toISOString(),
+  });
+});
+
+// Mark one or all favorite venue alerts read
+apiRouter.post('/favorite-venue-alerts/mark-read', (req, res) => {
+  const { alertId, markAll, venueIds } = req.body || {};
+
+  if (markAll) {
+    const idSet = Array.isArray(venueIds) ? new Set<string>(venueIds.map(String)) : null;
+    favoriteVenueAlertsStore = favoriteVenueAlertsStore.map((a) =>
+      !idSet || idSet.has(a.venueId) ? { ...a, isRead: true } : a
+    );
+    broadcastSseEvent('alert:sync', { alerts: favoriteVenueAlertsStore });
+    return res.json({ updated: true, alerts: favoriteVenueAlertsStore });
+  }
+
+  if (!alertId) {
+    return res.status(400).json({ error: 'alertId or markAll=true is required.' });
+  }
+
+  let updatedAlert: ServerFavoriteVenueAlert | undefined;
+  favoriteVenueAlertsStore = favoriteVenueAlertsStore.map((a) => {
+    if (a.id === alertId) {
+      updatedAlert = { ...a, isRead: true };
+      return updatedAlert;
+    }
+    return a;
+  });
+
+  if (updatedAlert) {
+    broadcastSseEvent('alert:updated', { alert: updatedAlert });
+  }
+
+  return res.json({ updated: Boolean(updatedAlert), alert: updatedAlert || null });
+});
+
+
+
 

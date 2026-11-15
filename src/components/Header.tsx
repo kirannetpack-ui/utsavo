@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { UserRole } from '../types';
-import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Tag, Music, UtensilsCrossed, FileText, Layers, Bookmark, Briefcase, Bell, Heart } from 'lucide-react';
+import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Tag, Music, UtensilsCrossed, FileText, Layers, Bookmark, Briefcase, Bell, Heart, Scale } from 'lucide-react';
 import { auth, loginWithGoogle, logoutUser, testFirestoreConnection } from '../firebase/config';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { BrandLogo } from './BrandLogo';
@@ -15,8 +15,8 @@ import { PWAInstallButton } from './PWAInstallButton';
 import { AuspiciousNotificationCenter } from './AuspiciousNotificationCenter';
 
 interface HeaderProps {
-  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE';
-  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE') => void;
+  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS';
+  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
   onOpenAiAssistant: () => void;
   onOpenFeatures?: () => void;
   onOpenLegalContract?: () => void;
@@ -157,6 +157,16 @@ export const Header: React.FC<HeaderProps> = ({
               <Heart className="w-4 h-4 text-rose-600 fill-rose-100" />
               <span>{language === 'ne' ? 'अन्नपूर्णा सेवा' : 'Social Cause'}</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            </button>
+            <button
+              onClick={() => setActiveView('CANCELLATIONS')}
+              className={`hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeView === 'CANCELLATIONS' ? 'text-amber-950 font-bold bg-amber-50 px-2 py-1 rounded-lg' : 'text-stone-700'
+              }`}
+              title="Cancellation Policies, Past-Deadline Resolution & Partner Referrals"
+            >
+              <Scale className="w-3.5 h-3.5 text-amber-800" />
+              <span>{language === 'ne' ? 'रद्द र सन्दर्भ नीति' : 'Cancellations'}</span>
             </button>
             <button
               onClick={() => setActiveModal('PANCHANGA_CALENDAR')}
@@ -418,6 +428,19 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-100" />
           <span>{language === 'ne' ? 'अन्नपूर्णा सेवा' : 'Social Cause'}</span>
+        </button>
+
+        {/* Cancellation Policy & Referrals */}
+        <button
+          onClick={() => setActiveView('CANCELLATIONS')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5 ${
+            activeView === 'CANCELLATIONS'
+              ? 'bg-amber-950 text-white font-bold shadow-xs'
+              : 'text-stone-700 bg-white border border-stone-200 hover:bg-stone-100'
+          }`}
+        >
+          <Scale className="w-3.5 h-3.5 text-amber-800" />
+          <span>{language === 'ne' ? 'रद्द र सन्दर्भ' : 'Cancellations'}</span>
         </button>
 
         {/* Saved Venues & Vendors */}

@@ -24,12 +24,13 @@ import {
   QrCode,
   Bookmark,
   Briefcase,
+  Scale,
 } from 'lucide-react';
 
 interface FeaturesShowcaseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigate: (view: 'EXPLORE' | 'DESTINATION' | 'VENDORS' | 'NIMANTRANA' | 'ORGANIZERS' | 'DASHBOARD' | 'STAFF_POOL') => void;
+  onNavigate: (view: 'EXPLORE' | 'DESTINATION' | 'VENDORS' | 'NIMANTRANA' | 'ORGANIZERS' | 'DASHBOARD' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
   onOpenModal: (modal: 'PANCHANGA_CALENDAR' | 'LEGAL_CONTRACT' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER') => void;
 }
 
@@ -179,6 +180,20 @@ export const FeaturesShowcaseModal: React.FC<FeaturesShowcaseModalProps> = ({
       actionLabel: 'Generate Contract',
       action: () => {
         onOpenModal('LEGAL_CONTRACT');
+        onClose();
+      },
+    },
+    {
+      id: 'cancellations',
+      category: 'Global Governance & Fairness',
+      title: 'Dynamic Cancellation Policy & Vendor Referral Hub',
+      nepali: 'रद्द नीति, म्यादपछिको प्रक्रिया र साझेदार सन्दर्भ',
+      description: 'Per-vendor flexible/moderate/strict schedules across all 5 roles, past-deadline no-show settlement, and peer referral escrow transfers.',
+      icon: Scale,
+      badge: '5-Role Dynamic',
+      actionLabel: 'Open Policy Hub',
+      action: () => {
+        onNavigate('CANCELLATIONS');
         onClose();
       },
     },

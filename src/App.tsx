@@ -35,7 +35,10 @@ import { Footer } from './components/Footer';
 import { EventStaffTalentPool } from './components/EventStaffTalentPool';
 import { VenueQuickPeekDrawer } from './components/VenueQuickPeekDrawer';
 import { AuspiciousPushNotificationToast } from './components/AuspiciousPushNotificationToast';
+import { FavoriteVenueAlertToast } from './components/FavoriteVenueAlertToast';
 import { ExcessFoodRescueSocialCause } from './components/ExcessFoodRescueSocialCause';
+import { CancellationPolicyReferralHub } from './components/CancellationPolicyReferralHub';
+import { StarHotelRequestModal } from './components/StarHotelRequestModal';
 
 const MainShell: React.FC = () => {
   const {
@@ -47,13 +50,14 @@ const MainShell: React.FC = () => {
     setSelectedVenue,
     quickPeekVenueId,
     setQuickPeekVenueId,
+    setCustomerDashboardTab,
   } = useMarketplace();
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
-  const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE'>(() => {
+  const [activeView, setActiveView] = useState<'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS'>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const view = params.get('view')?.toUpperCase();
-      if (view === 'NIMANTRANA' || view === 'DESTINATION' || view === 'VENDORS' || view === 'ORGANIZERS' || view === 'DASHBOARD' || view === 'STAFF_POOL' || view === 'SOCIAL_CAUSE') {
+      if (view === 'NIMANTRANA' || view === 'DESTINATION' || view === 'VENDORS' || view === 'ORGANIZERS' || view === 'DASHBOARD' || view === 'STAFF_POOL' || view === 'SOCIAL_CAUSE' || view === 'CANCELLATIONS') {
         return view as any;
       }
     }
@@ -186,6 +190,10 @@ const MainShell: React.FC = () => {
           </div>
         ) : activeView === 'SOCIAL_CAUSE' ? (
           <ExcessFoodRescueSocialCause onBackToExplore={() => setActiveView('EXPLORE')} />
+        ) : activeView === 'CANCELLATIONS' ? (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <CancellationPolicyReferralHub onBackToExplore={() => setActiveView('EXPLORE')} />
+          </div>
         ) : (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {currentUser.role === 'CUSTOMER' && (
@@ -233,9 +241,18 @@ const MainShell: React.FC = () => {
         onNavigateToCatalog={() => setActiveView('EXPLORE')}
       />
 
+      {/* Real-Time Server-Sent Events (SSE) Favorite Venue Alert Toast */}
+      <FavoriteVenueAlertToast
+        onOpenCustomerAlerts={() => {
+          setCustomerDashboardTab('FAVORITE_ALERTS');
+          setActiveView('DASHBOARD');
+        }}
+      />
+
       {/* Interactive Modals & Drawers */}
       <SmartPlannerModal />
       <PanchangaCalendarModal />
+      <StarHotelRequestModal />
       <VenueDetailModal />
       <VenueQuickPeekDrawer
         venue={venues.find((v) => v.id === quickPeekVenueId) || null}
@@ -310,7 +327,7 @@ const MainShell: React.FC = () => {
       />
 
       {/* Footer */}
-      <Footer />
+      <Footer onOpenCancellations={() => setActiveView('CANCELLATIONS')} />
     </div>
   );
 };

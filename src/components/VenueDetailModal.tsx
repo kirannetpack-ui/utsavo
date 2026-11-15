@@ -3,27 +3,23 @@
  * Overview, Hall Spaces, Live Shift Calendar, Menu Customizer & Verified Reviews
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useMarketplace } from '../context/MarketplaceContext';
-import { HallSpace, Venue } from '../types';
+import { HallSpace } from '../types';
 import { VenueImageVisual } from './VenueImageVisual';
 import { MenuCustomizer } from './MenuCustomizer';
+import { VirtualTour360Placeholder } from './VirtualTour360Placeholder';
 import {
   X,
-  MapPin,
   ShieldCheck,
   Star,
-  Users,
   Car,
   Zap,
   Flame,
   Calendar,
   Utensils,
   CheckCircle,
-  Clock,
-  Phone,
-  Mail,
   Building,
   Image as ImageIcon,
   Video,
@@ -31,8 +27,8 @@ import {
   ExternalLink,
   Tag,
   FileText,
-  Printer,
   Bookmark,
+  Compass,
 } from 'lucide-react';
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
 import { createVenueInquiryMessage } from '../utils/communication';
@@ -50,18 +46,29 @@ export const VenueDetailModal: React.FC = () => {
     setActiveNegotiationId,
     toggleSaveVenue,
     isVenueSaved,
+    getVendorCancellationPolicy,
   } = useMarketplace();
 
   const [isLegalPdfOpen, setIsLegalPdfOpen] = useState(false);
-
-  if (!selectedVenue) return null;
-
-  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'MENU_ENGINE' | 'MEDIA_GALLERY' | 'CALENDAR' | 'REVIEWS'>('OVERVIEW');
-  const [selectedHall, setSelectedHall] = useState<HallSpace>(selectedVenue.halls[0]);
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'VIRTUAL_TOUR' | 'MENU_ENGINE' | 'MEDIA_GALLERY' | 'CALENDAR' | 'REVIEWS'>('OVERVIEW');
+  const [selectedHall, setSelectedHall] = useState<HallSpace | null>(selectedVenue?.halls[0] || null);
   const [selectedShift, setSelectedShift] = useState<'MORNING' | 'DAY' | 'EVENING' | 'FULL_DAY'>('DAY');
   const [selectedDateBS, setSelectedDateBS] = useState<string>('2081 Mangsir 18');
   const [selectedDateAD, setSelectedDateAD] = useState<string>('2024-12-03');
   const [activeVideoModal, setActiveVideoModal] = useState<any | null>(null);
+
+  useEffect(() => {
+    if (selectedVenue?.halls?.length) {
+      setSelectedHall(selectedVenue.halls[0]);
+      setActiveTab('OVERVIEW');
+    }
+  }, [selectedVenue?.id]);
+
+  if (!selectedVenue) return null;
+
+  const activeHall = selectedHall && selectedVenue.halls.some((h) => h.id === selectedHall.id)
+    ? selectedHall
+    : selectedVenue.halls[0];
 
   // Venue-specific verified reviews
   const venueReviews = reviews.filter((r) => r.venueId === selectedVenue.id);
@@ -74,7 +81,7 @@ export const VenueDetailModal: React.FC = () => {
       dateBS: selectedDateBS,
       dateAD: selectedDateAD,
       shift: selectedShift,
-      hallId: selectedHall.id,
+      hallId: activeHall.id,
       guestCount: quotationData.guestCount,
       proposedPerPlateNpr: quotationData.effectivePerPlateNpr,
       hallRentalNpr: quotationData.hallRentalNpr,
@@ -150,18 +157,30 @@ export const VenueDetailModal: React.FC = () => {
 
         {/* Tab Navigation */}
         <div className="px-6 py-3 bg-stone-100 border-b border-stone-200 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-1 p-1 bg-stone-200/80 rounded-xl text-xs font-semibold">
+          <div className="flex items-center gap-1 p-1 bg-stone-200/80 rounded-xl text-xs font-semibold overflow-x-auto max-w-full">
             <button
+              type="button"
               onClick={() => setActiveTab('OVERVIEW')}
-              className={`px-3 py-1.5 rounded-lg transition-colors ${
+              className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'OVERVIEW' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
               {t('tabOverview')}
             </button>
             <button
+              type="button"
+              onClick={() => setActiveTab('VIRTUAL_TOUR')}
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
+                activeTab === 'VIRTUAL_TOUR' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Compass className="w-3.5 h-3.5 text-amber-800" />
+              <span>360° Virtual Tour</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveTab('MENU_ENGINE')}
-              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'MENU_ENGINE' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
@@ -169,8 +188,9 @@ export const VenueDetailModal: React.FC = () => {
               <span>{t('tabMenuCustomizer')}</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('MEDIA_GALLERY')}
-              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'MEDIA_GALLERY' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
@@ -178,8 +198,9 @@ export const VenueDetailModal: React.FC = () => {
               <span>Photos & Videos ({selectedVenue.mediaGallery?.length || selectedVenue.gallery.length})</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('CALENDAR')}
-              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'CALENDAR' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
@@ -187,8 +208,9 @@ export const VenueDetailModal: React.FC = () => {
               <span>{t('tabAvailability')}</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('REVIEWS')}
-              className={`px-3 py-1.5 rounded-lg transition-colors ${
+              className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                 activeTab === 'REVIEWS' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
@@ -282,7 +304,7 @@ export const VenueDetailModal: React.FC = () => {
                       key={hall.id}
                       onClick={() => setSelectedHall(hall)}
                       className={`p-4 rounded-2xl border cursor-pointer transition-all ${
-                        selectedHall.id === hall.id
+                        activeHall.id === hall.id
                           ? 'border-amber-900 bg-amber-50/50 shadow-sm ring-1 ring-amber-900'
                           : 'border-stone-200 hover:border-stone-300'
                       }`}
@@ -316,6 +338,21 @@ export const VenueDetailModal: React.FC = () => {
                           </li>
                         ))}
                       </ul>
+
+                      <div className="mt-3 pt-2.5 border-t border-stone-100 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedHall(hall);
+                            setActiveTab('VIRTUAL_TOUR');
+                          }}
+                          className="text-xs font-semibold text-amber-900 hover:text-amber-950 flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Compass className="w-3.5 h-3.5" />
+                          <span>Launch 360° Space Preview</span>
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -399,24 +436,70 @@ export const VenueDetailModal: React.FC = () => {
                 )}
               </div>
 
-              {/* Quick Contact & Policies */}
-              <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/60 text-xs space-y-2">
-                <div className="font-bold text-amber-950">Operating Policies:</div>
-                <div className="text-stone-600">
-                  <strong>Cancellation Policy:</strong> {selectedVenue.cancellationPolicy}
-                </div>
-                <div className="text-stone-600">
-                  <strong>Decoration Rules:</strong> {selectedVenue.decorationPolicy}
-                </div>
-              </div>
+              {/* Dynamic Cancellation Policy, Past-Deadline Rule & Partner Referral Guarantee */}
+              {(() => {
+                const dynPolicy = getVendorCancellationPolicy(selectedVenue.id, selectedVenue.name, 'VENUE_VENDOR');
+                return (
+                  <div className="p-4 bg-amber-50/50 rounded-2xl border border-amber-200/70 text-xs space-y-2.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-bold text-amber-950 uppercase tracking-wider text-[11px]">
+                        Dynamic Operating &amp; Cancellation Schedule ({dynPolicy.preset.replace(/_/g, ' ')})
+                      </span>
+                      <span className="text-[11px] font-semibold text-amber-900">
+                        {dynPolicy.coolingOffHours}h Free Cooling-Off (&gt;14d out)
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {dynPolicy.tiers.map((t) => (
+                        <div key={t.id} className="p-2.5 bg-white rounded-xl border border-amber-200/70 tabular-nums">
+                          <div className="font-bold text-stone-900">{t.label}</div>
+                          <div className="text-[11px] text-stone-600 mt-0.5">
+                            Refund: <strong className="text-emerald-800">{t.refundPercent}%</strong> · Reschedule Credit:{' '}
+                            <strong>{t.rescheduleCreditPercent}%</strong>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="text-stone-700 leading-relaxed pt-1 border-t border-amber-200/60">
+                      <strong>If Event Date &amp; Time Is Over (No-Show):</strong>{' '}
+                      {dynPolicy.pastDeadlineRule.forfeitPercentAfterDeadline}% deposit forfeiture (Sec. 535 sunken catering/hall costs); {dynPolicy.pastDeadlineRule.allowEmergencyMedicalReviewHours}h post-event hospital emergency review up to {dynPolicy.pastDeadlineRule.goodwillCreditCapPercent}% goodwill credit.{' '}
+                      {dynPolicy.pastDeadlineRule.staffReportingPayPercent}% pool staff reporting pay guaranteed.
+                    </div>
+
+                    {dynPolicy.referralConfig.allowsPartnerReferral && (
+                      <div className="text-stone-700 leading-relaxed">
+                        <strong>Vendor Cancellation Substitute &amp; Referral Guarantee:</strong>{' '}
+                        If venue initiates cancellation, client receives 100% refund OR chooses from 1–3 vetted peer venues with direct UTSAVO escrow transfer ({dynPolicy.referralConfig.referralFeeModel === 'COURTESY_ZERO_FEE' ? '0% emergency courtesy fee' : 'B2B partner fee covered by vendor'}).
+                      </div>
+                    )}
+
+                    <div className="text-stone-600">
+                      <strong>Decoration Rules:</strong> {selectedVenue.decorationPolicy}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
+          )}
+
+          {/* TAB 1.5: 360-DEGREE VIRTUAL TOUR PLACEHOLDER */}
+          {activeTab === 'VIRTUAL_TOUR' && (
+            <VirtualTour360Placeholder
+              venue={selectedVenue}
+              selectedHall={activeHall}
+              onSelectHall={(hall) => setSelectedHall(hall)}
+              onCheckAvailability={() => setActiveTab('CALENDAR')}
+              onCustomizeMenu={() => setActiveTab('MENU_ENGINE')}
+            />
           )}
 
           {/* TAB 2: MENU CUSTOMIZER ENGINE */}
           {activeTab === 'MENU_ENGINE' && (
             <MenuCustomizer
               venue={selectedVenue}
-              selectedHall={selectedHall}
+              selectedHall={activeHall}
               onProceedToNegotiation={handleProceedToNegotiation}
             />
           )}
@@ -509,7 +592,7 @@ export const VenueDetailModal: React.FC = () => {
                       Panchanga-Integrated Live Availability
                     </span>
                     <span className="px-2 py-0.5 rounded-full bg-amber-900 text-amber-100 text-[10px] font-semibold">
-                      {selectedHall.name}
+                      {activeHall.name}
                     </span>
                   </div>
                   <p className="text-stone-600 text-[11px] mt-0.5">
@@ -526,8 +609,8 @@ export const VenueDetailModal: React.FC = () => {
 
               <RealtimeAvailabilityCalendar
                 entityType="VENUE"
-                entityId={`${selectedVenue.id}-${selectedHall.id}`}
-                entityName={`${selectedVenue.name} (${selectedHall.name})`}
+                entityId={`${selectedVenue.id}-${activeHall.id}`}
+                entityName={`${selectedVenue.name} (${activeHall.name})`}
                 contactPhone={selectedVenue.phone}
                 initialDateBS={selectedDateBS}
                 onSelectSlot={(dateBS, dateAD, shift) => {

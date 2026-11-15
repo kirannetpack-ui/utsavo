@@ -7,7 +7,11 @@ import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { BrandLogo } from './BrandLogo';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onOpenCancellations?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onOpenCancellations }) => {
   const { language } = useLanguage();
 
   return (
@@ -73,7 +77,13 @@ export const Footer: React.FC = () => {
             <span>·</span>
             <span className="hover:text-stone-400 cursor-pointer">Privacy & Data Consent</span>
             <span>·</span>
-            <span className="hover:text-stone-400 cursor-pointer">Dispute Policy</span>
+            <button
+              type="button"
+              onClick={onOpenCancellations}
+              className="hover:text-amber-300 cursor-pointer underline-offset-2 hover:underline"
+            >
+              Cancellation & Partner Referral Policy
+            </button>
           </div>
         </div>
 

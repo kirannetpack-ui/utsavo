@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { LegalContractDocument, EventType, ShiftTime } from '../types';
+import { useMarketplace } from '../context/MarketplaceContext';
 import {
   FileText,
   Printer,
@@ -41,6 +42,7 @@ export const LegalContractQuotationGenerator: React.FC<LegalContractQuotationGen
   onClose,
   initialVenueData
 }) => {
+  const { venues, getVendorCancellationPolicy } = useMarketplace();
   if (!isOpen) return null;
 
   const [documentMode, setDocumentMode] = useState<'CONTRACT' | 'QUOTATION'>('CONTRACT');
@@ -368,11 +370,26 @@ export const LegalContractQuotationGenerator: React.FC<LegalContractQuotationGen
                 <p>
                   <strong>४.३ बाह्य इभेन्ट म्यानेजमेन्ट तथा सजावट:</strong> दोस्रो पक्षले बाह्य इभेन्ट डेकोरेटर ल्याउन पाउनेछ। डेकोरेटर टोलीले उत्सव सुरु हुनुभन्दा कम्तिमा ६ घण्टा अगावै सामग्री भित्राई सजावट सम्पन्न गर्नुपर्नेछ।
                 </p>
+                {(() => {
+                  const matchedVenue = venues.find((v) => v.name === docData.venueTradeName);
+                  const contractPolicy = getVendorCancellationPolicy(
+                    matchedVenue?.id || 'venue-regal-pavilion-ktm',
+                    docData.venueTradeName,
+                    'VENUE_VENDOR'
+                  );
+                  return (
+                    <p>
+                      <strong>४.४ सम्झौता खारेजी, म्यादपछिको प्रक्रिया र साझेदार सन्दर्भ ({contractPolicy.preset.replace(/_/g, ' ')} Policy):</strong>{' '}
+                      {contractPolicy.tiers.map((t) => `${t.label} मा ${t.refundPercent}% नगद फिर्ता (वा ${t.rescheduleCreditPercent}% मिति सार्ने क्रेडिट)`).join('; ')}।{' '}
+                      <strong>उत्सव मिति र समय समाप्त भएपछि (Past-Deadline / No-Show):</strong>{' '}
+                      मुलुकी देवानी संहिता २०७४ दफा ५३५ (वास्तविक प्रत्यक्ष हानि) बमोजिम तयारी खाना तथा जनशक्ति खर्च कट्टा भई {contractPolicy.pastDeadlineRule.forfeitPercentAfterDeadline}% अग्रिम जफत हुनेछ; आपतकालीन अस्पताल प्रमाण भएमा {contractPolicy.pastDeadlineRule.allowEmergencyMedicalReviewHours} घण्टाभित्र {contractPolicy.pastDeadlineRule.goodwillCreditCapPercent}% सम्म सद्भाव क्रेडिट विचार गरिनेछ। काबु बाहिरको परिस्थिति (Force Majeure - दफा ५३१) मा १२ महिनाको मिति सार्ने क्रेडिट लागू हुनेछ।{' '}
+                      <strong>प्रथम पक्ष रद्द तथा साझेदार सन्दर्भ (Partner Referral):</strong>{' '}
+                      प्रथम पक्षले रद्द गरेमा १००% रकम फिर्ता वा दोस्रो पक्षको स्वीकृतिमा समान/उच्च स्तरका १–३ वैकल्पिक साझेदार सन्दर्भ (Direct Escrow Transfer र तेस्रो-पक्ष दायित्व छुट सहित) उपलब्ध गराइनेछ।
+                    </p>
+                  );
+                })()}
                 <p>
-                  <strong>४.४ सम्झौता खारेजी तथा रकम फिर्ता:</strong> उत्सव हुनुभन्दा ३० दिन अगावै जानकारी दिएमा पहिलो किस्ताको ५०% फिर्ता हुनेछ। १५ दिनभित्र खारेज गरेमा अग्रिम रकम फिर्ता हुने छैन।
-                </p>
-                <p>
-                  <strong>४.५ कानुनी क्षेत्राधिकार:</strong> यस सम्झौतामा कुनै विवाद उत्पन्न भएमा नेपाल करार ऐन २०५६ बमोजिम जिल्ला अदालत तथा नेपाल मध्यस्थता परिषद्को क्षेत्राधिकार लागू हुनेछ।
+                  <strong>४.५ कानुनी क्षेत्राधिकार:</strong> यस सम्झौतामा कुनै विवाद उत्पन्न भएमा नेपाल करार ऐन २०५६ तथा मुलुकी देवानी संहिता २०७४ बमोजिम जिल्ला अदालत, उपभोक्ता अदालत तथा नेपाल मध्यस्थता परिषद्को क्षेत्राधिकार लागू हुनेछ।
                 </p>
               </div>
             )}

@@ -3,7 +3,7 @@
  * Central engine governing venues, negotiations, bookings, agreements, and role switching
  */
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import {
   Booking,
   EventOrganizer,
@@ -26,7 +26,33 @@ import {
   UserPanchangaPreferences,
   AuspiciousPushAlert,
   ExcessFoodRescuePledge,
+  DynamicCancellationPolicy,
+  VendorReferralOffer,
+  CancellationResolutionRecord,
+  CancellationStakeholderRole,
+  RecommendedReferralPartner,
+  ReferralFeeModel,
+  StarHotelSourcingRequest,
+  SourcedStarHotelProposal,
+  OutsideNepalDestinationRequest,
+  FavoriteVenueAlert,
+  FavoriteVenueAlertKind,
+  SseStreamStatus,
 } from '../types';
+import {
+  SEED_VENDOR_CANCELLATION_POLICIES,
+  SEED_VENDOR_REFERRAL_OFFERS,
+  SEED_CANCELLATION_RECORDS,
+  createDynamicPolicyFromPreset,
+  calculateCancellationOutcome,
+} from '../data/cancellationPoliciesData';
+import {
+  SEED_STAR_HOTEL_REQUESTS,
+  SEED_OUTSIDE_NEPAL_REQUESTS,
+} from '../data/outsideNepalDestinations';
+import { STANDARD_CATERING_PACKAGES, MASTER_MENU_ITEMS } from '../data/menuCatalog';
+import { doc, setDoc } from 'firebase/firestore';
+import { db, auth } from '../firebase/config';
 import { PANCHANGA_AUSPICIOUS_MUHURATS } from '../data/panchangaCalendar';
 import { SEED_VENUES } from '../data/venuesData';
 import { SEED_BOOKINGS, SEED_NEGOTIATIONS, SEED_REVIEWS } from '../data/seedMarketplaceState';
@@ -130,8 +156,8 @@ interface MarketplaceContextType {
   addVerifiedReview: (review: Omit<VerifiedReview, 'id' | 'createdAt'>) => void;
 
   // Modals & Drawers
-  activeModal: 'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER';
-  setActiveModal: (modal: 'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER') => void;
+  activeModal: 'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER' | 'STAR_HOTEL_REQUEST';
+  setActiveModal: (modal: 'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER' | 'STAR_HOTEL_REQUEST') => void;
   activeNegotiationId: string | null;
   setActiveNegotiationId: (id: string | null) => void;
   activeBookingId: string | null;
@@ -146,8 +172,8 @@ interface MarketplaceContextType {
   isVendorSaved: (vendorId: string) => boolean;
   removeSavedVenue: (venueId: string) => void;
   removeSavedVendor: (vendorId: string) => void;
-  customerDashboardTab: 'BOOKINGS' | 'NEGOTIATIONS' | 'SAVED' | 'ALERTS';
-  setCustomerDashboardTab: (tab: 'BOOKINGS' | 'NEGOTIATIONS' | 'SAVED' | 'ALERTS') => void;
+  customerDashboardTab: 'BOOKINGS' | 'NEGOTIATIONS' | 'BUDGET' | 'SAVED' | 'ALERTS' | 'FAVORITE_ALERTS';
+  setCustomerDashboardTab: (tab: 'BOOKINGS' | 'NEGOTIATIONS' | 'BUDGET' | 'SAVED' | 'ALERTS' | 'FAVORITE_ALERTS') => void;
 
   // Cultural Artists & Custom Category Proposals
   culturalVendors: CulturalVendor[];
@@ -212,11 +238,105 @@ interface MarketplaceContextType {
   simulatePushAlert: (specificMuhuratId?: string) => void;
   unreadAlertsCount: number;
 
+  // Real-Time Server-Sent Events (SSE) Favorite Venue Availability & Cancellation Alerts
+  favoriteVenueAlerts: FavoriteVenueAlert[];
+  unreadFavoriteVenueAlertsCount: number;
+  sseConnectionStatus: SseStreamStatus;
+  isScanningFavoriteVenues: boolean;
+  lastFavoriteScanMessage: string | null;
+  activeFavoriteVenueToast: FavoriteVenueAlert | null;
+  dismissFavoriteVenueToast: () => void;
+  markFavoriteVenueAlertRead: (alertId: string | 'ALL') => Promise<void>;
+  scanFavoriteVenueAvailability: () => Promise<number>;
+  publishFavoriteVenueAlert: (params: {
+    venueId: string;
+    venueName: string;
+    district?: string;
+    locality?: string;
+    alertKind: FavoriteVenueAlertKind;
+    title?: string;
+    message?: string;
+    dateBS: string;
+    dateAD?: string;
+    shift?: any;
+    hallName?: string;
+    tithi?: string;
+    nakshatra?: string;
+    auspiciousTime?: string;
+    discountOrIncentiveNote?: string;
+    sourceBookingRef?: string;
+  }) => Promise<FavoriteVenueAlert | null>;
+
   // Social Cause: Annapurna Surplus Feast Food Rescue (Strict Voluntary Client Consent)
   foodRescuePledges: ExcessFoodRescuePledge[];
   addFoodRescuePledge: (pledge: Omit<ExcessFoodRescuePledge, 'id' | 'createdAt' | 'temperatureAndSafetyChecked' | 'cleanStorageBoxesSuppliedByUtsavo'>) => ExcessFoodRescuePledge;
   updateFoodRescueConsent: (pledgeId: string, consentGiven: boolean, declaration?: string) => void;
   updateFoodRescueStatus: (pledgeId: string, status: ExcessFoodRescuePledge['status'], notes?: string, beneficiariesFed?: number) => void;
+
+  // Dynamic Cancellation Policies, Past-Deadline Resolution & Vendor Partner Referrals
+  vendorPolicies: Record<string, DynamicCancellationPolicy>;
+  getVendorCancellationPolicy: (
+    vendorId: string,
+    vendorName?: string,
+    stakeholderCategory?: 'VENUE_VENDOR' | 'CULTURAL_ARTIST' | 'EVENT_PLANNER'
+  ) => DynamicCancellationPolicy;
+  updateVendorCancellationPolicy: (policy: DynamicCancellationPolicy) => void;
+  referralOffers: VendorReferralOffer[];
+  createVendorReferralOffer: (params: {
+    bookingId: string;
+    cancellingVendorId: string;
+    cancellingVendorName: string;
+    stakeholderRole: CancellationStakeholderRole;
+    handoffType: 'WARM_REFERRAL' | 'DIRECT_SUBSTITUTE_GUARANTEE';
+    recommendedPartners: RecommendedReferralPartner[];
+    referralFeeModel: ReferralFeeModel;
+    reason: string;
+    includeLiabilityRelease: boolean;
+  }) => VendorReferralOffer;
+  respondToReferralOffer: (
+    offerId: string,
+    decision: 'ACCEPTED_PARTNER' | 'DECLINED_REFUND_ONLY',
+    acceptedPartnerId?: string
+  ) => void;
+  cancellationRecords: CancellationResolutionRecord[];
+  cancelBookingWithPolicy: (params: {
+    bookingId: string;
+    initiatedByRole: CancellationStakeholderRole;
+    daysBeforeEvent: number;
+    isPastDeadline: boolean;
+    isForceMajeure: boolean;
+    hasEmergencyMedicalProof: boolean;
+    bookedPoolStaffCount?: number;
+    reason: string;
+  }) => CancellationResolutionRecord | null;
+
+  // Star Hotel Concierge Sourcing & Outside-Nepal Global Celebrations
+  starHotelRequests: StarHotelSourcingRequest[];
+  submitStarHotelRequest: (
+    req: Omit<StarHotelSourcingRequest, 'id' | 'requestRef' | 'status' | 'createdAt' | 'updatedAt'>
+  ) => StarHotelSourcingRequest;
+  updateStarHotelRequestByAdmin: (
+    requestId: string,
+    updates: {
+      status?: StarHotelSourcingRequest['status'];
+      adminWorkNotes?: string;
+      newProposal?: Omit<SourcedStarHotelProposal, 'id' | 'adminVerifiedAt'>;
+    }
+  ) => void;
+  publishStarHotelAsVenue: (requestId: string, proposal: SourcedStarHotelProposal) => Venue | null;
+
+  outsideNepalRequests: OutsideNepalDestinationRequest[];
+  submitOutsideNepalRequest: (
+    req: Omit<OutsideNepalDestinationRequest, 'id' | 'requestRef' | 'status' | 'createdAt' | 'updatedAt'>
+  ) => OutsideNepalDestinationRequest;
+  updateOutsideNepalRequestByAdmin: (
+    requestId: string,
+    updates: {
+      status?: OutsideNepalDestinationRequest['status'];
+      adminCoordinatorNotes?: string;
+      newDeliverable?: string;
+    }
+  ) => void;
 }
 
 export const DEFAULT_PANCHANGA_PREFS: UserPanchangaPreferences = {
@@ -275,22 +395,74 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
   const [editingVenue, setEditingVenue] = useState<Venue | null>(null);
 
-  const [activeModal, setActiveModal] = useState<'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER'>('NONE');
+  const [activeModal, setActiveModal] = useState<'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER' | 'STAR_HOTEL_REQUEST'>('NONE');
   const [activeNegotiationId, setActiveNegotiationId] = useState<string | null>(null);
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
-  const [customerDashboardTab, setCustomerDashboardTab] = useState<'BOOKINGS' | 'NEGOTIATIONS' | 'SAVED' | 'ALERTS'>('BOOKINGS');
+  const [customerDashboardTab, setCustomerDashboardTab] = useState<'BOOKINGS' | 'NEGOTIATIONS' | 'BUDGET' | 'SAVED' | 'ALERTS' | 'FAVORITE_ALERTS'>('BOOKINGS');
+
+  // Star Hotel Concierge Requests & Outside-Nepal Global Celebrations (Persisted)
+  const [starHotelRequests, setStarHotelRequests] = useState<StarHotelSourcingRequest[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_star_hotel_requests');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to parse star hotel requests', e);
+      }
+    }
+    return SEED_STAR_HOTEL_REQUESTS;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_star_hotel_requests', JSON.stringify(starHotelRequests));
+      } catch (e) {
+        console.warn('Failed to save star hotel requests', e);
+      }
+    }
+  }, [starHotelRequests]);
+
+  const [outsideNepalRequests, setOutsideNepalRequests] = useState<OutsideNepalDestinationRequest[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_outside_nepal_requests');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to parse outside Nepal requests', e);
+      }
+    }
+    return SEED_OUTSIDE_NEPAL_REQUESTS;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_outside_nepal_requests', JSON.stringify(outsideNepalRequests));
+      } catch (e) {
+        console.warn('Failed to save outside Nepal requests', e);
+      }
+    }
+  }, [outsideNepalRequests]);
 
   // Bookmarking: Saved Venues & Event Vendors
   const [savedVenueIds, setSavedVenueIds] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       try {
         const stored = localStorage.getItem('utsavo_saved_venues');
-        if (stored) return JSON.parse(stored);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            return parsed.map((id) =>
+              id === 'venue-heritage-garden-sanepa' ? 'venue-lalitpur-royal-palace' : id
+            );
+          }
+        }
       } catch (e) {
         console.warn('Failed to parse saved venues from localStorage', e);
       }
     }
-    return ['venue-regal-pavilion-ktm', 'venue-heritage-garden-sanepa'];
+    return ['venue-regal-pavilion-ktm', 'venue-lalitpur-royal-palace', 'venue-pokhara-lakeside-resort'];
   });
 
   const [savedVendorIds, setSavedVendorIds] = useState<string[]>(() => {
@@ -1095,6 +1267,285 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const unreadAlertsCount = pushAlerts.filter((a) => !a.isRead).length;
 
+  // Real-Time Server-Sent Events (SSE) Favorite Venue Notifications
+  const [rawServerVenueAlerts, setRawServerVenueAlerts] = useState<FavoriteVenueAlert[]>([]);
+  const [sseConnectionStatus, setSseConnectionStatus] = useState<SseStreamStatus>('CONNECTING');
+  const [isScanningFavoriteVenues, setIsScanningFavoriteVenues] = useState(false);
+  const [lastFavoriteScanMessage, setLastFavoriteScanMessage] = useState<string | null>(null);
+  const [activeFavoriteVenueToast, setActiveFavoriteVenueToast] = useState<FavoriteVenueAlert | null>(null);
+
+  const savedVenueIdsRef = useRef<string[]>(savedVenueIds);
+  savedVenueIdsRef.current = savedVenueIds;
+
+  const panchangaPrefsRef = useRef<UserPanchangaPreferences>(panchangaPreferences);
+  panchangaPrefsRef.current = panchangaPreferences;
+
+  const upsertServerAlertIdempotently = useCallback((incoming: FavoriteVenueAlert) => {
+    setRawServerVenueAlerts((prev) => {
+      const idx = prev.findIndex((a) => a.id === incoming.id);
+      if (idx >= 0) {
+        const updated = [...prev];
+        updated[idx] = incoming;
+        return updated;
+      }
+      return [incoming, ...prev];
+    });
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof EventSource === 'undefined') return;
+
+    setSseConnectionStatus('CONNECTING');
+    const eventSource = new EventSource('/api/favorite-venue-alerts/stream');
+
+    eventSource.onopen = () => {
+      setSseConnectionStatus('CONNECTED');
+    };
+
+    const handleInit = (e: MessageEvent) => {
+      try {
+        const data = JSON.parse(e.data || '{}');
+        if (Array.isArray(data.alerts)) {
+          const deduped = new Map<string, FavoriteVenueAlert>();
+          for (const item of data.alerts as FavoriteVenueAlert[]) {
+            if (item && item.id) deduped.set(item.id, item);
+          }
+          setRawServerVenueAlerts(Array.from(deduped.values()));
+        }
+        setSseConnectionStatus('CONNECTED');
+      } catch (err) {
+        console.warn('Failed to parse SSE init payload', err);
+      }
+    };
+
+    const handleCreated = (e: MessageEvent) => {
+      try {
+        const data = JSON.parse(e.data || '{}');
+        const alert = data?.alert as FavoriteVenueAlert | undefined;
+        if (!alert || !alert.id) return;
+
+        let wasAlreadyPresent = false;
+        setRawServerVenueAlerts((prev) => {
+          if (prev.some((a) => a.id === alert.id)) {
+            wasAlreadyPresent = true;
+            return prev;
+          }
+          return [alert, ...prev];
+        });
+
+        if (!wasAlreadyPresent && savedVenueIdsRef.current.includes(alert.venueId)) {
+          setActiveFavoriteVenueToast(alert);
+          if (panchangaPrefsRef.current.pushSoundEnabled) {
+            playAuspiciousChime();
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to parse SSE alert:created payload', err);
+      }
+    };
+
+    const handleUpdated = (e: MessageEvent) => {
+      try {
+        const data = JSON.parse(e.data || '{}');
+        const alert = data?.alert as FavoriteVenueAlert | undefined;
+        if (!alert || !alert.id) return;
+        upsertServerAlertIdempotently(alert);
+      } catch (err) {
+        console.warn('Failed to parse SSE alert:updated payload', err);
+      }
+    };
+
+    const handleSync = (e: MessageEvent) => {
+      try {
+        const data = JSON.parse(e.data || '{}');
+        if (Array.isArray(data.alerts)) {
+          const deduped = new Map<string, FavoriteVenueAlert>();
+          for (const item of data.alerts as FavoriteVenueAlert[]) {
+            if (item && item.id) deduped.set(item.id, item);
+          }
+          setRawServerVenueAlerts(Array.from(deduped.values()));
+        }
+      } catch (err) {
+        console.warn('Failed to parse SSE alert:sync payload', err);
+      }
+    };
+
+    eventSource.addEventListener('init', handleInit as EventListener);
+    eventSource.addEventListener('alert:created', handleCreated as EventListener);
+    eventSource.addEventListener('alert:updated', handleUpdated as EventListener);
+    eventSource.addEventListener('alert:sync', handleSync as EventListener);
+
+    eventSource.onerror = () => {
+      // Browser EventSource handles automatic reconnect and server resends 'init' on reconnect
+      setSseConnectionStatus('RECONNECTING');
+    };
+
+    return () => {
+      eventSource.removeEventListener('init', handleInit as EventListener);
+      eventSource.removeEventListener('alert:created', handleCreated as EventListener);
+      eventSource.removeEventListener('alert:updated', handleUpdated as EventListener);
+      eventSource.removeEventListener('alert:sync', handleSync as EventListener);
+      eventSource.close();
+    };
+  }, [upsertServerAlertIdempotently]);
+
+  const favoriteVenueAlerts = useMemo(() => {
+    const idSet = new Set(savedVenueIds);
+    return rawServerVenueAlerts
+      .filter((a) => idSet.has(a.venueId))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [rawServerVenueAlerts, savedVenueIds]);
+
+  const unreadFavoriteVenueAlertsCount = useMemo(
+    () => favoriteVenueAlerts.filter((a) => !a.isRead).length,
+    [favoriteVenueAlerts]
+  );
+
+  const dismissFavoriteVenueToast = useCallback(() => {
+    setActiveFavoriteVenueToast(null);
+  }, []);
+
+  const markFavoriteVenueAlertRead = useCallback(
+    async (alertId: string | 'ALL') => {
+      // Optimistic local state update synced immediately with server authoritative state via SSE
+      if (alertId === 'ALL') {
+        const favIds = new Set(savedVenueIdsRef.current);
+        setRawServerVenueAlerts((prev) =>
+          prev.map((a) => (favIds.has(a.venueId) ? { ...a, isRead: true } : a))
+        );
+        try {
+          await fetch('/api/favorite-venue-alerts/mark-read', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ markAll: true, venueIds: savedVenueIdsRef.current }),
+          });
+        } catch (err) {
+          console.warn('Failed to mark all favorite venue alerts read on server', err);
+        }
+        return;
+      }
+
+      setRawServerVenueAlerts((prev) =>
+        prev.map((a) => (a.id === alertId ? { ...a, isRead: true } : a))
+      );
+      try {
+        await fetch('/api/favorite-venue-alerts/mark-read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ alertId }),
+        });
+      } catch (err) {
+        console.warn('Failed to mark favorite venue alert read on server', err);
+      }
+    },
+    []
+  );
+
+  const publishFavoriteVenueAlert = useCallback(
+    async (params: {
+      venueId: string;
+      venueName: string;
+      district?: string;
+      locality?: string;
+      alertKind: FavoriteVenueAlertKind;
+      title?: string;
+      message?: string;
+      dateBS: string;
+      dateAD?: string;
+      shift?: any;
+      hallName?: string;
+      tithi?: string;
+      nakshatra?: string;
+      auspiciousTime?: string;
+      discountOrIncentiveNote?: string;
+      sourceBookingRef?: string;
+    }): Promise<FavoriteVenueAlert | null> => {
+      try {
+        const res = await fetch('/api/favorite-venue-alerts/publish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(params),
+        });
+        if (!res.ok) return null;
+        const data = await res.json();
+        const alert = data?.alert as FavoriteVenueAlert | undefined;
+        if (alert) {
+          upsertServerAlertIdempotently(alert);
+          return alert;
+        }
+        return null;
+      } catch (err) {
+        console.warn('Failed to publish favorite venue alert', err);
+        return null;
+      }
+    },
+    [upsertServerAlertIdempotently]
+  );
+
+  const scanFavoriteVenueAvailability = useCallback(async (): Promise<number> => {
+    const favoriteVenuesPayload = venues
+      .filter((v) => savedVenueIdsRef.current.includes(v.id))
+      .map((v) => ({
+        id: v.id,
+        name: v.name,
+        district: v.district,
+        locality: v.locality,
+        hallNames: v.halls.map((h) => h.name),
+      }));
+
+    if (favoriteVenuesPayload.length === 0) {
+      setLastFavoriteScanMessage('Bookmark at least one venue to scan server Panchanga & cancellation availability.');
+      return 0;
+    }
+
+    setIsScanningFavoriteVenues(true);
+    setLastFavoriteScanMessage(null);
+    try {
+      const res = await fetch('/api/favorite-venue-alerts/scan-availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          favoriteVenues: favoriteVenuesPayload,
+          bookings: bookings.map((b) => ({
+            venueId: b.venueId,
+            eventDateBS: b.eventDateBS,
+            eventDateAD: b.eventDateAD,
+            shift: b.shift,
+            status: b.status,
+            hallName: b.hallName,
+            bookingRef: b.bookingRef,
+          })),
+          muhurats: PANCHANGA_AUSPICIOUS_MUHURATS.map((m) => ({
+            dateBS: m.dateBS,
+            dateAD: m.dateAD,
+            tithi: m.tithi,
+            nakshatra: m.nakshatra,
+            auspiciousTime: m.auspiciousTime,
+            eventType: m.eventType,
+          })),
+        }),
+      });
+      if (!res.ok) {
+        setLastFavoriteScanMessage('Server scan temporarily unavailable.');
+        return 0;
+      }
+      const data = await res.json();
+      const count = Number(data?.newlyDiscovered) || 0;
+      if (count > 0) {
+        setLastFavoriteScanMessage(`Discovered & pushed ${count} new favorite-venue slot alert${count > 1 ? 's' : ''} via live server stream.`);
+      } else {
+        setLastFavoriteScanMessage('All currently open Panchanga dates and cancellations for your saved venues are already synced.');
+      }
+      return count;
+    } catch (err) {
+      console.warn('Error scanning favorite venue availability', err);
+      setLastFavoriteScanMessage('Unable to reach availability scanner right now.');
+      return 0;
+    } finally {
+      setIsScanningFavoriteVenues(false);
+    }
+  }, [venues, bookings]);
+
   // Social Cause: Annapurna Surplus Feast Food Rescue (Strict Voluntary Client Consent Driven)
   const [foodRescuePledges, setFoodRescuePledges] = useState<ExcessFoodRescuePledge[]>(() => {
     if (typeof window !== 'undefined') {
@@ -1165,6 +1616,561 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
             }
           : p
       )
+    );
+  };
+
+  // Dynamic Per-Vendor Cancellation Policies, Past-Deadline Protocols & Peer Partner Referrals
+  const [vendorPolicies, setVendorPolicies] = useState<Record<string, DynamicCancellationPolicy>>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_vendor_cancellation_policies_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load vendor cancellation policies', e);
+      }
+    }
+    return SEED_VENDOR_CANCELLATION_POLICIES;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_vendor_cancellation_policies_v1', JSON.stringify(vendorPolicies));
+      } catch (e) {
+        console.warn('Failed to save vendor cancellation policies', e);
+      }
+    }
+  }, [vendorPolicies]);
+
+  const [referralOffers, setReferralOffers] = useState<VendorReferralOffer[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_vendor_referral_offers_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load vendor referral offers', e);
+      }
+    }
+    return SEED_VENDOR_REFERRAL_OFFERS;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_vendor_referral_offers_v1', JSON.stringify(referralOffers));
+      } catch (e) {
+        console.warn('Failed to save vendor referral offers', e);
+      }
+    }
+  }, [referralOffers]);
+
+  const [cancellationRecords, setCancellationRecords] = useState<CancellationResolutionRecord[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_cancellation_records_v1');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to load cancellation records', e);
+      }
+    }
+    return SEED_CANCELLATION_RECORDS;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_cancellation_records_v1', JSON.stringify(cancellationRecords));
+      } catch (e) {
+        console.warn('Failed to save cancellation records', e);
+      }
+    }
+  }, [cancellationRecords]);
+
+  const getVendorCancellationPolicy = (
+    vendorId: string,
+    vendorName?: string,
+    stakeholderCategory: 'VENUE_VENDOR' | 'CULTURAL_ARTIST' | 'EVENT_PLANNER' = 'VENUE_VENDOR'
+  ): DynamicCancellationPolicy => {
+    if (vendorPolicies[vendorId]) return vendorPolicies[vendorId];
+    return createDynamicPolicyFromPreset({
+      vendorId,
+      vendorName: vendorName || 'UTSAVO Partner',
+      stakeholderCategory,
+      preset: 'MODERATE_STANDARD',
+    });
+  };
+
+  const updateVendorCancellationPolicy = (policy: DynamicCancellationPolicy) => {
+    const stamped: DynamicCancellationPolicy = {
+      ...policy,
+      updatedAt: new Date().toISOString(),
+    };
+    setVendorPolicies((prev) => ({
+      ...prev,
+      [stamped.vendorId]: stamped,
+    }));
+
+    // Sync concise summary to matching venue if applicable
+    const summaryTier = stamped.tiers[0];
+    const summaryText = `${stamped.preset.replace(/_/g, ' ')} Policy: ${stamped.coolingOffHours}h free grace; ${
+      summaryTier ? `${summaryTier.refundPercent}% refund at ${summaryTier.minDaysBefore}+ days` : ''
+    }; Past-deadline ${stamped.pastDeadlineRule.forfeitPercentAfterDeadline}% retained (${
+      stamped.pastDeadlineRule.allowEmergencyMedicalReviewHours
+    }h emergency review). ${
+      stamped.referralConfig.allowsPartnerReferral
+        ? 'Peer partner referral & escrow transfer supported.'
+        : ''
+    }`;
+
+    setVenues((prev) =>
+      prev.map((v) =>
+        v.id === stamped.vendorId
+          ? {
+              ...v,
+              dynamicCancellationPolicy: stamped,
+              cancellationPolicy: stamped.customSummaryText || summaryText,
+            }
+          : v
+      )
+    );
+  };
+
+  const createVendorReferralOffer = (params: {
+    bookingId: string;
+    cancellingVendorId: string;
+    cancellingVendorName: string;
+    stakeholderRole: CancellationStakeholderRole;
+    handoffType: 'WARM_REFERRAL' | 'DIRECT_SUBSTITUTE_GUARANTEE';
+    recommendedPartners: RecommendedReferralPartner[];
+    referralFeeModel: ReferralFeeModel;
+    reason: string;
+    includeLiabilityRelease: boolean;
+  }): VendorReferralOffer => {
+    const targetBooking = bookings.find((b) => b.id === params.bookingId);
+    const newOffer: VendorReferralOffer = {
+      id: `ref-offer-${Date.now()}`,
+      bookingId: params.bookingId,
+      bookingRef: targetBooking?.bookingRef || `UTS-REF-${Date.now().toString().slice(-4)}`,
+      eventDateBS: targetBooking?.eventDateBS || '2081 Falgun 14',
+      eventDateAD: targetBooking?.eventDateAD || '2025-02-26',
+      clientName: targetBooking?.customerName || currentUser.name,
+      cancellingVendorId: params.cancellingVendorId,
+      cancellingVendorName: params.cancellingVendorName,
+      stakeholderRole: params.stakeholderRole,
+      handoffType: params.handoffType,
+      recommendedPartners: params.recommendedPartners,
+      referralFeeModel: params.referralFeeModel,
+      reason: sanitizeText(params.reason, 400),
+      includeLiabilityRelease: params.includeLiabilityRelease,
+      clientDecision: 'PENDING',
+      escrowAction: 'HELD_FOR_TRANSFER',
+      escrowAmountNpr: targetBooking?.depositPaidNpr || targetBooking?.depositRequiredNpr || 100000,
+      createdAt: new Date().toISOString(),
+    };
+
+    setReferralOffers((prev) => [newOffer, ...prev]);
+    return newOffer;
+  };
+
+  const respondToReferralOffer = (
+    offerId: string,
+    decision: 'ACCEPTED_PARTNER' | 'DECLINED_REFUND_ONLY',
+    acceptedPartnerId?: string
+  ) => {
+    const targetOffer = referralOffers.find((o) => o.id === offerId);
+    if (!targetOffer) return;
+
+    const chosenPartner = targetOffer.recommendedPartners.find((p) => p.partnerId === acceptedPartnerId) ||
+      targetOffer.recommendedPartners[0];
+
+    setReferralOffers((prev) =>
+      prev.map((offer) => {
+        if (offer.id !== offerId) return offer;
+        if (decision === 'ACCEPTED_PARTNER' && chosenPartner) {
+          return {
+            ...offer,
+            clientDecision: 'ACCEPTED_PARTNER',
+            acceptedPartnerId: chosenPartner.partnerId,
+            acceptedPartnerName: chosenPartner.partnerName,
+            escrowAction: 'TRANSFERRED_TO_PARTNER',
+            resolvedAt: new Date().toISOString(),
+          };
+        }
+        return {
+          ...offer,
+          clientDecision: 'DECLINED_REFUND_ONLY',
+          escrowAction: 'FULL_REFUND_ISSUED',
+          resolvedAt: new Date().toISOString(),
+        };
+      })
+    );
+
+    if (decision === 'ACCEPTED_PARTNER' && chosenPartner) {
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === targetOffer.bookingId
+            ? {
+                ...b,
+                venueId: chosenPartner.partnerId,
+                venueName: chosenPartner.partnerName,
+                hallName: chosenPartner.categoryOrCapacity.split('·')[1]?.trim() || b.hallName,
+                status: 'CONFIRMED',
+              }
+            : b
+        )
+      );
+    } else {
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === targetOffer.bookingId
+            ? {
+                ...b,
+                status: 'CANCELLED',
+              }
+            : b
+        )
+      );
+    }
+  };
+
+  const cancelBookingWithPolicy = (params: {
+    bookingId: string;
+    initiatedByRole: CancellationStakeholderRole;
+    daysBeforeEvent: number;
+    isPastDeadline: boolean;
+    isForceMajeure: boolean;
+    hasEmergencyMedicalProof: boolean;
+    bookedPoolStaffCount?: number;
+    reason: string;
+  }): CancellationResolutionRecord | null => {
+    const booking = bookings.find((b) => b.id === params.bookingId);
+    if (!booking) return null;
+
+    const policy = getVendorCancellationPolicy(booking.venueId, booking.venueName, 'VENUE_VENDOR');
+    const calc = calculateCancellationOutcome({
+      policy,
+      initiatedBy: params.initiatedByRole,
+      daysBeforeEvent: params.daysBeforeEvent,
+      hoursSinceBooking: 72,
+      isPastDeadline: params.isPastDeadline,
+      isForceMajeure: params.isForceMajeure,
+      hasEmergencyMedicalProof: params.hasEmergencyMedicalProof,
+      totalAmountNpr: booking.totalAmountNpr,
+      depositPaidNpr: booking.depositPaidNpr,
+      bookedPoolStaffCount: params.bookedPoolStaffCount || 0,
+      staffShiftWageNpr: statutoryRules.minDailyShiftWageNpr,
+    });
+
+    const record: CancellationResolutionRecord = {
+      id: `cancel-rec-${Date.now()}`,
+      bookingId: booking.id,
+      bookingRef: booking.bookingRef,
+      venueOrPartnerName: booking.venueName,
+      initiatedByRole: params.initiatedByRole,
+      reason: sanitizeText(params.reason, 400),
+      isPastDeadline: params.isPastDeadline,
+      isForceMajeure: params.isForceMajeure,
+      totalAmountNpr: booking.totalAmountNpr,
+      depositPaidNpr: booking.depositPaidNpr,
+      refundIssuedNpr: calc.refundToClientNpr,
+      rescheduleCreditNpr: calc.rescheduleCreditNpr,
+      retainedFeeNpr: calc.retainedByVendorNpr,
+      staffReportingPayNpr: calc.staffReportingPayTotalNpr,
+      legalBasisSummary: calc.legalBasis,
+      resolvedAt: new Date().toISOString(),
+    };
+
+    setCancellationRecords((prev) => [record, ...prev]);
+    setBookings((prev) =>
+      prev.map((b) =>
+        b.id === booking.id
+          ? {
+              ...b,
+              status: 'CANCELLED',
+              settlementStatus: calc.retainedByVendorNpr > 0 ? 'SETTLED' : 'HELD',
+            }
+          : b
+      )
+    );
+
+    // Broadcast real-time SSE alert for any customer who favorited this venue
+    const venueObj = venues.find((v) => v.id === booking.venueId);
+    const matchingMuhurat = PANCHANGA_AUSPICIOUS_MUHURATS.find(
+      (m) => m.dateBS === booking.eventDateBS
+    );
+    void publishFavoriteVenueAlert({
+      venueId: booking.venueId,
+      venueName: booking.venueName,
+      district: venueObj?.district || 'Kathmandu',
+      locality: venueObj?.locality || '',
+      alertKind: 'LAST_MINUTE_CANCELLATION',
+      title: `Last-Minute Cancellation Released at ${booking.venueName}`,
+      message: `Booking #${booking.bookingRef} (${booking.shift} Shift, ${booking.hallName}) was cancelled (${record.initiatedByRole.toLowerCase()} request) — ${booking.eventDateBS} is now open for immediate reservation.`,
+      dateBS: booking.eventDateBS,
+      dateAD: booking.eventDateAD,
+      shift: booking.shift,
+      hallName: booking.hallName,
+      tithi: matchingMuhurat?.tithi,
+      nakshatra: matchingMuhurat?.nakshatra,
+      auspiciousTime: matchingMuhurat?.auspiciousTime,
+      discountOrIncentiveNote: 'Last-Minute Cancellation Release · Express Escrow Transfer Available',
+      sourceBookingRef: booking.bookingRef,
+    });
+
+    return record;
+  };
+
+  // Star Hotel Concierge Actions
+  const submitStarHotelRequest = (
+    req: Omit<StarHotelSourcingRequest, 'id' | 'requestRef' | 'status' | 'createdAt' | 'updatedAt'>
+  ): StarHotelSourcingRequest => {
+    const now = new Date().toISOString();
+    const requestRef = `UTS-HTL-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newReq: StarHotelSourcingRequest = {
+      ...req,
+      id: `htl-req-${Date.now()}`,
+      requestRef,
+      clientName: sanitizeText(req.clientName, 100),
+      clientEmail: sanitizeText(req.clientEmail, 100),
+      clientPhone: sanitizeText(req.clientPhone, 40),
+      preferredHotelNames: sanitizeText(req.preferredHotelNames, 250),
+      districtOrCity: sanitizeText(req.districtOrCity, 100),
+      country: sanitizeText(req.country, 80),
+      specialHospitalityNotes: sanitizeText(req.specialHospitalityNotes, 600),
+      status: 'SUBMITTED_TO_ADMIN',
+      adminAssignedCoordinator: 'Anurag Thapa (Admin Concierge Queue)',
+      sourcedHotelProposals: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    setStarHotelRequests((prev) => [newReq, ...prev]);
+
+    // Sync sanitized summary to Firestore destinationInquiries when active auth session is present
+    if (auth.currentUser) {
+      setDoc(doc(db, 'destinationInquiries', newReq.id), {
+        inquiryRef: newReq.requestRef,
+        clientName: newReq.clientName,
+        clientEmail: newReq.clientEmail,
+        clientCountryOfResidence: newReq.country,
+        targetDestination: `${newReq.starTier.replace(/_/g, ' ')} Hotel in ${newReq.districtOrCity}`.slice(0, 145),
+        estimatedGuests: newReq.estimatedGuests,
+        budgetAmount: newReq.targetBudgetAmount,
+        budgetCurrency: newReq.targetBudgetCurrency,
+        status: 'SUBMITTED',
+        createdAt: now,
+      }).catch((err) => console.warn('Optional Firestore sync skipped for Star Hotel inquiry:', err));
+    }
+
+    return newReq;
+  };
+
+  const updateStarHotelRequestByAdmin = (
+    requestId: string,
+    updates: {
+      status?: StarHotelSourcingRequest['status'];
+      adminWorkNotes?: string;
+      newProposal?: Omit<SourcedStarHotelProposal, 'id' | 'adminVerifiedAt'>;
+    }
+  ) => {
+    const now = new Date().toISOString();
+    setStarHotelRequests((prev) =>
+      prev.map((item) => {
+        if (item.id !== requestId) return item;
+        const nextProposals = [...(item.sourcedHotelProposals || [])];
+        if (updates.newProposal) {
+          nextProposals.push({
+            ...updates.newProposal,
+            id: `prop-${Date.now()}`,
+            hotelName: sanitizeText(updates.newProposal.hotelName, 150),
+            starCategory: sanitizeText(updates.newProposal.starCategory, 80),
+            districtOrCity: sanitizeText(updates.newProposal.districtOrCity, 100),
+            availabilityNote: sanitizeText(updates.newProposal.availabilityNote, 300),
+            adminVerifiedAt: now.split('T')[0],
+          });
+        }
+        return {
+          ...item,
+          status: updates.status || item.status,
+          adminWorkNotes:
+            updates.adminWorkNotes !== undefined
+              ? sanitizeText(updates.adminWorkNotes, 500)
+              : item.adminWorkNotes,
+          sourcedHotelProposals: nextProposals,
+          updatedAt: now,
+        };
+      })
+    );
+  };
+
+  const publishStarHotelAsVenue = (requestId: string, proposal: SourcedStarHotelProposal): Venue | null => {
+    const reqItem = starHotelRequests.find((r) => r.id === requestId);
+    if (!reqItem) return null;
+
+    const newVenueId = `venue-star-${Date.now()}`;
+    const perPlateNpr =
+      proposal.currency === 'USD'
+        ? Math.round(proposal.quotedPerPlateNprOrUsd * 133)
+        : proposal.quotedPerPlateNprOrUsd;
+    const hallRentalNpr =
+      proposal.currency === 'USD'
+        ? Math.round(proposal.quotedHallRentalNprOrUsd * 133)
+        : proposal.quotedHallRentalNprOrUsd;
+
+    const newVenue: Venue = {
+      id: newVenueId,
+      name: proposal.hotelName,
+      nepaliName: `${proposal.hotelName} (${proposal.starCategory})`,
+      tagline: `${proposal.starCategory} · Sourced & Verified by UTSAVO Admin Concierge (${proposal.districtOrCity})`,
+      province: 'Bagmati Province',
+      district: proposal.districtOrCity || 'Kathmandu',
+      municipality: `${proposal.districtOrCity || 'Kathmandu'} Hospitality Hub`,
+      ward: 1,
+      locality: proposal.districtOrCity || 'Central District',
+      address: `${proposal.hotelName}, ${proposal.districtOrCity}, ${reqItem.country}`,
+      mapCoordinates: { lat: 27.7172, lng: 85.324 },
+      coverImage: 'heritage_palace',
+      gallery: ['heritage_palace', 'indoor_hall', 'garden_lawn'],
+      verificationStatus: 'VERIFIED',
+      panNumber: '609001122',
+      businessRegNumber: `CONCIERGE-${reqItem.requestRef}`,
+      contactPerson: reqItem.adminAssignedCoordinator || 'UTSAVO Star Hotel Concierge',
+      phone: '+977-9801234567',
+      email: 'concierge@utsavo.com',
+      rating: 4.9,
+      reviewCount: 42,
+      responseRatePercent: 99,
+      halls: [
+        {
+          id: `${newVenueId}-ballroom`,
+          name: `${proposal.hotelName} Grand Ballroom`,
+          nepaliName: `${proposal.hotelName} ग्रान्ड बलरूम`,
+          type: reqItem.banquetSetting === 'POOLSIDE_LAWN' ? 'GARDEN_LAWN' : 'INDOOR_HALL',
+          minCapacity: Math.max(50, Math.floor(reqItem.estimatedGuests * 0.5)),
+          maxCapacity: Math.max(400, reqItem.estimatedGuests + 150),
+          minGuestGuarantee: Math.max(50, Math.floor(reqItem.estimatedGuests * 0.7)),
+          areaSqFt: 9800,
+          baseRentalNpr: hallRentalNpr,
+          features: [
+            proposal.starCategory,
+            'Central HVAC & Acoustic Ballroom',
+            reqItem.roomBlockNeeded ? `${reqItem.roomsCount} Guest Room Block Available` : 'Luxury Hospitality Suite',
+            'Concierge Rate Secured',
+          ],
+          photoUrl: 'indoor_hall',
+        },
+      ],
+      parkingCapacityCars: 150,
+      parkingCapacityBikes: 200,
+      hasPowerBackup: true,
+      hasWheelchairAccess: true,
+      hasMandapSetup: true,
+      hasLiveMusicPermit: true,
+      hasVipLounge: true,
+      minGuests: 80,
+      maxGuests: Math.max(500, reqItem.estimatedGuests + 150),
+      baseRentalStartingNpr: hallRentalNpr,
+      cateringStartingNpr: perPlateNpr,
+      packages: STANDARD_CATERING_PACKAGES,
+      availableMenuItems: MASTER_MENU_ITEMS,
+      cancellationPolicy: 'Star Hotel Flexible Terms: Full refund minus 10% admin fee up to 30 days prior.',
+      decorationPolicy: reqItem.allowExternalCatererOrDecor
+        ? 'External luxury decorators approved per Admin concierge agreement.'
+        : 'In-house 5-Star floral & banquet production team.',
+    };
+
+    setVenues((prev) => [newVenue, ...prev]);
+    setStarHotelRequests((prev) =>
+      prev.map((item) => {
+        if (item.id !== requestId) return item;
+        return {
+          ...item,
+          status: 'PUBLISHED_TO_MARKETPLACE',
+          sourcedHotelProposals: (item.sourcedHotelProposals || []).map((p) =>
+            p.id === proposal.id ? { ...p, publishedVenueId: newVenueId } : p
+          ),
+          updatedAt: new Date().toISOString(),
+        };
+      })
+    );
+
+    return newVenue;
+  };
+
+  // Outside-Nepal Global Celebrations Actions
+  const submitOutsideNepalRequest = (
+    req: Omit<OutsideNepalDestinationRequest, 'id' | 'requestRef' | 'status' | 'createdAt' | 'updatedAt'>
+  ): OutsideNepalDestinationRequest => {
+    const now = new Date().toISOString();
+    const requestRef = `UTS-INTL-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newReq: OutsideNepalDestinationRequest = {
+      ...req,
+      id: `intl-req-${Date.now()}`,
+      requestRef,
+      clientName: sanitizeText(req.clientName, 100),
+      clientEmail: sanitizeText(req.clientEmail, 100),
+      clientPhone: sanitizeText(req.clientPhone, 40),
+      originCities: sanitizeText(req.originCities, 200),
+      guestPassportNationalities: sanitizeText(req.guestPassportNationalities, 200),
+      targetCountry: sanitizeText(req.targetCountry, 80),
+      targetCityOrRegion: sanitizeText(req.targetCityOrRegion, 120),
+      loveStoryOrMilestoneTheme: sanitizeText(req.loveStoryOrMilestoneTheme, 500),
+      specialDreamsAndNotes: sanitizeText(req.specialDreamsAndNotes, 800),
+      status: 'DOSSIER_GATHERED',
+      arrangedDeliverables: [
+        'Full Global Celebration Dossier Logged with Executive Concierge',
+      ],
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    setOutsideNepalRequests((prev) => [newReq, ...prev]);
+
+    if (auth.currentUser) {
+      setDoc(doc(db, 'destinationInquiries', newReq.id), {
+        inquiryRef: newReq.requestRef,
+        clientName: newReq.clientName,
+        clientEmail: newReq.clientEmail,
+        clientCountryOfResidence: newReq.originCities.slice(0, 95),
+        targetDestination: `${newReq.targetCityOrRegion}, ${newReq.targetCountry}`.slice(0, 145),
+        estimatedGuests: newReq.estimatedGuests,
+        budgetAmount: newReq.budgetAmount,
+        budgetCurrency: newReq.currency,
+        status: 'SUBMITTED',
+        createdAt: now,
+      }).catch((err) => console.warn('Optional Firestore sync skipped for Global inquiry:', err));
+    }
+
+    return newReq;
+  };
+
+  const updateOutsideNepalRequestByAdmin = (
+    requestId: string,
+    updates: {
+      status?: OutsideNepalDestinationRequest['status'];
+      adminCoordinatorNotes?: string;
+      newDeliverable?: string;
+    }
+  ) => {
+    const now = new Date().toISOString();
+    setOutsideNepalRequests((prev) =>
+      prev.map((item) => {
+        if (item.id !== requestId) return item;
+        const nextDeliverables = [...(item.arrangedDeliverables || [])];
+        if (updates.newDeliverable && updates.newDeliverable.trim()) {
+          nextDeliverables.push(sanitizeText(updates.newDeliverable, 240));
+        }
+        return {
+          ...item,
+          status: updates.status || item.status,
+          adminCoordinatorNotes:
+            updates.adminCoordinatorNotes !== undefined
+              ? sanitizeText(updates.adminCoordinatorNotes, 600)
+              : item.adminCoordinatorNotes,
+          arrangedDeliverables: nextDeliverables,
+          updatedAt: now,
+        };
+      })
     );
   };
 
@@ -1581,10 +2587,35 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         clearAllAlerts,
         simulatePushAlert,
         unreadAlertsCount,
+        favoriteVenueAlerts,
+        unreadFavoriteVenueAlertsCount,
+        sseConnectionStatus,
+        isScanningFavoriteVenues,
+        lastFavoriteScanMessage,
+        activeFavoriteVenueToast,
+        dismissFavoriteVenueToast,
+        markFavoriteVenueAlertRead,
+        scanFavoriteVenueAvailability,
+        publishFavoriteVenueAlert,
         foodRescuePledges,
         addFoodRescuePledge,
         updateFoodRescueConsent,
         updateFoodRescueStatus,
+        vendorPolicies,
+        getVendorCancellationPolicy,
+        updateVendorCancellationPolicy,
+        referralOffers,
+        createVendorReferralOffer,
+        respondToReferralOffer,
+        cancellationRecords,
+        cancelBookingWithPolicy,
+        starHotelRequests,
+        submitStarHotelRequest,
+        updateStarHotelRequestByAdmin,
+        publishStarHotelAsVenue,
+        outsideNepalRequests,
+        submitOutsideNepalRequest,
+        updateOutsideNepalRequestByAdmin,
       }}
     >
       {children}

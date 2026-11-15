@@ -238,6 +238,7 @@ export interface Venue {
   packages: CateringPackage[];
   availableMenuItems: MenuItem[];
   cancellationPolicy: string;
+  dynamicCancellationPolicy?: DynamicCancellationPolicy;
   decorationPolicy: string;
   eventManagementPolicy?: EventManagementPolicy; // In-house vs Outside event management configuration
 }
@@ -364,6 +365,7 @@ export interface EventOrganizer {
   clientTestimonialsCount: number;
   bio: string;
   websiteUrl?: string;
+  dynamicCancellationPolicy?: DynamicCancellationPolicy;
 }
 
 export type NegotiationStatus = 
@@ -553,6 +555,7 @@ export interface CulturalVendor {
   specializations: string[];
   isOpenForTravelAcrossNepal: boolean;
   bilingualEnglishSupport?: boolean; // For diaspora & international destination clients
+  dynamicCancellationPolicy?: DynamicCancellationPolicy;
 }
 
 // -------------------------------------------------------------
@@ -1021,5 +1024,270 @@ export interface ExcessFoodRescuePledge {
   createdAt: string;
 }
 
+// -------------------------------------------------------------
+// GLOBAL & DYNAMIC CANCELLATION POLICY + VENDOR REFERRAL SYSTEM
+// -------------------------------------------------------------
+export type CancellationStakeholderRole =
+  | 'CLIENT'
+  | 'VENUE_VENDOR'
+  | 'CULTURAL_ARTIST'
+  | 'EVENT_PLANNER'
+  | 'EVENT_STAFF_POOL';
 
+export type CancellationPolicyPreset =
+  | 'FLEXIBLE'
+  | 'MODERATE_STANDARD'
+  | 'STRICT_PEAK_MUHURAT'
+  | 'CUSTOM';
 
+export type ReferralFeeModel =
+  | 'COURTESY_ZERO_FEE'
+  | 'B2B_COMMISSION_5_PERCENT'
+  | 'B2B_COMMISSION_10_PERCENT';
+
+export interface CancellationTier {
+  id: string;
+  label: string;
+  minDaysBefore: number;
+  maxDaysBefore?: number;
+  refundPercent: number;
+  rescheduleCreditPercent: number;
+  retainedFeePercent: number;
+  notes: string;
+}
+
+export interface PastDeadlineRule {
+  forfeitPercentAfterDeadline: number;          // e.g. 100% after cutoff/event time passes
+  claimRemainingBalanceOnNoShow: boolean;        // Whether unpaid balance is due on client no-show
+  allowEmergencyMedicalReviewHours: number;      // e.g. 48-hour post-event documentation window
+  goodwillCreditCapPercent: number;              // e.g. 0-25% future off-season credit on verified medical emergency
+  staffReportingPayPercent: number;              // e.g. 50-100% shift pay protected for pool staff on late/past cancel
+  vendorNoShowPenaltyCreditPercent: number;      // e.g. 15% emergency replacement credit on vendor default
+  evidenceLockRequired: boolean;                 // Locks check-in, kitchen prep & timestamps for dispute audit
+}
+
+export interface ReferralHandoffConfig {
+  allowsPartnerReferral: boolean;                // Can cancelling vendor refer peer partners
+  substitutionGuaranteeEnabled: boolean;         // Direct equal-or-better replacement option
+  referralFeeModel: ReferralFeeModel;            // 0% courtesy vs 5% / 10% B2B finder fee
+  clientMustApproveSubstitute: boolean;          // Required consent for creative/performance/venue changes
+  escrowDirectTransferAllowed: boolean;          // Allow client to transfer existing escrow directly to replacement
+  liabilityReleaseIncluded: boolean;             // Third-party referral liability disclaimer
+}
+
+export interface DynamicCancellationPolicy {
+  vendorId: string;
+  vendorName: string;
+  stakeholderCategory: 'VENUE_VENDOR' | 'CULTURAL_ARTIST' | 'EVENT_PLANNER';
+  preset: CancellationPolicyPreset;
+  coolingOffHours: number;                       // e.g. 24-48h free cancellation if booked >14 days out
+  retainerNonRefundablePercent: number;          // Administrative/Muhurat hold retainer %
+  tiers: CancellationTier[];
+  pastDeadlineRule: PastDeadlineRule;
+  referralConfig: ReferralHandoffConfig;
+  forceMajeureCreditMonths: number;              // e.g. 12 months credit validity (Muluki Civil Code Sec. 531)
+  customSummaryText?: string;
+  updatedAt: string;
+}
+
+export interface RecommendedReferralPartner {
+  partnerId: string;
+  partnerName: string;
+  partnerType: 'VENUE_VENDOR' | 'CULTURAL_ARTIST' | 'EVENT_PLANNER';
+  district: string;
+  categoryOrCapacity: string;
+  estimatedPriceNpr: number;
+  priceDeltaNote: string;                        // e.g. "Price matched" / "NPR 25,000 lower (refund credited)"
+  phone: string;
+  rating: number;
+}
+
+export interface VendorReferralOffer {
+  id: string;
+  bookingId: string;
+  bookingRef: string;
+  eventDateBS: string;
+  eventDateAD: string;
+  clientName: string;
+  cancellingVendorId: string;
+  cancellingVendorName: string;
+  stakeholderRole: CancellationStakeholderRole;
+  handoffType: 'WARM_REFERRAL' | 'DIRECT_SUBSTITUTE_GUARANTEE';
+  recommendedPartners: RecommendedReferralPartner[];
+  referralFeeModel: ReferralFeeModel;
+  reason: string;
+  includeLiabilityRelease: boolean;
+  clientDecision: 'PENDING' | 'ACCEPTED_PARTNER' | 'DECLINED_REFUND_ONLY';
+  acceptedPartnerId?: string;
+  acceptedPartnerName?: string;
+  escrowAction: 'HELD_FOR_TRANSFER' | 'TRANSFERRED_TO_PARTNER' | 'FULL_REFUND_ISSUED';
+  escrowAmountNpr: number;
+  createdAt: string;
+  resolvedAt?: string;
+}
+
+export interface CancellationResolutionRecord {
+  id: string;
+  bookingId: string;
+  bookingRef: string;
+  venueOrPartnerName: string;
+  initiatedByRole: CancellationStakeholderRole;
+  reason: string;
+  isPastDeadline: boolean;
+  isForceMajeure: boolean;
+  totalAmountNpr: number;
+  depositPaidNpr: number;
+  refundIssuedNpr: number;
+  rescheduleCreditNpr: number;
+  retainedFeeNpr: number;
+  staffReportingPayNpr: number;
+  referralOfferId?: string;
+  legalBasisSummary: string;
+  resolvedAt: string;
+}
+
+// -------------------------------------------------------------
+// CLIENT STAR HOTEL VENUE CONCIERGE & OUTSIDE-NEPAL CELEBRATIONS
+// -------------------------------------------------------------
+export type StarHotelTier =
+  | 'ANY_TOP_STAR'
+  | '3_STAR'
+  | '4_STAR'
+  | '5_STAR_LUXURY'
+  | '5_STAR_HERITAGE_RESORT'
+  | '7_STAR_ULTRA_LUXURY';
+
+export interface SourcedStarHotelProposal {
+  id: string;
+  hotelName: string;
+  starCategory: string;
+  districtOrCity: string;
+  quotedPerPlateNprOrUsd: number;
+  quotedHallRentalNprOrUsd: number;
+  roomBlockRateNprOrUsd?: number;
+  currency: 'NPR' | 'USD';
+  availabilityNote: string;
+  adminVerifiedAt: string;
+  publishedVenueId?: string;
+}
+
+export interface StarHotelSourcingRequest {
+  id: string;
+  requestRef: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  starTier: StarHotelTier;
+  preferredHotelNames: string;
+  openToAdminRecommendations: boolean;
+  locationScope: 'INSIDE_NEPAL' | 'OUTSIDE_NEPAL';
+  districtOrCity: string;
+  country: string;
+  eventType: EventType;
+  eventDateBS: string;
+  eventDateAD: string;
+  shift: ShiftTime;
+  estimatedGuests: number;
+  roomBlockNeeded: boolean;
+  roomsCount: number;
+  banquetSetting: 'INDOOR_BALLROOM' | 'POOLSIDE_LAWN' | 'ROOFTOP_TERRACE' | 'FULL_HOTEL_BUYOUT';
+  allowExternalCatererOrDecor: boolean;
+  targetBudgetCurrency: 'NPR' | 'USD';
+  targetBudgetAmount: number;
+  specialHospitalityNotes: string;
+  status:
+    | 'SUBMITTED_TO_ADMIN'
+    | 'ADMIN_SCOUTING_HOTELS'
+    | 'PROPOSAL_AND_RATES_SHARED'
+    | 'HOTEL_SECURED'
+    | 'PUBLISHED_TO_MARKETPLACE';
+  adminAssignedCoordinator?: string;
+  adminWorkNotes?: string;
+  sourcedHotelProposals?: SourcedStarHotelProposal[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type GlobalDestinationArchetype =
+  | 'FIVE_STAR_LUXURY_RESORT'
+  | 'ROYAL_PALACE_HAVELI'
+  | 'BEACHFRONT_BUYOUT'
+  | 'EUROPEAN_CHATEAU_VILLA'
+  | 'PRIVATE_ISLAND_OVERWATER'
+  | 'ULTRA_LUXURY_CITY_HOTEL';
+
+export interface OutsideNepalDestinationRequest {
+  id: string;
+  requestRef: string;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  originCities: string;
+  guestPassportNationalities: string;
+  needGroupVisaConcierge: boolean;
+  targetCountry: string;
+  targetCityOrRegion: string;
+  celebrationType: EventType | 'DESTINATION_WEDDING' | 'ANNIVERSARY_RENEWAL';
+  celebrationDaysCount: number;
+  preferredDateWindowAD: string;
+  auspiciousMuhuratReferenceBS?: string;
+  estimatedGuests: number;
+  eldersAndKidsAccessibilityNotes: string;
+  accommodationArchetype: GlobalDestinationArchetype;
+  roomBlockCount: number;
+  ceremonialRitualsIncluded: string[];
+  culturalBridgeNeeds: {
+    flyPancheBajaOrFolkTroupe: boolean;
+    shipPujaSamagriAndAttire: boolean;
+    bilingualVedicOrBuddhistPriest: boolean;
+    liveBroadcastBackToNepal: boolean;
+  };
+  culinaryDesign: {
+    dietaryProfiles: string[];
+    flyNepaliMaharajChef: boolean;
+    signatureCounters: string;
+    beverageStyle: string;
+  };
+  memorableSignatureExperiences: string[];
+  loveStoryOrMilestoneTheme: string;
+  aestheticColorPalette: string;
+  currency: 'USD' | 'EUR' | 'GBP' | 'AED' | 'AUD' | 'INR' | 'NPR';
+  budgetAmount: number;
+  specialDreamsAndNotes: string;
+  aiConciergeBlueprint?: string;
+  status:
+    | 'DOSSIER_GATHERED'
+    | 'PARTNER_HOTEL_SCOUTING'
+    | 'MEMORABLE_PROPOSAL_READY'
+    | 'ARRANGEMENTS_CONFIRMED';
+  adminCoordinatorNotes?: string;
+  arrangedDeliverables?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type FavoriteVenueAlertKind = 'PANCHANGA_DATE_OPEN' | 'LAST_MINUTE_CANCELLATION';
+
+export type SseStreamStatus = 'CONNECTING' | 'CONNECTED' | 'RECONNECTING';
+
+export interface FavoriteVenueAlert {
+  id: string;
+  venueId: string;
+  venueName: string;
+  district: string;
+  locality: string;
+  alertKind: FavoriteVenueAlertKind;
+  title: string;
+  message: string;
+  dateBS: string;
+  dateAD: string;
+  shift: ShiftTime;
+  hallName?: string;
+  tithi?: string;
+  nakshatra?: string;
+  auspiciousTime?: string;
+  discountOrIncentiveNote?: string;
+  sourceBookingRef?: string;
+  createdAt: string;
+  isRead: boolean;
+}

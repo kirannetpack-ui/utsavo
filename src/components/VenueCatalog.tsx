@@ -29,10 +29,12 @@ import {
   Bookmark,
   Eye,
   Camera,
+  Wand2,
 } from 'lucide-react';
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
 import { createVenueInquiryMessage } from '../utils/communication';
 import { SocialCelebrationWall } from './SocialCelebrationWall';
+import { SmartVenueMatcher } from './SmartVenueMatcher';
 
 export const VenueCatalog: React.FC = () => {
   const { t, language } = useLanguage();
@@ -47,9 +49,10 @@ export const VenueCatalog: React.FC = () => {
     isVenueSaved,
     savedVenueIds,
     setQuickPeekVenueId,
+    setActiveModal,
   } = useMarketplace();
 
-  const [exploreMode, setExploreMode] = useState<'VENUES' | 'SOCIAL_WALL'>('VENUES');
+  const [exploreMode, setExploreMode] = useState<'VENUES' | 'SMART_MATCHER' | 'SOCIAL_WALL'>('VENUES');
   const [selectedAmenity, setSelectedAmenity] = useState<string>('ALL');
   const [activeTab, setActiveTab] = useState<'GRID' | 'MAP_VIEW'>('GRID');
 
@@ -194,8 +197,20 @@ export const VenueCatalog: React.FC = () => {
             </button>
 
             <button
+              onClick={() => setExploreMode('SMART_MATCHER')}
+              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap shrink-0 ${
+                exploreMode === 'SMART_MATCHER'
+                  ? 'bg-amber-900 text-white shadow-md ring-1 ring-amber-700/20'
+                  : 'text-stone-700 hover:text-amber-950'
+              }`}
+            >
+              <Wand2 className={`w-4 h-4 ${exploreMode === 'SMART_MATCHER' ? 'text-amber-300' : 'text-amber-800'}`} />
+              <span>{language === 'ne' ? 'स्मार्ट भेन्यु म्याचर (Top 3)' : 'AI Smart Venue Matcher'}</span>
+            </button>
+
+            <button
               onClick={() => setExploreMode('SOCIAL_WALL')}
-              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap ${
+              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all whitespace-nowrap shrink-0 ${
                 exploreMode === 'SOCIAL_WALL'
                   ? 'bg-gradient-to-r from-rose-800 to-rose-950 text-white shadow-md ring-1 ring-rose-500/20'
                   : 'text-stone-600 hover:text-rose-900'
@@ -203,7 +218,7 @@ export const VenueCatalog: React.FC = () => {
             >
               <Camera className={`w-4 h-4 ${exploreMode === 'SOCIAL_WALL' ? 'text-amber-400' : 'text-rose-700'}`} />
               <span>{language === 'ne' ? 'वास्तविक उत्सव पर्खाल' : 'Celebration Social Wall'}</span>
-              <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-bold animate-pulse">
+              <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-rose-500 text-white font-bold">
                 Live Photos
               </span>
             </button>
@@ -217,8 +232,29 @@ export const VenueCatalog: React.FC = () => {
               if (v) setSelectedVenue(v);
             }}
           />
+        ) : exploreMode === 'SMART_MATCHER' ? (
+          <SmartVenueMatcher onApplyFiltersToCatalog={() => setExploreMode('VENUES')} />
         ) : (
           <>
+            {/* Smart Venue Matcher Compact Bar in Explore Grid */}
+            <div className="mb-5 p-3.5 sm:px-5 rounded-2xl bg-white border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 text-xs sm:text-sm text-stone-700">
+                <Sparkles className="w-4 h-4 text-amber-800 shrink-0" />
+                <span>
+                  <strong className="text-stone-900">Smart Venue Matcher:</strong> Get AI-ranked top 3
+                  best-fit Nepal party palaces tailored to your guest count, district, and NPR budget.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setExploreMode('SMART_MATCHER')}
+                className="px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-950 text-white text-xs font-bold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto"
+              >
+                <Wand2 className="w-3.5 h-3.5 text-amber-300" />
+                <span>Find My Top 3 Matches</span>
+              </button>
+            </div>
+
             {/* 1-Touch Quick-Filter Preset Pills (Maximum Information at Minimum Touchable) */}
             <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
               <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
@@ -384,6 +420,15 @@ export const VenueCatalog: React.FC = () => {
               <option value="CAPACITY_DESC">{t('sortCapacityDesc')}</option>
               <option value="RATING_DESC">{t('sortRatingDesc')}</option>
             </select>
+
+            <button
+              type="button"
+              onClick={() => setActiveModal('STAR_HOTEL_REQUEST')}
+              className="px-3 py-1.5 rounded-lg bg-amber-900 hover:bg-amber-950 text-white text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition-colors"
+            >
+              <Building2 className="w-3.5 h-3.5 text-amber-300" />
+              <span>{language === 'ne' ? 'तारे होटल अनुरोध' : 'Request Any Star Hotel'}</span>
+            </button>
           </div>
         </div>
 
@@ -658,6 +703,13 @@ export const VenueCatalog: React.FC = () => {
                 className="px-4 py-2 text-xs font-semibold text-white bg-amber-900 hover:bg-amber-950 rounded-xl shadow-xs transition-colors"
               >
                 {language === 'ne' ? 'नयाँ पार्टी प्यालेस दर्ता गर्नुहोस्' : 'Register a Party Palace Here'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveModal('STAR_HOTEL_REQUEST')}
+                className="px-4 py-2 text-xs font-semibold text-amber-950 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-xl transition-colors"
+              >
+                {language === 'ne' ? '३★–५★ होटल अनुरोध पठाउनुहोस्' : 'Request Any Star Hotel via Admin'}
               </button>
             </div>
           </div>

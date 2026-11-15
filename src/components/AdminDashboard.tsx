@@ -35,6 +35,7 @@ import {
   Briefcase,
   AlertTriangle,
 } from 'lucide-react';
+import { AdminConciergeSourcingTab } from './AdminConciergeSourcingTab';
 
 export const AdminDashboard: React.FC = () => {
   const { language } = useLanguage();
@@ -53,9 +54,14 @@ export const AdminDashboard: React.FC = () => {
     dismissGovtDirective,
     statutoryRules,
     updateStatutoryRules,
+    vendorPolicies,
+    referralOffers,
+    cancellationRecords,
+    starHotelRequests,
+    outsideNepalRequests,
   } = useMarketplace();
 
-  const [adminTab, setAdminTab] = useState<'OVERVIEW' | 'VERIFICATION' | 'CATEGORIES' | 'GOVT_COMPLIANCE' | 'SETTLEMENTS' | 'AUDIT_LOGS'>('OVERVIEW');
+  const [adminTab, setAdminTab] = useState<'OVERVIEW' | 'VERIFICATION' | 'CONCIERGE_SOURCING' | 'CATEGORIES' | 'GOVT_COMPLIANCE' | 'SETTLEMENTS' | 'AUDIT_LOGS'>('OVERVIEW');
   const [categorySubTab, setCategorySubTab] = useState<'ARTISTS' | 'WORKFORCE_ROLES'>('ARTISTS');
   const [categoryFilterStatus, setCategoryFilterStatus] = useState<'ALL' | 'PENDING' | 'PERMANENT' | 'TEMPORARY'>('ALL');
 
@@ -71,6 +77,9 @@ export const AdminDashboard: React.FC = () => {
   const totalPendingCategoriesCount = pendingArtistProposalsCount + pendingStaffProposalsCount;
 
   const pendingGovtDirectivesCount = govtDirectives.filter(d => d.status === 'PENDING_ADMIN_DECISION').length;
+  const pendingConciergeCount =
+    starHotelRequests.filter((r) => r.status === 'SUBMITTED_TO_ADMIN' || r.status === 'ADMIN_SCOUTING_HOTELS').length +
+    outsideNepalRequests.filter((r) => r.status === 'DOSSIER_GATHERED' || r.status === 'PARTNER_HOTEL_SCOUTING').length;
 
   // Compute platform marketplace metrics
   const totalGMVNpr = bookings.reduce((sum, b) => sum + b.totalAmountNpr, 0);
@@ -163,11 +172,26 @@ export const AdminDashboard: React.FC = () => {
           
           <button
             onClick={() => setAdminTab('VERIFICATION')}
-            className={`px-3 py-1.5 rounded-lg transition-colors ${
+            className={`px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap shrink-0 ${
               adminTab === 'VERIFICATION' ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600 hover:text-stone-900'
             }`}
           >
             KYC Verification ({venues.length})
+          </button>
+
+          <button
+            onClick={() => setAdminTab('CONCIERGE_SOURCING')}
+            className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              adminTab === 'CONCIERGE_SOURCING' ? 'bg-amber-900 text-white shadow-sm font-bold' : 'text-stone-700 hover:text-stone-900'
+            }`}
+          >
+            <Building2 className="w-3.5 h-3.5 text-amber-500" />
+            <span>Star Hotels &amp; Global</span>
+            <span className={`px-1.5 py-0.2 text-[10px] font-bold rounded-full tabular-nums ${
+              adminTab === 'CONCIERGE_SOURCING' ? 'bg-amber-500 text-stone-950' : 'bg-amber-100 text-amber-900'
+            }`}>
+              {pendingConciergeCount > 0 ? pendingConciergeCount : starHotelRequests.length + outsideNepalRequests.length}
+            </span>
           </button>
 
           <button
@@ -331,6 +355,47 @@ export const AdminDashboard: React.FC = () => {
               >
                 Open Compliance Intelligence Hub →
               </button>
+            </div>
+
+            {/* Dynamic Cancellation & Partner Referral Governance Card */}
+            <div className="pt-4 border-t border-stone-200 space-y-2.5 text-xs">
+              <div className="flex items-center justify-between">
+                <strong className="text-stone-900 font-bold">Cancellation &amp; Referral SLA</strong>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 tabular-nums">
+                  {Object.keys(vendorPolicies).length} Active Policies
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="p-2 bg-stone-50 rounded-xl border border-stone-200">
+                  <strong className="block text-sm font-bold text-stone-900 tabular-nums">
+                    {referralOffers.filter((r) => r.clientDecision === 'PENDING').length}
+                  </strong>
+                  <span className="text-[10px] text-stone-500">Pending Referrals</span>
+                </div>
+                <div className="p-2 bg-stone-50 rounded-xl border border-stone-200">
+                  <strong className="block text-sm font-bold text-emerald-800 tabular-nums">
+                    {referralOffers.filter((r) => r.clientDecision === 'ACCEPTED_PARTNER').length}
+                  </strong>
+                  <span className="text-[10px] text-stone-500">Escrow Swaps</span>
+                </div>
+                <div className="p-2 bg-stone-50 rounded-xl border border-stone-200">
+                  <strong className="block text-sm font-bold text-rose-800 tabular-nums">
+                    {cancellationRecords.filter((c) => c.isPastDeadline).length}
+                  </strong>
+                  <span className="text-[10px] text-stone-500">No-Show Settled</span>
+                </div>
+              </div>
+              {referralOffers.slice(0, 2).map((offer) => (
+                <div key={offer.id} className="p-2.5 bg-amber-50/70 rounded-xl border border-amber-200 text-[11px] space-y-0.5">
+                  <div className="flex items-center justify-between font-semibold text-stone-900">
+                    <span className="truncate">{offer.cancellingVendorName}</span>
+                    <span className="text-[10px] font-bold text-amber-900 shrink-0">{offer.clientDecision.replace(/_/g, ' ')}</span>
+                  </div>
+                  <div className="text-stone-600 truncate">
+                    #{offer.bookingRef} · {offer.recommendedPartners.length} peer partner(s) · {offer.referralFeeModel.replace(/_/g, ' ')}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -821,11 +886,27 @@ export const AdminDashboard: React.FC = () => {
 
       {/* TAB 6: AUDIT LOGS */}
       {adminTab === 'AUDIT_LOGS' && (
-        <div className="bg-white rounded-3xl border border-stone-200 p-6 space-y-3 text-xs font-mono">
-          <h3 className="text-base font-bold text-stone-900 font-sans mb-3">
-            System Security & Financial Transaction Audit Log
-          </h3>
+        <div className="bg-white rounded-3xl border border-stone-200 p-6 space-y-4 text-xs font-mono">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-sans">
+            <h3 className="text-base font-bold text-stone-900">
+              System Security, Cancellation &amp; Financial Transaction Audit Log
+            </h3>
+            <span className="text-xs text-stone-500 tabular-nums">
+              {cancellationRecords.length} Cancellation Settlements · {referralOffers.length} Referral Handoffs
+            </span>
+          </div>
+
           <div className="space-y-2 text-stone-600 bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            {cancellationRecords.map((rec) => (
+              <div key={rec.id} className="text-stone-800">
+                [{rec.resolvedAt}] CANCELLATION_SETTLED ({rec.initiatedByRole}): Booking #{rec.bookingRef} · {rec.legalBasisSummary} · Client Refund NPR {rec.refundIssuedNpr.toLocaleString()} · Vendor Retained NPR {rec.retainedFeeNpr.toLocaleString()} {rec.isPastDeadline ? '[PAST-DEADLINE / NO-SHOW]' : ''}
+              </div>
+            ))}
+            {referralOffers.map((offer) => (
+              <div key={offer.id} className="text-amber-900">
+                [{offer.createdAt}] PARTNER_REFERRAL_HANDOFF ({offer.clientDecision}): {offer.cancellingVendorName} → Booking #{offer.bookingRef} · {offer.recommendedPartners.length} recommended peer(s) · Liability Waiver: {offer.includeLiabilityRelease ? 'CONFIRMED' : 'PENDING'}
+              </div>
+            ))}
             <div>[2024-11-08 07:15:00] GOVT_COMPLIANCE_ENFORCED: Labour Act 2074 minimum wage rule NPR 668/day shift applied platform-wide.</div>
             <div>[2024-11-04 00:20:12] AUDIT_PAYMENT_CONFIRMED: Txn ESW-2081-98214902 validated server-side. Deposit NPR 303,969 credited.</div>
             <div>[2024-11-04 00:15:40] AUDIT_CONTRACT_SIGNED: Booking UTS-2081-4921 signed with SHA256 cryptographic hash.</div>
@@ -833,6 +914,16 @@ export const AdminDashboard: React.FC = () => {
             <div>[2024-11-02 14:30:00] AUDIT_KYC_VERIFIED: The Regal Pavilion PAN 602918471 verified against Inland Revenue Department records.</div>
           </div>
         </div>
+      )}
+
+      {/* TAB: STAR HOTELS & OUTSIDE-NEPAL GLOBAL CONCIERGE SOURCING */}
+      {adminTab === 'CONCIERGE_SOURCING' && (
+        <AdminConciergeSourcingTab
+          onToast={(msg) => {
+            setDirectiveActionToast(msg);
+            setTimeout(() => setDirectiveActionToast(null), 5000);
+          }}
+        />
       )}
 
     </div>

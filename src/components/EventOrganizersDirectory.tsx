@@ -200,6 +200,32 @@ export const EventOrganizersDirectory: React.FC<EventOrganizersDirectoryProps> =
         </div>
       </div>
 
+      {/* Event Management Retainer, -6 hr Load-In & Peer Referral Liability Strip */}
+      <div className="p-4 sm:p-5 bg-white rounded-2xl border border-stone-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="p-2.5 bg-stone-900 text-amber-300 rounded-xl shrink-0">
+            <HeartHandshake className="w-5 h-5" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider">
+                Planner Retainer · -6 hr Load-In SLA & Peer Continuity Referral
+              </h4>
+              <span className="px-2 py-0.5 bg-stone-100 text-stone-800 border border-stone-200 rounded-md text-[10px] font-bold">
+                30% Retainer Non-Refundable Upon Design Work
+              </span>
+            </div>
+            <p className="text-xs text-stone-600 leading-relaxed">
+              <strong>-6 hr Load-In No-Show Window:</strong> Missing pre-event rigging/load-in freezes final milestone payout and dispatches standby UTSAVO production leads; client cancellations after production fabrication cover incurred third-party sub-vendor costs. <strong>Continuity Peer Referral:</strong> Cancelling planners transfer full CAD Run-of-Show packets to an alternate vetted agency with optional <strong>5–10% B2B Finder Fee</strong> & explicit <strong>Third-Party Referral Liability Release</strong> once the client executes the new agreement.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0 text-[11px] font-semibold text-stone-700 bg-stone-50 border border-stone-200 px-3 py-2 rounded-xl whitespace-nowrap">
+          <Clock className="w-3.5 h-3.5 text-amber-700" />
+          <span>45d+ Notice: 70% Escrow · Force Majeure Sec. 531</span>
+        </div>
+      </div>
+
       {/* Organizers Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         {filteredOrganizers.map((org) => {

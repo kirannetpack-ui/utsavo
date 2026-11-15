@@ -34,6 +34,7 @@ import {
   Mountain,
   Tag,
   PlusCircle,
+  Building2,
 } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -249,6 +250,26 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStaffPool }) => 
                   <span>{t('btnSearch')}</span>
                 </button>
               </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-stone-600">
+              <span className="text-[11px] text-stone-500">
+                {language === 'ne'
+                  ? 'पार्टी प्यालेस वा ३★–५★ होटल खोज्दै हुनुहुन्छ? सिस्टम एडमिनमार्फत सोझै अनुरोध पठाउनुहोस्।'
+                  : 'Prefer a 3★–5★ Luxury Hotel Ballroom or Resort Buyout instead of a Party Palace?'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setActiveModal('STAR_HOTEL_REQUEST')}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 hover:text-amber-950 underline whitespace-nowrap shrink-0"
+              >
+                <Building2 className="w-3.5 h-3.5 text-amber-800" />
+                <span>
+                  {language === 'ne'
+                    ? 'कुनै पनि तारे होटल भेन्यु अनुरोध गर्नुहोस् →'
+                    : 'Request Any Star Hotel Venue (Admin Sourced) →'}
+                </span>
+              </button>
             </div>
 
             {/* Quick Top Controls (Always visible for fast selection: Location, Event Type, Guests) */}

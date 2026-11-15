@@ -58,10 +58,14 @@ import {
   Printer,
   UtensilsCrossed,
   Briefcase,
+  Scale,
+  ArrowRightLeft,
 } from 'lucide-react';
 import { VenueAnalytics } from './VenueAnalytics';
+import { VenuePerformanceTab } from './VenuePerformanceTab';
 import { LegalContractQuotationGenerator } from './LegalContractQuotationGenerator';
 import { EventStaffTalentPool } from './EventStaffTalentPool';
+import { createDynamicPolicyFromPreset } from '../data/cancellationPoliciesData';
 
 export const VenueOwnerDashboard: React.FC = () => {
   const { language } = useLanguage();
@@ -75,13 +79,18 @@ export const VenueOwnerDashboard: React.FC = () => {
     setActiveModal,
     setActiveNegotiationId,
     eventStaffPool,
+    getVendorCancellationPolicy,
+    updateVendorCancellationPolicy,
+    createVendorReferralOffer,
+    cancelBookingWithPolicy,
+    publishFavoriteVenueAlert,
   } = useMarketplace();
 
   // Active venue for the logged-in venue operator
   const myVenue: Venue = venues[0]; // The Regal Pavilion & Heritage Banquet
 
   const [activeTab, setActiveTab] = useState<
-    'CALENDAR' | 'INBOX' | 'WALK_IN' | 'MENU_PRICING' | 'MEDIA_GALLERY' | 'OFFERS' | 'KYC_VERIFICATION' | 'EVENT_POLICY' | 'ANALYTICS' | 'EVENT_STAFF'
+    'CALENDAR' | 'VENUE_PERFORMANCE' | 'INBOX' | 'WALK_IN' | 'MENU_PRICING' | 'MEDIA_GALLERY' | 'OFFERS' | 'KYC_VERIFICATION' | 'EVENT_POLICY' | 'CANCELLATIONS' | 'ANALYTICS' | 'EVENT_STAFF'
   >('CALENDAR');
 
   const [selectedHallId, setSelectedHallId] = useState<string>(myVenue.halls[0].id);
@@ -269,6 +278,16 @@ export const VenueOwnerDashboard: React.FC = () => {
 
   const venueBookings = bookings.filter((b) => b.venueId === myVenue.id);
   const venueNegotiations = negotiations.filter((n) => n.venueId === myVenue.id);
+
+  // DYNAMIC CANCELLATION POLICY & PEER REFERRAL STATE
+  const [venueCancelPolicy, setVenueCancelPolicy] = useState(() =>
+    getVendorCancellationPolicy(myVenue.id, myVenue.name, 'VENUE_VENDOR')
+  );
+  const [referralTargetBookingId, setReferralTargetBookingId] = useState<string>('');
+  const [referralPeerIds, setReferralPeerIds] = useState<string[]>([]);
+  const [referralReasonNote, setReferralReasonNote] = useState<string>(
+    'Unplanned hall electrical upgrade on booking date; referring sister verified palaces with matched capacity and direct escrow transfer.'
+  );
 
   // Financial KPIs
   const totalRevenueNpr = venueBookings.reduce((sum, b) => sum + (b.depositPaidNpr || 0), 0);
@@ -623,13 +642,13 @@ export const VenueOwnerDashboard: React.FC = () => {
           {/* Booking Performance Quick Metrics Bar */}
           <div className="flex flex-wrap items-center gap-2 pt-2">
             <button
-              onClick={() => setActiveTab('ANALYTICS')}
+              onClick={() => setActiveTab('VENUE_PERFORMANCE')}
               className="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-200/80 text-[11px] font-semibold flex items-center gap-1.5 transition-colors"
-              title="Click to view full Booking Performance Recharts Dashboard"
+              title="Click to view 6-Month Venue Performance Recharts Dashboard"
             >
               <TrendingUp className="w-3.5 h-3.5 text-amber-800" />
               <span>Performance Pulse: <strong>84 Inquiries</strong> · <strong className="text-emerald-700">26 Booked</strong> · <strong>NPR 48.6L Revenue Peak</strong></span>
-              <span className="text-[10px] text-amber-800 underline ml-1">View Performance Charts →</span>
+              <span className="text-[10px] text-amber-800 underline ml-1">Open Venue Performance →</span>
             </button>
           </div>
         </div>
@@ -733,6 +752,24 @@ export const VenueOwnerDashboard: React.FC = () => {
             >
               <Award className="w-3.5 h-3.5 text-amber-800" />
               <span>Event Management Policy</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('CANCELLATIONS')}
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 ${
+                activeTab === 'CANCELLATIONS' ? 'bg-white text-stone-900 shadow-sm font-bold' : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Scale className="w-3.5 h-3.5 text-amber-800" />
+              <span>Cancellation &amp; Referrals</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('VENUE_PERFORMANCE')}
+              className={`px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeTab === 'VENUE_PERFORMANCE' ? 'bg-amber-900 text-white shadow-sm font-bold' : 'text-stone-700 hover:text-amber-950'
+              }`}
+            >
+              <BarChart3 className={`w-3.5 h-3.5 ${activeTab === 'VENUE_PERFORMANCE' ? 'text-amber-300' : 'text-amber-800'}`} />
+              <span>Venue Performance</span>
             </button>
             <button
               onClick={() => setActiveTab('ANALYTICS')}
@@ -850,19 +887,48 @@ export const VenueOwnerDashboard: React.FC = () => {
 
                 <div className="space-y-1.5">
                   {Object.entries(slot.shifts).map(([shiftKey, status]) => (
-                    <div key={shiftKey} className="flex items-center justify-between text-xs">
+                    <div key={shiftKey} className="flex items-center justify-between gap-2 text-xs">
                       <span className="text-stone-600 capitalize text-[11px]">{shiftKey.toLowerCase()} Shift</span>
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                          status === 'AVAILABLE'
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : status === 'CONFIRMED'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
-                        {status}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {status === 'AVAILABLE' && (
+                          <button
+                            onClick={() => {
+                              const hallObj = myVenue.halls.find((h) => h.id === selectedHallId) || myVenue.halls[0];
+                              void publishFavoriteVenueAlert({
+                                venueId: myVenue.id,
+                                venueName: myVenue.name,
+                                district: myVenue.district,
+                                locality: myVenue.locality,
+                                alertKind: 'PANCHANGA_DATE_OPEN',
+                                title: `Newly Released ${shiftKey} Shift on ${slot.dateBS} at ${myVenue.name}`,
+                                message: `${myVenue.name} opened ${hallObj?.name || 'Main Hall'} for ${slot.dateBS} (${slot.tithi}, ${shiftKey} Shift). Reserve directly while slot stays unbooked.`,
+                                dateBS: slot.dateBS,
+                                dateAD: '2024-12-03',
+                                shift: shiftKey as ShiftTime,
+                                hallName: hallObj?.name,
+                                tithi: slot.tithi,
+                                discountOrIncentiveNote: 'Live Venue Release · Priority Inquiry for Favorite Watchers',
+                              });
+                              showToast(`Broadcast live SSE availability alert for ${slot.dateBS} (${shiftKey} Shift) to favorited customers.`);
+                            }}
+                            className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-900 hover:bg-amber-950 text-white transition-colors whitespace-nowrap"
+                            title="Push live SSE notification to customers who favorited this venue"
+                          >
+                            Notify Watchers
+                          </button>
+                        )}
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                            status === 'AVAILABLE'
+                              ? 'bg-emerald-100 text-emerald-800'
+                              : status === 'CONFIRMED'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-amber-100 text-amber-800'
+                          }`}
+                        >
+                          {status}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -2162,7 +2228,339 @@ export const VenueOwnerDashboard: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 7: ADVANCED RECHARTS ANALYTICS & MARKET INTELLIGENCE */}
+      {/* TAB 6.5: DYNAMIC CANCELLATION POLICY, PAST-DEADLINE RESOLUTION & PARTNER REFERRALS */}
+      {activeTab === 'CANCELLATIONS' && (
+        <div className="space-y-6">
+          {/* Dynamic Policy Customizer */}
+          <div className="bg-white rounded-3xl border border-stone-200 p-6 space-y-5 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 pb-4">
+              <div>
+                <h3 className="text-lg font-bold text-stone-900 flex items-center gap-2">
+                  <Scale className="w-5 h-5 text-amber-800" />
+                  <span>Dynamic Cancellation Schedule &amp; Past-Deadline Rules ({myVenue.name})</span>
+                </h3>
+                <p className="text-stone-500 mt-0.5">
+                  Customize refund percentages, cooling-off windows, post-deadline forfeiture, staff &lt;48h reporting pay, and partner referral fees.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {(['FLEXIBLE', 'MODERATE_STANDARD', 'STRICT_PEAK_MUHURAT'] as const).map((presetKey) => (
+                  <button
+                    key={presetKey}
+                    type="button"
+                    onClick={() =>
+                      setVenueCancelPolicy(
+                        createDynamicPolicyFromPreset({
+                          vendorId: myVenue.id,
+                          vendorName: myVenue.name,
+                          stakeholderCategory: 'VENUE_VENDOR',
+                          preset: presetKey,
+                          referralFeeModel: venueCancelPolicy.referralConfig.referralFeeModel,
+                        })
+                      )
+                    }
+                    className={`px-3 py-1.5 rounded-xl font-bold border transition-colors ${
+                      venueCancelPolicy.preset === presetKey
+                        ? 'bg-amber-900 text-white border-amber-900'
+                        : 'bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100'
+                    }`}
+                  >
+                    {presetKey.replace(/_/g, ' ')}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {venueCancelPolicy.tiers.map((tier, idx) => (
+                <div key={tier.id} className="p-3.5 rounded-xl border border-stone-200 bg-stone-50 space-y-2">
+                  <div className="font-bold text-stone-900">{tier.label}</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-stone-500">Refund %:</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={tier.refundPercent}
+                      onChange={(e) => {
+                        const val = Math.min(100, Math.max(0, Number(e.target.value) || 0));
+                        const next = [...venueCancelPolicy.tiers];
+                        next[idx] = { ...tier, refundPercent: val, retainedFeePercent: 100 - val };
+                        setVenueCancelPolicy({ ...venueCancelPolicy, preset: 'CUSTOM', tiers: next });
+                      }}
+                      className="w-16 bg-white border border-stone-300 rounded-lg px-2 py-1 font-mono font-bold text-right"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-stone-500">Credit %:</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={tier.rescheduleCreditPercent}
+                      onChange={(e) => {
+                        const val = Math.min(100, Math.max(0, Number(e.target.value) || 0));
+                        const next = [...venueCancelPolicy.tiers];
+                        next[idx] = { ...tier, rescheduleCreditPercent: val };
+                        setVenueCancelPolicy({ ...venueCancelPolicy, preset: 'CUSTOM', tiers: next });
+                      }}
+                      className="w-16 bg-white border border-stone-300 rounded-lg px-2 py-1 font-mono font-bold text-right"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-stone-50 rounded-2xl border border-stone-200">
+              <div>
+                <label className="font-semibold text-stone-700 block mb-1">Post-Deadline Forfeiture (%)</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={venueCancelPolicy.pastDeadlineRule.forfeitPercentAfterDeadline}
+                  onChange={(e) =>
+                    setVenueCancelPolicy({
+                      ...venueCancelPolicy,
+                      pastDeadlineRule: {
+                        ...venueCancelPolicy.pastDeadlineRule,
+                        forfeitPercentAfterDeadline: Number(e.target.value) || 0,
+                      },
+                    })
+                  }
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 font-mono font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold text-stone-700 block mb-1">Pool Staff &lt;48h Reporting Pay (%)</label>
+                <input
+                  type="number"
+                  min={50}
+                  max={100}
+                  value={venueCancelPolicy.pastDeadlineRule.staffReportingPayPercent}
+                  onChange={(e) =>
+                    setVenueCancelPolicy({
+                      ...venueCancelPolicy,
+                      pastDeadlineRule: {
+                        ...venueCancelPolicy.pastDeadlineRule,
+                        staffReportingPayPercent: Number(e.target.value) || 50,
+                      },
+                    })
+                  }
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 font-mono font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold text-stone-700 block mb-1">Partner Referral Commission</label>
+                <select
+                  value={venueCancelPolicy.referralConfig.referralFeeModel}
+                  onChange={(e) =>
+                    setVenueCancelPolicy({
+                      ...venueCancelPolicy,
+                      referralConfig: {
+                        ...venueCancelPolicy.referralConfig,
+                        referralFeeModel: e.target.value as any,
+                      },
+                    })
+                  }
+                  className="w-full bg-white border border-stone-300 rounded-lg p-2 font-semibold"
+                >
+                  <option value="COURTESY_ZERO_FEE">0% Emergency Courtesy Hand-off</option>
+                  <option value="B2B_COMMISSION_5_PERCENT">5% B2B Peer Referral Fee</option>
+                  <option value="B2B_COMMISSION_10_PERCENT">10% Turnkey Agency Fee</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  updateVendorCancellationPolicy(venueCancelPolicy);
+                  showToast('Dynamic venue cancellation & referral policy saved live!');
+                }}
+                className="px-5 py-2.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl font-bold flex items-center gap-1.5"
+              >
+                <Check className="w-4 h-4" />
+                <span>Save Venue Cancellation Policy Live</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Active Bookings: Partner Referral Handoff OR Past-Deadline No-Show Settlement */}
+          <div className="bg-white rounded-3xl border border-stone-200 p-6 space-y-4 text-xs">
+            <div className="border-b border-stone-100 pb-3">
+              <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
+                <ArrowRightLeft className="w-4 h-4 text-amber-800" />
+                <span>Booking Cancellation Actions: Peer Partner Referral &amp; Past-Deadline Settlement</span>
+              </h3>
+              <p className="text-stone-500 mt-0.5">
+                If your hall faces an emergency outage, refer alternate verified party palaces to preserve the client&apos;s event, or settle post-deadline client no-shows under Muluki Civil Code Sec. 535.
+              </p>
+            </div>
+
+            <div className="divide-y divide-stone-100">
+              {venueBookings.map((b) => (
+                <div key={b.id} className="py-4 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-stone-500">#{b.bookingRef}</span>
+                        <strong className="text-sm text-stone-900">{b.customerName}</strong>
+                        <span className="px-2 py-0.5 rounded bg-stone-100 text-stone-700 font-bold text-[10px]">{b.status}</span>
+                      </div>
+                      <div className="text-stone-500 mt-0.5">
+                        {b.hallName} · {b.eventDateBS} ({b.shift}) · Deposit Paid: NPR {b.depositPaidNpr.toLocaleString()}
+                      </div>
+                    </div>
+
+                    {b.status !== 'CANCELLED' && (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReferralTargetBookingId(referralTargetBookingId === b.id ? '' : b.id);
+                            setReferralPeerIds([]);
+                          }}
+                          className="px-3.5 py-2 bg-amber-900 hover:bg-amber-950 text-white rounded-xl font-semibold"
+                        >
+                          {referralTargetBookingId === b.id ? 'Close Peer Referrals' : 'Vendor Cancel & Refer Peers'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const rec = cancelBookingWithPolicy({
+                              bookingId: b.id,
+                              initiatedByRole: 'CLIENT',
+                              daysBeforeEvent: 0,
+                              isPastDeadline: true,
+                              isForceMajeure: false,
+                              hasEmergencyMedicalProof: false,
+                              bookedPoolStaffCount: 6,
+                              reason: 'Event date & shift deadline passed with client no-show; kitchen prep & crew locked.',
+                            });
+                            if (rec) {
+                              showToast(
+                                `Past-Deadline settled for #${b.bookingRef}: NPR ${rec.retainedFeeNpr.toLocaleString()} retained, NPR ${rec.staffReportingPayNpr.toLocaleString()} protected for hired pool staff.`
+                              );
+                            }
+                          }}
+                          className="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-900 border border-rose-200 rounded-xl font-semibold"
+                        >
+                          Resolve Date/Time Over (Client No-Show)
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {referralTargetBookingId === b.id && (
+                    <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-3">
+                      <div className="font-bold text-stone-900">
+                        Select 1–3 Peer Party Palaces to Refer to {b.customerName} ({referralPeerIds.length}/3):
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {venues
+                          .filter((v) => v.id !== myVenue.id)
+                          .map((peer) => {
+                            const selected = referralPeerIds.includes(peer.id);
+                            return (
+                              <label
+                                key={peer.id}
+                                className={`p-2.5 rounded-xl border bg-white flex items-center gap-2 cursor-pointer ${
+                                  selected ? 'border-amber-900 ring-1 ring-amber-900' : 'border-stone-200'
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selected}
+                                  onChange={() =>
+                                    setReferralPeerIds((prev) =>
+                                      prev.includes(peer.id)
+                                        ? prev.filter((x) => x !== peer.id)
+                                        : prev.length < 3
+                                        ? [...prev, peer.id]
+                                        : prev
+                                    )
+                                  }
+                                />
+                                <div className="min-w-0">
+                                  <div className="font-bold text-stone-900 truncate">{peer.name}</div>
+                                  <div className="text-[11px] text-stone-500">
+                                    {peer.district} · Rs. {peer.cateringStartingNpr.toLocaleString()}/plate
+                                  </div>
+                                </div>
+                              </label>
+                            );
+                          })}
+                      </div>
+                      <input
+                        type="text"
+                        value={referralReasonNote}
+                        onChange={(e) => setReferralReasonNote(e.target.value)}
+                        className="w-full bg-white border border-stone-200 rounded-lg p-2"
+                        placeholder="Reason & handoff note..."
+                      />
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          disabled={referralPeerIds.length === 0}
+                          onClick={() => {
+                            const partners = referralPeerIds
+                              .map((pid) => venues.find((v) => v.id === pid))
+                              .filter((v): v is Venue => Boolean(v))
+                              .map((v) => ({
+                                partnerId: v.id,
+                                partnerName: v.name,
+                                partnerType: 'VENUE_VENDOR' as const,
+                                district: v.district,
+                                categoryOrCapacity: `${v.minGuests}–${v.maxGuests} guests`,
+                                estimatedPriceNpr: v.cateringStartingNpr * b.guestCount + v.baseRentalStartingNpr,
+                                priceDeltaNote: 'Price-matched / Direct Escrow Transfer Eligible',
+                                phone: v.phone,
+                                rating: v.rating,
+                              }));
+                            createVendorReferralOffer({
+                              bookingId: b.id,
+                              cancellingVendorId: myVenue.id,
+                              cancellingVendorName: myVenue.name,
+                              stakeholderRole: 'VENUE_VENDOR',
+                              handoffType: 'WARM_REFERRAL',
+                              recommendedPartners: partners,
+                              referralFeeModel: venueCancelPolicy.referralConfig.referralFeeModel,
+                              reason: referralReasonNote,
+                              includeLiabilityRelease: true,
+                            });
+                            setReferralTargetBookingId('');
+                            setReferralPeerIds([]);
+                            showToast(`Referral offer with ${partners.length} peer palace(s) dispatched to ${b.customerName}.`);
+                          }}
+                          className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 disabled:opacity-50 text-white rounded-xl font-bold"
+                        >
+                          Dispatch Referral Offer to Client
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 7: 6-MONTH VENUE PERFORMANCE (RECHARTS) */}
+      {activeTab === 'VENUE_PERFORMANCE' && (
+        <VenuePerformanceTab
+          venue={myVenue}
+          bookings={venueBookings}
+          negotiations={venueNegotiations}
+          onOpenNegotiationInbox={() => setActiveTab('INBOX')}
+        />
+      )}
+
+      {/* TAB 7B: ADVANCED RECHARTS ANALYTICS & MARKET INTELLIGENCE */}
       {activeTab === 'ANALYTICS' && (
         <VenueAnalytics
           venue={myVenue}

@@ -465,6 +465,32 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
         </div>
       </div>
 
+      {/* Two-Sided Staffing Cancellation & Past-Deadline Auto-Backfill SLA Strip */}
+      <div className="p-4 sm:p-5 bg-white rounded-2xl border border-stone-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="p-2.5 bg-emerald-900 text-white rounded-xl shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider">
+                Two-Sided Staffing SLA · Reporting Pay &amp; +45 min Call-Time Auto-Backfill
+              </h4>
+              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-900 rounded-md text-[10px] font-bold tabular-nums">
+                Floor: NPR {statutoryRules.minDailyShiftWageNpr}/shift (Labour Act 2074)
+              </span>
+            </div>
+            <p className="text-xs text-stone-600 leading-relaxed">
+              <strong>Vendor Shift Cancellation (&lt;48h / &lt;24h):</strong> Cancelling &lt;48h triggers <strong>50% Reporting Pay</strong> (NPR {Math.round(statutoryRules.minDailyShiftWageNpr * 0.5).toLocaleString()}); cancelling &lt;24h or post-check-in pays <strong>100% Full Shift Wage</strong> (NPR {statutoryRules.minDailyShiftWageNpr.toLocaleString()}). <strong>+45 min Call-Time No-Show &amp; Backfill:</strong> Staff unverified past +45 min face a <strong>14–28 day late-drop cooldown</strong> while UTSAVO auto-pings high-reliability standby workers in the same district with a verified peer referral swap.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0 text-[11px] font-semibold text-emerald-950 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl whitespace-nowrap">
+          <Clock className="w-3.5 h-3.5 text-emerald-700" />
+          <span>48h+ Advance Cancel: 0% Penalty</span>
+        </div>
+      </div>
+
       {/* 2. Control Toolbar: Search, Filters, Multi-Select & VIEW DENSITY SWITCHER */}
       <div id="talent-grid" className="bg-white rounded-3xl border border-stone-200 shadow-xs p-5 sm:p-6 space-y-5">
         

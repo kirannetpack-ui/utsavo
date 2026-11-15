@@ -57,6 +57,7 @@ import {
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
 import { createDestinationInquiryMessage } from '../utils/communication';
 import { NepalDistrictSelector } from './NepalLocationSelector';
+import { OutsideNepalDestinationWorkspace } from './OutsideNepalDestinationWorkspace';
 
 interface DestinationCelebrationHubProps {
   onBackToExplore?: () => void;
@@ -73,6 +74,9 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
     addDestinationHotel,
     addDestinationVendorService,
   } = useMarketplace();
+
+  // Scope Switcher: Inside Nepal vs Outside Nepal (Worldwide Celebrations)
+  const [destinationScope, setDestinationScope] = useState<'INSIDE_NEPAL' | 'OUTSIDE_NEPAL'>('INSIDE_NEPAL');
 
   // Primary Destination View Mode: Packages vs Destination Hotels/Places vs Specialized Vendor Services
   const [activeCatalogTab, setActiveCatalogTab] = useState<'PACKAGES' | 'HOTELS_AND_PLACES' | 'VENDOR_SERVICES'>('HOTELS_AND_PLACES');
@@ -318,7 +322,51 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
   };
 
   return (
-    <div className="space-y-12 pb-16">
+    <div className="space-y-8 pb-16">
+      {/* Top Global Scope Switcher: Inside Nepal vs Outside Nepal + Star Hotel CTA */}
+      <div className="bg-white rounded-2xl border border-stone-200 p-3 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-stone-100 rounded-xl border border-stone-200 text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setDestinationScope('INSIDE_NEPAL')}
+            className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              destinationScope === 'INSIDE_NEPAL'
+                ? 'bg-amber-900 text-white shadow-xs'
+                : 'text-stone-700 hover:text-stone-900'
+            }`}
+          >
+            <Mountain className="w-3.5 h-3.5" />
+            <span>Inside Nepal (Himalayas &amp; Heritage)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setDestinationScope('OUTSIDE_NEPAL')}
+            className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              destinationScope === 'OUTSIDE_NEPAL'
+                ? 'bg-amber-900 text-white shadow-xs'
+                : 'text-stone-700 hover:text-stone-900'
+            }`}
+          >
+            <Plane className="w-3.5 h-3.5" />
+            <span>Outside Nepal (Worldwide Celebrations)</span>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setActiveModal('STAR_HOTEL_REQUEST')}
+          className="px-4 py-2 bg-stone-900 hover:bg-black text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0"
+        >
+          <Building2 className="w-3.5 h-3.5 text-amber-400" />
+          <span>Request Any 3★–5★ Hotel Venue (Admin Sourced)</span>
+        </button>
+      </div>
+
+      {destinationScope === 'OUTSIDE_NEPAL' ? (
+        <OutsideNepalDestinationWorkspace onBackToExplore={onBackToExplore} />
+      ) : (
+        <>
       
       {/* 1. Hero Destination & Tourism Banner */}
       <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-stone-800 bg-stone-950 text-white">
@@ -2043,6 +2091,8 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
         </div>
       )}
 
+        </>
+      )}
     </div>
   );
 };

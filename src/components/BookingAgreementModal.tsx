@@ -26,6 +26,7 @@ export const BookingAgreementModal: React.FC = () => {
     activeBookingId,
     bookings,
     signAgreement,
+    getVendorCancellationPolicy,
   } = useMarketplace();
 
   if (activeModal !== 'AGREEMENT' || !activeBookingId) return null;
@@ -177,8 +178,19 @@ export const BookingAgreementModal: React.FC = () => {
                 <strong>3.2 Vedic Fire & Mandap Safety:</strong> Traditional Vivaha Homa and Hawan are authorized exclusively in designated fire-retardant mandap zones with venue security presence.
               </p>
               <p>
-                <strong>3.3 Food Safety & Leftover Policy:</strong> All catering is prepared fresh on the event date. In compliance with Nepal consumer protection directives, leftover buffet food removal is subject to client safety waivers.
+                <strong>3.3 Food Safety &amp; Leftover Policy:</strong> All catering is prepared fresh on the event date. In compliance with Nepal consumer protection directives, leftover buffet food removal is subject to client safety waivers.
               </p>
+              {(() => {
+                const policy = getVendorCancellationPolicy(currentBooking.venueId, currentBooking.venueName, 'VENUE_VENDOR');
+                const tierSummary = policy.tiers.map((t) => `${t.label}: ${t.refundPercent}% refund / ${t.rescheduleCreditPercent}% credit`).join(' · ');
+                return (
+                  <p>
+                    <strong>3.4 Dynamic Cancellation, Past-Deadline &amp; Partner Referral Schedule ({policy.preset.replace(/_/g, ' ')}):</strong>{' '}
+                    {policy.coolingOffHours}h free cooling-off (&gt;14d prior). {tierSummary}.{' '}
+                    <strong>Event Date &amp; Time Over (No-Show Cutoff):</strong> {policy.pastDeadlineRule.forfeitPercentAfterDeadline}% deposit forfeiture under Muluki Civil Code Sec. 535, with {policy.pastDeadlineRule.allowEmergencyMedicalReviewHours}h verified emergency medical review (up to {policy.pastDeadlineRule.goodwillCreditCapPercent}% off-season credit) and {policy.pastDeadlineRule.staffReportingPayPercent}% pool staff reporting pay protection. Should Party A cancel, Party A shall issue a 100% refund or provide Equal-or-Greater Peer Partner Referrals with direct escrow transfer and optional referral liability release.
+                  </p>
+                );
+              })()}
             </div>
 
             {/* Cryptographic Signature Stamp */}

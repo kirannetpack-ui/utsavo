@@ -9,8 +9,11 @@ import { useLanguage } from '../context/LanguageContext';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { initialCulturalVendors } from '../data/culturalVendorsData';
 import { VenueImageVisual } from './VenueImageVisual';
+import { EventBudgetTracker } from './EventBudgetTracker';
+import { FavoriteVenueAlertsPanel } from './FavoriteVenueAlertsPanel';
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
 import { createVenueInquiryMessage, createVendorInquiryMessage } from '../utils/communication';
+import { calculateCancellationOutcome } from '../data/cancellationPoliciesData';
 import {
   Calendar,
   Clock,
@@ -39,13 +42,18 @@ import {
   X,
   Columns,
   Bell,
+  BellRing,
   Play,
   Compass,
+  Radio,
+  Scale,
+  ArrowRightLeft,
+  Wallet,
 } from 'lucide-react';
 
 interface CustomerDashboardProps {
   onOpenReviewModal: (bookingId: string, venueId: string) => void;
-  onNavigateView?: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL') => void;
+  onNavigateView?: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
 }
 
 export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
@@ -76,6 +84,17 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
     clearAllAlerts,
     setFilters,
     unreadAlertsCount,
+    referralOffers,
+    respondToReferralOffer,
+    getVendorCancellationPolicy,
+    cancelBookingWithPolicy,
+    cancellationRecords,
+    statutoryRules,
+    starHotelRequests,
+    outsideNepalRequests,
+    favoriteVenueAlerts,
+    unreadFavoriteVenueAlertsCount,
+    sseConnectionStatus,
   } = useMarketplace();
 
   // Internal tab state synced with context
@@ -86,6 +105,16 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
   const [savedFilterCategory, setSavedFilterCategory] = useState<'ALL' | 'VENUES' | 'VENDORS'>('ALL');
   const [savedSearchQuery, setSavedSearchQuery] = useState('');
   const [showComparisonMatrix, setShowComparisonMatrix] = useState(false);
+
+  // Cancellation & Referral state
+  const [selectedReferralPartnerMap, setSelectedReferralPartnerMap] = useState<Record<string, string>>({});
+  const [cancellingBookingId, setCancellingBookingId] = useState<string | null>(null);
+  const [cancelDaysBefore, setCancelDaysBefore] = useState<number>(20);
+  const [cancelPastDeadline, setCancelPastDeadline] = useState<boolean>(false);
+  const [cancelForceMajeure, setCancelForceMajeure] = useState<boolean>(false);
+  const [cancelMedicalProof, setCancelMedicalProof] = useState<boolean>(false);
+  const [cancelReasonText, setCancelReasonText] = useState<string>('Schedule change / family date adjustment');
+  const [cancelNoticeToast, setCancelNoticeToast] = useState<string | null>(null);
 
   const myBookings = bookings;
   const myNegotiations = negotiations;
@@ -161,13 +190,24 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
             </button>
             <button
               onClick={() => setActiveTab('NEGOTIATIONS')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all ${
+              className={`px-3.5 py-1.5 rounded-xl transition-all whitespace-nowrap shrink-0 ${
                 activeTab === 'NEGOTIATIONS'
                   ? 'bg-white text-stone-900 shadow-sm font-bold'
                   : 'text-stone-600 hover:text-stone-900'
               }`}
             >
               Active Negotiations ({myNegotiations.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('BUDGET')}
+              className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeTab === 'BUDGET'
+                  ? 'bg-amber-900 text-white shadow-sm font-bold'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Wallet className={`w-3.5 h-3.5 ${activeTab === 'BUDGET' ? 'text-amber-300' : 'text-amber-800'}`} />
+              <span>{language === 'ne' ? 'उत्सव बजेट ट्र्याकर' : 'Event Budgeting Tracker'}</span>
             </button>
             <button
               onClick={() => setActiveTab('SAVED')}
@@ -191,7 +231,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
             {/* TAB 4: Auspicious Panchanga Alerts */}
             <button
               onClick={() => setActiveTab('ALERTS')}
-              className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 activeTab === 'ALERTS'
                   ? 'bg-amber-900 text-white shadow-sm font-bold'
                   : 'text-stone-600 hover:text-stone-900'
@@ -200,20 +240,191 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
               <Bell className={`w-3.5 h-3.5 ${activeTab === 'ALERTS' ? 'text-amber-300' : 'text-amber-800'}`} />
               <span>{language === 'ne' ? 'शुभ साइत सूचना' : 'Panchanga Alerts'}</span>
               <span
-                className={`ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                  unreadAlertsCount > 0 ? 'bg-red-600 text-white animate-pulse' : 'bg-stone-200 text-stone-700'
+                className={`ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold tabular-nums ${
+                  unreadAlertsCount > 0 ? 'bg-red-600 text-white' : 'bg-stone-200 text-stone-700'
                 }`}
               >
                 {pushAlerts.length}
+              </span>
+            </button>
+
+            {/* TAB 5: Real-Time Favorite Venue Alerts */}
+            <button
+              onClick={() => setActiveTab('FAVORITE_ALERTS')}
+              className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeTab === 'FAVORITE_ALERTS'
+                  ? 'bg-amber-900 text-white shadow-sm font-bold'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <BellRing className={`w-3.5 h-3.5 ${activeTab === 'FAVORITE_ALERTS' ? 'text-amber-300' : 'text-amber-800'}`} />
+              <span>{language === 'ne' ? 'मनपर्ने भेन्यु अलर्ट' : 'Favorite Venue Alerts'}</span>
+              <span
+                className={`ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold tabular-nums ${
+                  unreadFavoriteVenueAlertsCount > 0
+                    ? 'bg-rose-700 text-white'
+                    : activeTab === 'FAVORITE_ALERTS'
+                    ? 'bg-amber-800 text-amber-200'
+                    : 'bg-stone-200 text-stone-700'
+                }`}
+              >
+                {unreadFavoriteVenueAlertsCount > 0
+                  ? unreadFavoriteVenueAlertsCount
+                  : favoriteVenueAlerts.length}
               </span>
             </button>
           </div>
         </div>
       </div>
 
+      {/* Live Unread Favorite Venue Notification Strip (when viewing other tabs) */}
+      {unreadFavoriteVenueAlertsCount > 0 && activeTab !== 'FAVORITE_ALERTS' && favoriteVenueAlerts[0] && (
+        <div className="p-4 bg-amber-50/90 border border-amber-300 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-amber-900 text-amber-200 flex items-center justify-center shrink-0">
+              <Radio className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-amber-950">
+                <span>
+                  {unreadFavoriteVenueAlertsCount} Live Opening
+                  {unreadFavoriteVenueAlertsCount > 1 ? 's' : ''} at Your Favorite Venues
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-white border border-amber-200 text-[10px] font-semibold text-stone-700">
+                  {sseConnectionStatus === 'CONNECTED' ? 'SSE Live Stream' : sseConnectionStatus}
+                </span>
+              </div>
+              <p className="text-xs text-stone-700 truncate mt-0.5">
+                {favoriteVenueAlerts[0].venueName} • {favoriteVenueAlerts[0].dateBS} ({favoriteVenueAlerts[0].shift} Shift) —{' '}
+                {favoriteVenueAlerts[0].title}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setActiveTab('FAVORITE_ALERTS')}
+            className="px-4 py-2 bg-amber-900 hover:bg-amber-950 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto"
+          >
+            <BellRing className="w-3.5 h-3.5 text-amber-300" />
+            <span>View Live Alerts</span>
+          </button>
+        </div>
+      )}
+
       {/* TAB 1: BOOKINGS & AGREEMENTS */}
       {activeTab === 'BOOKINGS' && (
         <div className="space-y-4">
+          {cancelNoticeToast && (
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-950 rounded-xl flex items-center justify-between text-xs font-semibold">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-700 shrink-0" />
+                <span>{cancelNoticeToast}</span>
+              </div>
+              <button onClick={() => setCancelNoticeToast(null)} className="text-stone-500 hover:text-stone-900">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
+          {/* Pending Cancelling Vendor Partner Referral Offers */}
+          {referralOffers.filter((r) => r.clientDecision === 'PENDING').length > 0 && (
+            <div className="space-y-3">
+              {referralOffers
+                .filter((r) => r.clientDecision === 'PENDING')
+                .map((offer) => {
+                  const chosenPartnerId =
+                    selectedReferralPartnerMap[offer.id] || offer.recommendedPartners[0]?.partnerId;
+                  return (
+                    <div
+                      key={offer.id}
+                      className="p-5 bg-white rounded-2xl border border-amber-300 space-y-3 text-xs"
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <ArrowRightLeft className="w-4 h-4 text-amber-800" />
+                          <strong className="text-sm text-stone-900">
+                            Partner Referral Handoff · #{offer.bookingRef} ({offer.eventDateBS})
+                          </strong>
+                        </div>
+                        <span className="font-mono font-bold text-amber-900 tabular-nums">
+                          Escrow Held: NPR {offer.escrowAmountNpr.toLocaleString()}
+                        </span>
+                      </div>
+
+                      <p className="text-stone-700 leading-relaxed">
+                        <strong>{offer.cancellingVendorName}</strong> initiated a cancellation &amp; recommended alternate verified partners: &ldquo;{offer.reason}&rdquo;
+                      </p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                        {offer.recommendedPartners.map((p) => {
+                          const isSelected = chosenPartnerId === p.partnerId;
+                          return (
+                            <div
+                              key={p.partnerId}
+                              onClick={() =>
+                                setSelectedReferralPartnerMap((prev) => ({
+                                  ...prev,
+                                  [offer.id]: p.partnerId,
+                                }))
+                              }
+                              className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                                isSelected
+                                  ? 'border-amber-900 bg-amber-50/60 ring-1 ring-amber-900'
+                                  : 'border-stone-200 bg-stone-50/40 hover:border-stone-300'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <strong className="text-stone-900 truncate">{p.partnerName}</strong>
+                                <span className="font-bold text-amber-900 tabular-nums shrink-0">{p.rating.toFixed(1)} ★</span>
+                              </div>
+                              <div className="text-[11px] text-stone-500 mt-0.5">
+                                {p.district} · {p.categoryOrCapacity}
+                              </div>
+                              <div className="text-[11px] font-semibold text-emerald-800 mt-1">
+                                {p.priceDeltaNote}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-stone-100">
+                        <span className="text-[11px] text-stone-500">
+                          {offer.includeLiabilityRelease
+                            ? 'Direct escrow transfer includes standard Third-Party Referral Liability Release.'
+                            : 'Original vendor remains backup guarantor.'}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              respondToReferralOffer(offer.id, 'ACCEPTED_PARTNER', chosenPartnerId);
+                              setCancelNoticeToast(
+                                `Escrow of NPR ${offer.escrowAmountNpr.toLocaleString()} transferred to your selected replacement partner!`
+                              );
+                            }}
+                            className="px-3.5 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl font-bold text-xs whitespace-nowrap shrink-0"
+                          >
+                            Accept Partner &amp; Transfer Escrow
+                          </button>
+                          <button
+                            onClick={() => {
+                              respondToReferralOffer(offer.id, 'DECLINED_REFUND_ONLY');
+                              setCancelNoticeToast(
+                                `Referral declined. Full NPR ${offer.escrowAmountNpr.toLocaleString()} escrow refund initiated.`
+                              );
+                            }}
+                            className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-semibold text-xs whitespace-nowrap shrink-0"
+                          >
+                            Decline &amp; 100% Refund
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+
           {myBookings.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-3xl border border-stone-200 p-6">
               <Calendar className="w-10 h-10 text-stone-400 mx-auto mb-2" />
@@ -323,11 +534,284 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                         <span>Write Verified Review</span>
                       </button>
                     )}
+
+                    {b.status !== 'CANCELLED' && b.status !== 'COMPLETED' && (
+                      <button
+                        onClick={() => setCancellingBookingId(cancellingBookingId === b.id ? null : b.id)}
+                        className="px-4 py-2 text-xs font-semibold text-rose-800 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                      >
+                        <Scale className="w-3.5 h-3.5" />
+                        <span>{cancellingBookingId === b.id ? 'Close Policy Preview' : 'Cancellation / Policy'}</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             ))
           )}
+
+          {/* Inline Interactive Cancellation & Past-Deadline Drawer */}
+          {cancellingBookingId && (() => {
+            const target = myBookings.find((item) => item.id === cancellingBookingId);
+            if (!target) return null;
+            const policy = getVendorCancellationPolicy(target.venueId, target.venueName, 'VENUE_VENDOR');
+            const preview = calculateCancellationOutcome({
+              policy,
+              initiatedBy: 'CLIENT',
+              daysBeforeEvent: cancelPastDeadline ? 0 : cancelDaysBefore,
+              hoursSinceBooking: 72,
+              isPastDeadline: cancelPastDeadline,
+              isForceMajeure: cancelForceMajeure,
+              hasEmergencyMedicalProof: cancelMedicalProof,
+              totalAmountNpr: target.totalAmountNpr,
+              depositPaidNpr: target.depositPaidNpr,
+              bookedPoolStaffCount: 4,
+              staffShiftWageNpr: statutoryRules.minDailyShiftWageNpr,
+            });
+
+            return (
+              <div className="p-5 bg-white rounded-2xl border border-rose-200 space-y-4 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
+                  <div>
+                    <span className="font-bold text-rose-900 uppercase text-[11px] tracking-wider block">
+                      Dynamic Cancellation Settlement · {policy.preset.replace(/_/g, ' ')} Policy
+                    </span>
+                    <h4 className="font-bold text-sm text-stone-900">
+                      #{target.bookingRef} — {target.venueName} ({target.eventDateBS})
+                    </h4>
+                  </div>
+                  <button
+                    onClick={() => setCancellingBookingId(null)}
+                    className="text-stone-400 hover:text-stone-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-semibold text-stone-700 block mb-1">
+                      Notice Timing Before Event ({cancelPastDeadline ? 'Date/Time Over' : `${cancelDaysBefore} Days`})
+                    </label>
+                    <input
+                      type="range"
+                      min={0}
+                      max={90}
+                      disabled={cancelPastDeadline}
+                      value={cancelDaysBefore}
+                      onChange={(e) => setCancelDaysBefore(Number(e.target.value))}
+                      className="w-full accent-amber-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-semibold text-stone-700 block mb-1">Cancellation Reason</label>
+                    <input
+                      type="text"
+                      value={cancelReasonText}
+                      onChange={(e) => setCancelReasonText(e.target.value)}
+                      className="w-full bg-stone-50 border border-stone-200 rounded-lg p-2"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <label className="flex items-center gap-1.5 cursor-pointer font-medium text-rose-900">
+                    <input
+                      type="checkbox"
+                      checked={cancelPastDeadline}
+                      onChange={(e) => setCancelPastDeadline(e.target.checked)}
+                      className="rounded text-rose-700"
+                    />
+                    <span>Event Date &amp; Time Over (Past Deadline)</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer font-medium text-stone-700">
+                    <input
+                      type="checkbox"
+                      checked={cancelForceMajeure}
+                      onChange={(e) => setCancelForceMajeure(e.target.checked)}
+                      className="rounded text-amber-900"
+                    />
+                    <span>Force Majeure (Muluki Civil Code Sec. 531)</span>
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer font-medium text-stone-700">
+                    <input
+                      type="checkbox"
+                      checked={cancelMedicalProof}
+                      onChange={(e) => setCancelMedicalProof(e.target.checked)}
+                      className="rounded text-amber-900"
+                    />
+                    <span>48h Emergency Medical Proof</span>
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-stone-50 rounded-xl border border-stone-200 tabular-nums">
+                  <div>
+                    <span className="text-stone-500 block text-[10px]">Refund to Client</span>
+                    <strong className="text-emerald-800 text-sm">NPR {preview.refundToClientNpr.toLocaleString()}</strong>
+                  </div>
+                  <div>
+                    <span className="text-stone-500 block text-[10px]">Muhurat Reschedule Credit</span>
+                    <strong className="text-amber-900 text-sm">NPR {preview.rescheduleCreditNpr.toLocaleString()}</strong>
+                  </div>
+                  <div>
+                    <span className="text-stone-500 block text-[10px]">Retained Fee</span>
+                    <strong className="text-stone-900 text-sm">NPR {preview.retainedByVendorNpr.toLocaleString()}</strong>
+                  </div>
+                  <div>
+                    <span className="text-stone-500 block text-[10px]">Remaining Balance Due</span>
+                    <strong className="text-rose-800 text-sm">NPR {preview.remainingBalanceDueNpr.toLocaleString()}</strong>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                  <span className="text-[11px] text-stone-500">{preview.legalBasis}</span>
+                  <div className="flex items-center gap-2">
+                    {onNavigateView && (
+                      <button
+                        type="button"
+                        onClick={() => onNavigateView('CANCELLATIONS')}
+                        className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-semibold"
+                      >
+                        Full Governance Hub →
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const record = cancelBookingWithPolicy({
+                          bookingId: target.id,
+                          initiatedByRole: 'CLIENT',
+                          daysBeforeEvent: cancelPastDeadline ? 0 : cancelDaysBefore,
+                          isPastDeadline: cancelPastDeadline,
+                          isForceMajeure: cancelForceMajeure,
+                          hasEmergencyMedicalProof: cancelMedicalProof,
+                          bookedPoolStaffCount: 4,
+                          reason: cancelReasonText,
+                        });
+                        setCancellingBookingId(null);
+                        if (record) {
+                          setCancelNoticeToast(
+                            `Booking #${record.bookingRef} resolved: Refund NPR ${record.refundIssuedNpr.toLocaleString()}, Credit NPR ${record.rescheduleCreditNpr.toLocaleString()}.`
+                          );
+                        }
+                      }}
+                      className="px-4 py-2 bg-rose-800 hover:bg-rose-900 text-white rounded-xl font-bold"
+                    >
+                      Confirm Policy Cancellation
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {cancellationRecords.length > 0 && (
+            <div className="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-2 text-xs">
+              <div className="font-bold text-stone-800">Resolved Cancellation Settlements ({cancellationRecords.length})</div>
+              {cancellationRecords.map((rec) => (
+                <div key={rec.id} className="flex flex-wrap items-center justify-between gap-2 bg-white p-3 rounded-xl border border-stone-200">
+                  <div>
+                    <strong>#{rec.bookingRef} · {rec.venueOrPartnerName}</strong>
+                    <div className="text-[11px] text-stone-500">{rec.reason} · {rec.legalBasisSummary}</div>
+                  </div>
+                  <div className="font-mono tabular-nums text-right">
+                    <span className="text-emerald-800 font-bold">Refund NPR {rec.refundIssuedNpr.toLocaleString()}</span>
+                    <span className="text-stone-400 mx-1.5">·</span>
+                    <span className="text-amber-900 font-semibold">Credit NPR {rec.rescheduleCreditNpr.toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Client Bespoke Concierge Requests (Star Hotels & Global Outside Nepal) */}
+          <div className="p-5 bg-white rounded-3xl border border-stone-200 space-y-4 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 pb-3">
+              <div>
+                <h4 className="font-display text-base font-bold text-stone-900">
+                  Bespoke Star Hotel &amp; Outside-Nepal Concierge Requests
+                </h4>
+                <p className="text-[11px] text-stone-500">
+                  Live Admin venue scouting quotes for 3★–7★ hotels and worldwide celebration arrangements
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveModal('STAR_HOTEL_REQUEST')}
+                  className="px-3.5 py-2 bg-amber-900 hover:bg-amber-950 text-white rounded-xl font-bold text-xs whitespace-nowrap shrink-0"
+                >
+                  + Request Any Star Hotel
+                </button>
+                {onNavigateView && (
+                  <button
+                    type="button"
+                    onClick={() => onNavigateView('DESTINATION')}
+                    className="px-3.5 py-2 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl font-semibold text-xs whitespace-nowrap shrink-0"
+                  >
+                    Global Destinations →
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {starHotelRequests.map((req) => (
+                <div key={req.id} className="p-4 rounded-2xl border border-stone-200 bg-stone-50/60 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-stone-500">#{req.requestRef}</span>
+                    <span className="px-2 py-0.5 rounded bg-amber-100 text-amber-950 text-[10px] font-bold">
+                      {req.status.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <strong className="block text-sm text-stone-900">{req.preferredHotelNames}</strong>
+                  <div className="text-[11px] text-stone-600 tabular-nums">
+                    {req.districtOrCity}, {req.country} · {req.eventDateBS} BS · {req.estimatedGuests} Guests
+                  </div>
+                  {req.adminWorkNotes && (
+                    <div className="p-2.5 bg-white rounded-xl border border-stone-200 text-[11px] text-stone-700">
+                      <strong>Admin Concierge:</strong> {req.adminWorkNotes}
+                    </div>
+                  )}
+                  {req.sourcedHotelProposals && req.sourcedHotelProposals.length > 0 && (
+                    <div className="space-y-1.5 pt-1">
+                      {req.sourcedHotelProposals.map((p) => (
+                        <div key={p.id} className="p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-200 text-[11px] tabular-nums">
+                          <div className="font-bold text-emerald-950">{p.hotelName} ({p.starCategory})</div>
+                          <div className="text-emerald-900">
+                            Plate: {p.currency} {p.quotedPerPlateNprOrUsd.toLocaleString()} · Hall: {p.currency} {p.quotedHallRentalNprOrUsd.toLocaleString()}
+                            {p.publishedVenueId ? ' · Live in Catalog' : ''}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {outsideNepalRequests.map((req) => (
+                <div key={req.id} className="p-4 rounded-2xl border border-stone-200 bg-stone-50/60 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-stone-500">#{req.requestRef}</span>
+                    <span className="px-2 py-0.5 rounded bg-stone-200 text-stone-800 text-[10px] font-bold">
+                      {req.status.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                  <strong className="block text-sm text-stone-900">
+                    {req.targetCityOrRegion}, {req.targetCountry}
+                  </strong>
+                  <div className="text-[11px] text-stone-600 tabular-nums">
+                    {req.celebrationDaysCount} Days · {req.estimatedGuests} Guests · {req.currency} {req.budgetAmount.toLocaleString()}
+                  </div>
+                  {req.adminCoordinatorNotes && (
+                    <div className="p-2.5 bg-white rounded-xl border border-stone-200 text-[11px] text-stone-700">
+                      <strong>Global Coordinator:</strong> {req.adminCoordinatorNotes}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -1097,6 +1581,16 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
             )}
           </div>
         </div>
+      )}
+
+      {/* TAB: EVENT BUDGETING TRACKER */}
+      {activeTab === 'BUDGET' && (
+        <EventBudgetTracker bookings={myBookings} />
+      )}
+
+      {/* TAB: REAL-TIME FAVORITE VENUE ALERTS */}
+      {activeTab === 'FAVORITE_ALERTS' && (
+        <FavoriteVenueAlertsPanel onNavigateView={onNavigateView} />
       )}
 
     </div>

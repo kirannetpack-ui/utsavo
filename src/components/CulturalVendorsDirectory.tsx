@@ -267,6 +267,32 @@ export const CulturalVendorsDirectory: React.FC<CulturalVendorsDirectoryProps> =
         </div>
       </div>
 
+      {/* Cultural Artist Cancellation, Muhurat No-Show & Guild Sub-List Policy Strip */}
+      <div className="p-4 sm:p-5 bg-white rounded-2xl border border-stone-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="p-2.5 bg-amber-900 text-white rounded-xl shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider">
+                Cultural Artist SLA · Muhurat Window & Guild Referral Policy
+              </h4>
+              <span className="px-2 py-0.5 bg-amber-100 text-amber-950 rounded-md text-[10px] font-bold">
+                25% Date-Block Retainer
+              </span>
+            </div>
+            <p className="text-xs text-stone-600 leading-relaxed">
+              <strong>+30 min Muhurat Cutoff:</strong> Beyond +30 min late venue readiness, artist may fulfill single-slot commitment or bill full standby fee; artist absence past +30 min triggers 100% refund + Guild backup dispatch. <strong>Guild Sub-List Partner Referral:</strong> Cancelling troupes/acharyas may propose an equal-grade Guild peer at matched rates—<strong>always subject to explicit client creative consent</strong> (no non-consensual switching).
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0 text-[11px] font-semibold text-amber-900 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl whitespace-nowrap">
+          <Music className="w-3.5 h-3.5 text-amber-700" />
+          <span>14d+ Notice: 75% · &lt;48h: 0% Refund</span>
+        </div>
+      </div>
+
       {/* Search and Category Filters */}
       <div className="space-y-4">
         {/* Search Input */}
