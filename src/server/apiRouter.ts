@@ -1084,6 +1084,21 @@ apiRouter.get('/favorite-venue-alerts/stream', (req, res) => {
   res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders?.();
 
+  // Serverless environments (Vercel) cannot hold persistent open sockets; use native EventSource retry interval
+  if (process.env.VERCEL) {
+    res.write('retry: 10000\n');
+    res.write(
+      `event: init\ndata: ${JSON.stringify({
+        alerts: favoriteVenueAlertsStore,
+        connectedClients: 1,
+        serverTime: new Date().toISOString(),
+        mode: 'serverless-sse',
+      })}\n\n`
+    );
+    res.end();
+    return;
+  }
+
   sseClients.add(res);
 
   // Initial authoritative snapshot so clients synchronize cleanly on connect/reconnect

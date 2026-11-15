@@ -1306,11 +1306,21 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
       try {
         const data = JSON.parse(e.data || '{}');
         if (Array.isArray(data.alerts)) {
-          const deduped = new Map<string, FavoriteVenueAlert>();
-          for (const item of data.alerts as FavoriteVenueAlert[]) {
-            if (item && item.id) deduped.set(item.id, item);
-          }
-          setRawServerVenueAlerts(Array.from(deduped.values()));
+          setRawServerVenueAlerts((prev) => {
+            const merged = new Map<string, FavoriteVenueAlert>();
+            for (const existing of prev) {
+              if (existing && existing.id) merged.set(existing.id, existing);
+            }
+            for (const item of data.alerts as FavoriteVenueAlert[]) {
+              if (!item || !item.id) continue;
+              const current = merged.get(item.id);
+              merged.set(item.id, {
+                ...item,
+                isRead: current?.isRead ? true : item.isRead,
+              });
+            }
+            return Array.from(merged.values());
+          });
         }
         setSseConnectionStatus('CONNECTED');
       } catch (err) {
@@ -1530,7 +1540,18 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         return 0;
       }
       const data = await res.json();
-      const count = Number(data?.newlyDiscovered) || 0;
+      const discovered = Array.isArray(data?.discoveredAlerts)
+        ? (data.discoveredAlerts as FavoriteVenueAlert[])
+        : [];
+      for (const alert of discovered) {
+        if (alert && alert.id) {
+          upsertServerAlertIdempotently(alert);
+        }
+      }
+      if (discovered.length > 0 && savedVenueIdsRef.current.includes(discovered[0].venueId)) {
+        setActiveFavoriteVenueToast(discovered[0]);
+      }
+      const count = discovered.length || Number(data?.newlyDiscovered) || 0;
       if (count > 0) {
         setLastFavoriteScanMessage(`Discovered & pushed ${count} new favorite-venue slot alert${count > 1 ? 's' : ''} via live server stream.`);
       } else {
@@ -1544,7 +1565,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } finally {
       setIsScanningFavoriteVenues(false);
     }
-  }, [venues, bookings]);
+  }, [venues, bookings, upsertServerAlertIdempotently]);
 
   // Social Cause: Annapurna Surplus Feast Food Rescue (Strict Voluntary Client Consent Driven)
   const [foodRescuePledges, setFoodRescuePledges] = useState<ExcessFoodRescuePledge[]>(() => {
