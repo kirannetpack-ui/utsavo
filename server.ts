@@ -44,16 +44,18 @@ async function startServer() {
     });
 
     // Prevent @vite/client from opening an HMR WebSocket connection in reverse-proxy/disabled-HMR environments
+    // while keeping transport.connect() marked as connected so plugin hot.send() calls resolve without SendBeforeConnectError
     app.get('/@vite/client', async (_req, res, next) => {
       try {
         const result = await vite.transformRequest('/@vite/client');
         if (!result) return next();
         const patchedCode = result.code
           .replace(
-            /transport\.connect\(createHMRHandler\(handleMessage\)\);?/g,
-            '/* HMR WebSocket connection disabled */'
+            'async connect(handlers) {',
+            'async connect() { return;'
           )
-          .replace(/wsTransport\.send\(data\)/g, 'Promise.resolve()');
+          .replace('await wsTransport.disconnect();', 'return;')
+          .replace('wsTransport.send(data);', 'return Promise.resolve();');
         res.status(200).set({ 'Content-Type': 'application/javascript' }).end(patchedCode);
       } catch (err) {
         next(err);
