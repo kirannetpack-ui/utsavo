@@ -1345,6 +1345,241 @@ apiRouter.post('/favorite-venue-alerts/mark-read', (req, res) => {
   return res.json({ updated: Boolean(updatedAlert), alert: updatedAlert || null });
 });
 
+// ---------------------------------------------------------------------------
+// 9. UTSAVO Full-Service Managed Event Global Sourcing & Blueprint Generator
+// ---------------------------------------------------------------------------
+apiRouter.post('/managed-event/suggest-blueprint', async (req, res) => {
+  const dossier = req.body || {};
+  const eventTitle = String(dossier.eventTitle || 'UTSAVO Managed Celebration').slice(0, 180);
+  const eventType = String(dossier.eventType || 'WEDDING').slice(0, 60);
+  const eventScope = dossier.eventScope === 'OUTSIDE_NEPAL' ? 'OUTSIDE_NEPAL' : 'INSIDE_NEPAL';
+  const locationLabel = [dossier.cityOrLocality, dossier.district, dossier.province, dossier.country]
+    .filter(Boolean)
+    .join(', ') || 'Kathmandu Valley, Nepal';
+  const eventDateBS = String(dossier.eventDateBS || '2081 Magh 22').slice(0, 60);
+  const eventDateAD = String(dossier.eventDateAD || '2025-02-04').slice(0, 40);
+  const shift = String(dossier.shift || 'FULL_DAY').slice(0, 20);
+  const startTime = String(dossier.startTime || '09:30 AM').slice(0, 20);
+  const endTime = String(dossier.endTime || '10:00 PM').slice(0, 20);
+  const totalPax = Math.max(20, Math.min(10000, Number(dossier.totalPax) || 350));
+  const budgetCurrency = String(dossier.budgetCurrency || 'NPR').slice(0, 10);
+  const totalBudget = Math.max(1000, Number(dossier.totalBudget) || 1500000);
+  const vendorFunctions = Array.isArray(dossier.vendorFunctions) ? dossier.vendorFunctions : [];
+  const activeVFs = vendorFunctions.filter((vf: any) => vf?.isEnabled && vf?.mode !== 'NOT_NEEDED');
+  const clientOwnVFs = activeVFs.filter((vf: any) => vf?.mode === 'CLIENT_HAS_OWN_VENDOR');
+
+  const buildDeterministicBlueprint = () => {
+    const perGuest = Math.round(totalBudget / Math.max(1, totalPax));
+    const isDayOrMorning = shift === 'MORNING' || shift === 'FULL_DAY';
+
+    return {
+      executiveSummary: `Tailored Full-Service Execution Blueprint for "${eventTitle}" (${totalPax} guests in ${locationLabel}) on ${eventDateBS} BS (${eventDateAD}). Within ${budgetCurrency} ${totalBudget.toLocaleString()} (~${budgetCurrency} ${perGuest.toLocaleString()}/guest), UTSAVO manages ${
+        activeVFs.length - clientOwnVFs.length
+      } turnkey vendor functions and seamlessly integrates ${clientOwnVFs.length} client-appointed vendor(s). Every suggestion remains editable under full client authority.`,
+      panchangaAndTimingAdvice: `For ${shift} (${startTime} – ${endTime}) in ${locationLabel}: Schedule vendor load-in 150 minutes prior, lock acoustic soundcheck 45 minutes before VIP arrival, and reserve a buffer block ahead of dining service to protect ceremony punctuality.`,
+      recommendedRunOfShow: [
+        {
+          id: 'ai-slot-1',
+          timeSlot: isDayOrMorning ? '07:00 AM - 08:45 AM' : '12:00 PM - 02:30 PM',
+          activity: 'Technical Rigging, Floral Mandap Sign-Off & Backup Genset Load Test',
+          leadOwner: 'UTSAVO Executive Director + Venue Engineer',
+          notes: 'Inspect kitchen hygiene temperature logs, fire extinguishers & elder wheelchair ramps.',
+          included: true,
+        },
+        {
+          id: 'ai-slot-2',
+          timeSlot: startTime,
+          activity: `Guest Welcome, Cultural Procession & QR Check-In Desk (${totalPax} Pax)`,
+          leadOwner: 'Welcome Ushers + Cultural Music Ensemble',
+          notes: 'Coordinate valet parking flow and welcome beverage distribution from entrance plaza.',
+          included: true,
+        },
+        {
+          id: 'ai-slot-3',
+          timeSlot: isDayOrMorning ? '10:30 AM - 01:00 PM' : '05:30 PM - 07:30 PM',
+          activity:
+            eventType === 'CORPORATE_GALA'
+              ? 'Main Plenary Keynote, Awards & Stage Production'
+              : 'Sacred Subha Muhurat Ceremony / Signature Celebration Moment',
+          leadOwner: 'Ceremonial Lead / Show Caller + Photo/Drone Crew',
+          notes: 'Real-time kitchen prep headcount confirmed via Nimantrana RSVP scan count.',
+          included: true,
+        },
+        {
+          id: 'ai-slot-4',
+          timeSlot: isDayOrMorning ? '01:00 PM - 03:00 PM' : '07:30 PM - 09:30 PM',
+          activity: 'Multi-Island Feast Service (Isolated Veg/Jain/Halal + Live Stations)',
+          leadOwner: 'Executive Catering Chef + Banquet Service Captains',
+          notes: 'Dedicated senior citizen seated buffet assistance & allergen signage at every chafing dish.',
+          included: true,
+        },
+        {
+          id: 'ai-slot-5',
+          timeSlot: endTime,
+          activity:
+            eventScope === 'INSIDE_NEPAL'
+              ? '10:00 PM DAO Sound Curfew Transition, Farewell & Annapurna Food Rescue'
+              : 'Send-Off Finale, Gift Hampers & Post-Event Surplus Food Recovery',
+          leadOwner: 'UTSAVO Night Producer + Operations Crew',
+          notes: 'Complete venue strike audit and final vendor sign-off.',
+          included: true,
+        },
+      ],
+      vendorCoordinationPlaybook: [
+        'Appoint one dedicated UTSAVO Producer as the single command bridge between all client-chosen and marketplace vendors.',
+        'Consolidate load-in windows across venue, decor, AV riggers, and kitchen supply trucks to eliminate venue bottlenecks.',
+        'Lock 48-hour weather contingency trigger between garden lawn and backup indoor hall.',
+        'Synchronize Digital Nimantrana guest counts with kitchen brigade 24 hours prior to curb food waste.',
+      ],
+      globalRiskAndPermitsChecklist: [
+        {
+          id: 'ai-chk-1',
+          category: 'PERMITS_CURFEW',
+          item:
+            eventScope === 'INSIDE_NEPAL'
+              ? 'DAO 10:00 PM outdoor PA sound curfew compliance & municipal banquet permit verified'
+              : 'Local municipal noise ordinance, open-flame Havan permit & drone clearance obtained',
+          completed: false,
+        },
+        {
+          id: 'ai-chk-2',
+          category: 'WEATHER_SAFETY',
+          item: 'Rain/wind backup enclosure, 65+ kVA dual generator & kitchen fire suppression check',
+          completed: false,
+        },
+        {
+          id: 'ai-chk-3',
+          category: 'GUEST_CARE',
+          item: 'Step-free elder access, quiet medical standby, & allergenic/dietary kitchen isolation',
+          completed: false,
+        },
+        {
+          id: 'ai-chk-4',
+          category: 'VENDOR_HANDOFF',
+          item: `Pre-event technical briefing completed for all ${activeVFs.length} active vendor functions`,
+          completed: false,
+        },
+      ],
+      webSources: [],
+      generatedWith: 'UTSAVO Global Event Production Synthesizer',
+      generatedAt: new Date().toISOString(),
+    };
+  };
+
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      return res.json(buildDeterministicBlueprint());
+    }
+
+    const vendorSummary = activeVFs
+      .map(
+        (vf: any) =>
+          `- ${vf.label}: mode=${vf.mode}, tier=${vf.selectedTier}, budget=${budgetCurrency} ${vf.allocatedBudgetAmount}, vendor="${vf.preferredVendorOrVenueName || 'UTSAVO to source'}", specs="${vf.specifications || ''}"`
+      )
+      .join('\n');
+
+    const prompt = `
+You are UTSAVO's Chief Global Event Director & Executive Producer.
+A client wants UTSAVO itself to organize their entire event end-to-end, starting from their core time, date, pax, budget, and all requested vendor functions.
+Using Google Search grounding for authentic regional/seasonal/weather, permit, hospitality, and global event-management best practices for ${locationLabel}, generate a practical, suggestive, client-editable blueprint.
+
+Client Dossier:
+- Event Title: ${eventTitle}
+- Event Type: ${eventType}
+- Scope & Location: ${eventScope} · ${locationLabel}
+- Date: ${eventDateBS} BS / ${eventDateAD} AD (Shift: ${shift}, ${startTime} - ${endTime})
+- Total Pax: ${totalPax} guests (Elders: ${dossier.paxBreakdown?.eldersRequiringAccess || 0}, Children: ${dossier.paxBreakdown?.children || 0}, VIPs: ${dossier.paxBreakdown?.vipHeads || 0}, Rooms needed: ${dossier.paxBreakdown?.outstationGuestsNeedingRooms || 0})
+- Budget Ceiling: ${budgetCurrency} ${totalBudget} (${dossier.budgetFlexibility || 'VALUE_OPTIMIZED'})
+- Weather Contingency: ${dossier.globalStandards?.weatherBackupContingency || 'INDOOR_BACKUP_HALL'}
+- Dietary & Bar: ${(dossier.globalStandards?.dietarySeparations || []).join(', ') || 'Standard'} | ${dossier.globalStandards?.barPolicy || 'Non-alcoholic / curated'}
+- Active Vendor Functions Configured by Client:
+${vendorSummary || 'All standard vendor functions'}
+
+Return ONLY a valid JSON object inside a \`\`\`json code fence with exact keys:
+{
+  "executiveSummary": "2-3 sentence tailored strategic summary honoring date, pax, location, budget & vendor mix",
+  "panchangaAndTimingAdvice": "2-3 sentence seasonal weather, timing, curfew/permit & setup advice specific to location and date",
+  "recommendedRunOfShow": [
+    { "id": "slot-1", "timeSlot": "...", "activity": "...", "leadOwner": "...", "notes": "...", "included": true }
+  ],
+  "vendorCoordinationPlaybook": ["4 concise actionable coordination rules factoring in client's own vendors and UTSAVO-sourced vendors"],
+  "globalRiskAndPermitsChecklist": [
+    { "id": "chk-1", "category": "PERMITS_CURFEW" | "WEATHER_SAFETY" | "VENDOR_HANDOFF" | "GUEST_CARE", "item": "...", "completed": false }
+  ]
+}
+`;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-4-hydrogen',
+      contents: prompt,
+      config: {
+        tools: [{ googleSearch: {} }],
+        systemInstruction:
+          'You are an international senior event producer for UTSAVO. Always incorporate seasonal climate considerations, local noise/fire/drone permits, accessible hospitality for elders/children, and seamless vendor run-of-show synchronization. Return valid JSON inside a ```json fence.',
+      },
+    });
+
+    const rawText = response.text || '';
+    const jsonMatch = rawText.match(/```json\s*([\s\S]*?)```/i) || rawText.match(/(\{[\s\S]*\})/);
+    const fallback = buildDeterministicBlueprint();
+    let parsed: any = {};
+
+    if (jsonMatch && jsonMatch[1]) {
+      try {
+        parsed = JSON.parse(jsonMatch[1].trim());
+      } catch {
+        parsed = {};
+      }
+    }
+
+    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+    const webSources = groundingChunks
+      .filter((c: any) => c.web)
+      .map((c: any) => ({
+        title: String(c.web.title || 'Verified Reference'),
+        uri: String(c.web.uri || ''),
+      }))
+      .filter((s: any) => s.uri);
+
+    return res.json({
+      executiveSummary: parsed.executiveSummary || fallback.executiveSummary,
+      panchangaAndTimingAdvice: parsed.panchangaAndTimingAdvice || fallback.panchangaAndTimingAdvice,
+      recommendedRunOfShow:
+        Array.isArray(parsed.recommendedRunOfShow) && parsed.recommendedRunOfShow.length > 0
+          ? parsed.recommendedRunOfShow.map((s: any, idx: number) => ({
+              id: String(s.id || `slot-${idx + 1}`),
+              timeSlot: String(s.timeSlot || ''),
+              activity: String(s.activity || ''),
+              leadOwner: String(s.leadOwner || 'UTSAVO Event Director'),
+              notes: String(s.notes || ''),
+              included: s.included !== false,
+            }))
+          : fallback.recommendedRunOfShow,
+      vendorCoordinationPlaybook:
+        Array.isArray(parsed.vendorCoordinationPlaybook) && parsed.vendorCoordinationPlaybook.length > 0
+          ? parsed.vendorCoordinationPlaybook.map(String)
+          : fallback.vendorCoordinationPlaybook,
+      globalRiskAndPermitsChecklist:
+        Array.isArray(parsed.globalRiskAndPermitsChecklist) && parsed.globalRiskAndPermitsChecklist.length > 0
+          ? parsed.globalRiskAndPermitsChecklist.map((c: any, idx: number) => ({
+              id: String(c.id || `chk-${idx + 1}`),
+              category: ['PERMITS_CURFEW', 'WEATHER_SAFETY', 'VENDOR_HANDOFF', 'GUEST_CARE'].includes(c.category)
+                ? c.category
+                : 'PERMITS_CURFEW',
+              item: String(c.item || ''),
+              completed: Boolean(c.completed),
+            }))
+          : fallback.globalRiskAndPermitsChecklist,
+      webSources,
+      generatedWith: 'Gemini 4 Hydrogen + Google Search Global Sourcing',
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    console.error('Managed Event Blueprint Error:', err);
+    return res.json(buildDeterministicBlueprint());
+  }
+});
+
 
 
 

@@ -38,6 +38,8 @@ import {
   FavoriteVenueAlert,
   FavoriteVenueAlertKind,
   SseStreamStatus,
+  ManagedEventRequest,
+  ManagedCoordinationMessage,
 } from '../types';
 import {
   SEED_VENDOR_CANCELLATION_POLICIES,
@@ -50,6 +52,7 @@ import {
   SEED_STAR_HOTEL_REQUESTS,
   SEED_OUTSIDE_NEPAL_REQUESTS,
 } from '../data/outsideNepalDestinations';
+import { SEED_MANAGED_EVENT_REQUESTS } from '../data/managedEventTemplates';
 import { STANDARD_CATERING_PACKAGES, MASTER_MENU_ITEMS } from '../data/menuCatalog';
 import { doc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase/config';
@@ -172,8 +175,8 @@ interface MarketplaceContextType {
   isVendorSaved: (vendorId: string) => boolean;
   removeSavedVenue: (venueId: string) => void;
   removeSavedVendor: (vendorId: string) => void;
-  customerDashboardTab: 'BOOKINGS' | 'NEGOTIATIONS' | 'BUDGET' | 'SAVED' | 'ALERTS' | 'FAVORITE_ALERTS';
-  setCustomerDashboardTab: (tab: 'BOOKINGS' | 'NEGOTIATIONS' | 'BUDGET' | 'SAVED' | 'ALERTS' | 'FAVORITE_ALERTS') => void;
+  customerDashboardTab: 'BOOKINGS' | 'NEGOTIATIONS' | 'BUDGET' | 'SAVED' | 'ALERTS' | 'FAVORITE_ALERTS' | 'MANAGED_EVENTS';
+  setCustomerDashboardTab: (tab: 'BOOKINGS' | 'NEGOTIATIONS' | 'BUDGET' | 'SAVED' | 'ALERTS' | 'FAVORITE_ALERTS' | 'MANAGED_EVENTS') => void;
 
   // Cultural Artists & Custom Category Proposals
   culturalVendors: CulturalVendor[];
@@ -337,6 +340,34 @@ interface MarketplaceContextType {
       newDeliverable?: string;
     }
   ) => void;
+
+  // UTSAVO Full-Service Managed Events (Client-Authoritative & Team Coordinated)
+  managedEventRequests: ManagedEventRequest[];
+  submitManagedEventRequest: (
+    req: Omit<
+      ManagedEventRequest,
+      'id' | 'requestRef' | 'createdAt' | 'updatedAt' | 'teamActionUpdates' | 'coordinationMessages'
+    > & { initialMessage?: string }
+  ) => ManagedEventRequest;
+  updateManagedEventByClient: (requestId: string, updates: Partial<ManagedEventRequest>) => void;
+  sendManagedEventMessage: (
+    requestId: string,
+    params: {
+      senderRole: 'CLIENT' | 'UTSAVO_TEAM';
+      senderName: string;
+      channel?: ManagedCoordinationMessage['channel'];
+      text: string;
+    }
+  ) => void;
+  updateManagedEventByAdmin: (
+    requestId: string,
+    updates: {
+      status?: ManagedEventRequest['status'];
+      assignedCoordinatorName?: string;
+      assignedCoordinatorPhone?: string;
+      newTeamActionUpdate?: string;
+    }
+  ) => void;
 }
 
 export const DEFAULT_PANCHANGA_PREFS: UserPanchangaPreferences = {
@@ -398,7 +429,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [activeModal, setActiveModal] = useState<'NONE' | 'SMART_PLANNER' | 'PANCHANGA_CALENDAR' | 'NEGOTIATION' | 'AGREEMENT' | 'PAYMENT' | 'REVIEW' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER' | 'STAR_HOTEL_REQUEST'>('NONE');
   const [activeNegotiationId, setActiveNegotiationId] = useState<string | null>(null);
   const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
-  const [customerDashboardTab, setCustomerDashboardTab] = useState<'BOOKINGS' | 'NEGOTIATIONS' | 'BUDGET' | 'SAVED' | 'ALERTS' | 'FAVORITE_ALERTS'>('BOOKINGS');
+  const [customerDashboardTab, setCustomerDashboardTab] = useState<'BOOKINGS' | 'NEGOTIATIONS' | 'BUDGET' | 'SAVED' | 'ALERTS' | 'FAVORITE_ALERTS' | 'MANAGED_EVENTS'>('BOOKINGS');
 
   // Star Hotel Concierge Requests & Outside-Nepal Global Celebrations (Persisted)
   const [starHotelRequests, setStarHotelRequests] = useState<StarHotelSourcingRequest[]>(() => {
@@ -444,6 +475,29 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     }
   }, [outsideNepalRequests]);
+
+  // UTSAVO Full-Service Managed Events State (Persisted)
+  const [managedEventRequests, setManagedEventRequests] = useState<ManagedEventRequest[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem('utsavo_managed_event_requests');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        console.warn('Failed to parse managed event requests', e);
+      }
+    }
+    return SEED_MANAGED_EVENT_REQUESTS;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('utsavo_managed_event_requests', JSON.stringify(managedEventRequests));
+      } catch (e) {
+        console.warn('Failed to save managed event requests', e);
+      }
+    }
+  }, [managedEventRequests]);
 
   // Bookmarking: Saved Venues & Event Vendors
   const [savedVenueIds, setSavedVenueIds] = useState<string[]>(() => {
@@ -2195,6 +2249,163 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     );
   };
 
+  // UTSAVO Full-Service Managed Events Actions
+  const submitManagedEventRequest = (
+    req: Omit<
+      ManagedEventRequest,
+      'id' | 'requestRef' | 'createdAt' | 'updatedAt' | 'teamActionUpdates' | 'coordinationMessages'
+    > & { initialMessage?: string }
+  ): ManagedEventRequest => {
+    const now = new Date().toISOString();
+    const requestRef = `UTS-MGD-2082-${Math.floor(1000 + Math.random() * 9000)}`;
+    const activeVendorsCount = req.vendorFunctions.filter((v) => v.isEnabled && v.mode !== 'NOT_NEEDED').length;
+
+    const initialMessages: ManagedCoordinationMessage[] = [
+      {
+        id: `mgd-msg-auto-${Date.now()}`,
+        senderRole: 'UTSAVO_TEAM',
+        senderName: req.assignedCoordinatorName || 'Aarav Shrestha (Senior UTSAVO Event Director)',
+        channel: 'PORTAL_CHAT',
+        text: `Namaste ${sanitizeText(req.clientName, 80)}! Your Full-Service Managed Event Brief (#${requestRef}) with ${activeVendorsCount} active vendor functions is live with our team. You may adjust any option or message us right here anytime.`,
+        timestamp: now,
+      },
+    ];
+
+    if (req.initialMessage && req.initialMessage.trim()) {
+      initialMessages.push({
+        id: `mgd-msg-client-${Date.now() + 1}`,
+        senderRole: 'CLIENT',
+        senderName: sanitizeText(req.clientName, 80),
+        channel: 'PORTAL_CHAT',
+        text: sanitizeText(req.initialMessage, 700),
+        timestamp: now,
+      });
+    }
+
+    const newReq: ManagedEventRequest = {
+      ...req,
+      id: `mgd-${Date.now()}`,
+      requestRef,
+      clientName: sanitizeText(req.clientName, 120),
+      clientEmail: sanitizeText(req.clientEmail, 120),
+      clientPhone: sanitizeText(req.clientPhone, 40),
+      eventTitle: sanitizeText(req.eventTitle, 180),
+      cityOrLocality: sanitizeText(req.cityOrLocality, 120),
+      country: sanitizeText(req.country, 80),
+      coordinationMessages: initialMessages,
+      teamActionUpdates: [
+        `Brief received (${activeVendorsCount} vendor functions captured · ${req.totalPax} pax · ${req.budgetCurrency} ${req.totalBudget.toLocaleString()})`,
+        `Assigned Senior Producer: ${req.assignedCoordinatorName || 'Aarav Shrestha'}`,
+      ],
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    setManagedEventRequests((prev) => [newReq, ...prev]);
+
+    if (auth.currentUser) {
+      setDoc(doc(db, 'managedEventRequests', newReq.id), {
+        requestRef: newReq.requestRef,
+        clientName: newReq.clientName,
+        clientEmail: newReq.clientEmail,
+        eventTitle: newReq.eventTitle,
+        eventType: newReq.eventType,
+        totalPax: newReq.totalPax,
+        totalBudget: newReq.totalBudget,
+        budgetCurrency: newReq.budgetCurrency,
+        status: newReq.status,
+        createdAt: now,
+      }).catch((err) => console.warn('Optional Firestore sync skipped for Managed Event brief:', err));
+    }
+
+    return newReq;
+  };
+
+  const updateManagedEventByClient = (
+    requestId: string,
+    updates: Partial<ManagedEventRequest>
+  ) => {
+    const now = new Date().toISOString();
+    setManagedEventRequests((prev) =>
+      prev.map((item) => {
+        if (item.id !== requestId) return item;
+        return {
+          ...item,
+          ...updates,
+          updatedAt: now,
+        };
+      })
+    );
+  };
+
+  const sendManagedEventMessage = (
+    requestId: string,
+    params: {
+      senderRole: 'CLIENT' | 'UTSAVO_TEAM';
+      senderName: string;
+      channel?: ManagedCoordinationMessage['channel'];
+      text: string;
+    }
+  ) => {
+    const cleanText = sanitizeText(params.text, 900);
+    if (!cleanText) return;
+    const now = new Date().toISOString();
+    const msg: ManagedCoordinationMessage = {
+      id: `mgd-msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      senderRole: params.senderRole,
+      senderName: sanitizeText(params.senderName, 100),
+      channel: params.channel || 'PORTAL_CHAT',
+      text: cleanText,
+      timestamp: now,
+    };
+    setManagedEventRequests((prev) =>
+      prev.map((item) =>
+        item.id === requestId
+          ? {
+              ...item,
+              coordinationMessages: [...item.coordinationMessages, msg],
+              updatedAt: now,
+            }
+          : item
+      )
+    );
+  };
+
+  const updateManagedEventByAdmin = (
+    requestId: string,
+    updates: {
+      status?: ManagedEventRequest['status'];
+      assignedCoordinatorName?: string;
+      assignedCoordinatorPhone?: string;
+      newTeamActionUpdate?: string;
+    }
+  ) => {
+    const now = new Date().toISOString();
+    setManagedEventRequests((prev) =>
+      prev.map((item) => {
+        if (item.id !== requestId) return item;
+        const nextUpdates = [...(item.teamActionUpdates || [])];
+        if (updates.newTeamActionUpdate && updates.newTeamActionUpdate.trim()) {
+          nextUpdates.push(sanitizeText(updates.newTeamActionUpdate, 280));
+        }
+        return {
+          ...item,
+          status: updates.status || item.status,
+          assignedCoordinatorName:
+            updates.assignedCoordinatorName !== undefined
+              ? sanitizeText(updates.assignedCoordinatorName, 120)
+              : item.assignedCoordinatorName,
+          assignedCoordinatorPhone:
+            updates.assignedCoordinatorPhone !== undefined
+              ? sanitizeText(updates.assignedCoordinatorPhone, 40)
+              : item.assignedCoordinatorPhone,
+          teamActionUpdates: nextUpdates,
+          updatedAt: now,
+        };
+      })
+    );
+  };
+
   const resetFilters = () => {
     setFilters(DEFAULT_FILTERS);
   };
@@ -2637,6 +2848,11 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         outsideNepalRequests,
         submitOutsideNepalRequest,
         updateOutsideNepalRequestByAdmin,
+        managedEventRequests,
+        submitManagedEventRequest,
+        updateManagedEventByClient,
+        sendManagedEventMessage,
+        updateManagedEventByAdmin,
       }}
     >
       {children}

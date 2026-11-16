@@ -30,7 +30,7 @@ import {
 interface FeaturesShowcaseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onNavigate: (view: 'EXPLORE' | 'DESTINATION' | 'VENDORS' | 'NIMANTRANA' | 'ORGANIZERS' | 'DASHBOARD' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
+  onNavigate: (view: 'EXPLORE' | 'MANAGED_EVENT' | 'DESTINATION' | 'VENDORS' | 'NIMANTRANA' | 'ORGANIZERS' | 'DASHBOARD' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
   onOpenModal: (modal: 'PANCHANGA_CALENDAR' | 'LEGAL_CONTRACT' | 'VENUE_ONBOARDING' | 'EVENT_ORGANIZER_REGISTER') => void;
 }
 
@@ -43,6 +43,20 @@ export const FeaturesShowcaseModal: React.FC<FeaturesShowcaseModalProps> = ({
   if (!isOpen) return null;
 
   const featureList = [
+    {
+      id: 'managed_event',
+      category: 'Full-Service Concierge',
+      title: 'UTSAVO Managed Event Studio',
+      nepali: 'UTSAVO पूर्ण इभेन्ट व्यवस्थापन',
+      description: 'Have UTSAVO organize your entire event using smart intake on time, date, pax, budget, mandatory 12+ vendor functions & global protocols under 100% client control.',
+      icon: Sparkles,
+      badge: 'Client Authority',
+      actionLabel: 'Launch Concierge',
+      action: () => {
+        onNavigate('MANAGED_EVENT');
+        onClose();
+      },
+    },
     {
       id: 'venues',
       category: 'Venue Discovery',

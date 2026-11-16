@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { useMarketplace } from '../context/MarketplaceContext';
 import {
+  ManagedEventRequest,
   OutsideNepalDestinationRequest,
   StarHotelSourcingRequest,
 } from '../types';
@@ -20,6 +21,8 @@ import {
   Calendar,
   Users,
   BedDouble,
+  Send,
+  Headphones,
 } from 'lucide-react';
 
 interface AdminConciergeSourcingTabProps {
@@ -35,9 +38,12 @@ export const AdminConciergeSourcingTab: React.FC<AdminConciergeSourcingTabProps>
     publishStarHotelAsVenue,
     outsideNepalRequests,
     updateOutsideNepalRequestByAdmin,
+    managedEventRequests,
+    updateManagedEventByAdmin,
+    sendManagedEventMessage,
   } = useMarketplace();
 
-  const [subTab, setSubTab] = useState<'STAR_HOTELS' | 'OUTSIDE_NEPAL'>('STAR_HOTELS');
+  const [subTab, setSubTab] = useState<'MANAGED_EVENTS' | 'STAR_HOTELS' | 'OUTSIDE_NEPAL'>('MANAGED_EVENTS');
 
   // Local draft inputs per star hotel request
   const [hotelNotesDraft, setHotelNotesDraft] = useState<Record<string, string>>({});
@@ -51,6 +57,12 @@ export const AdminConciergeSourcingTab: React.FC<AdminConciergeSourcingTabProps>
   // Local draft inputs per outside-Nepal dossier
   const [intlNotesDraft, setIntlNotesDraft] = useState<Record<string, string>>({});
   const [intlDeliverableDraft, setIntlDeliverableDraft] = useState<Record<string, string>>({});
+
+  // Local draft inputs per managed event brief
+  const [coordNameDraft, setCoordNameDraft] = useState<Record<string, string>>({});
+  const [coordPhoneDraft, setCoordPhoneDraft] = useState<Record<string, string>>({});
+  const [managedUpdateDraft, setManagedUpdateDraft] = useState<Record<string, string>>({});
+  const [managedReplyDraft, setManagedReplyDraft] = useState<Record<string, string>>({});
 
   const notify = (msg: string) => {
     if (onToast) onToast(msg);
@@ -116,6 +128,19 @@ export const AdminConciergeSourcingTab: React.FC<AdminConciergeSourcingTabProps>
         <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
           <button
             type="button"
+            onClick={() => setSubTab('MANAGED_EVENTS')}
+            className={`px-4 py-2 rounded-xl transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+              subTab === 'MANAGED_EVENTS'
+                ? 'bg-amber-900 text-white font-bold'
+                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>UTSAVO Managed Event Briefs ({managedEventRequests.length})</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setSubTab('STAR_HOTELS')}
             className={`px-4 py-2 rounded-xl transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
               subTab === 'STAR_HOTELS'
@@ -142,9 +167,303 @@ export const AdminConciergeSourcingTab: React.FC<AdminConciergeSourcingTabProps>
         </div>
 
         <span className="text-xs text-stone-500">
-          Admin Concierge fulfillment updates sync immediately to Customer Dashboard
+          Admin Concierge fulfillment &amp; team coordination sync immediately to Client Studio
         </span>
       </div>
+
+      {/* PANEL 0: UTSAVO FULL-SERVICE MANAGED EVENT BRIEFS */}
+      {subTab === 'MANAGED_EVENTS' && (
+        <div className="space-y-4">
+          {managedEventRequests.map((req: ManagedEventRequest) => {
+            const activeVendors = req.vendorFunctions.filter((vf) => vf.isEnabled);
+            const utsavomanagedCount = activeVendors.filter((vf) => vf.mode === 'UTSAVO_FULL_MANAGE').length;
+            const clientOwnCount = activeVendors.filter((vf) => vf.mode === 'CLIENT_HAS_OWN_VENDOR').length;
+
+            return (
+              <div
+                key={req.id}
+                className="bg-white rounded-3xl border border-stone-200 p-5 sm:p-6 space-y-4 text-xs"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-stone-100 pb-3">
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono font-bold text-stone-500">#{req.requestRef}</span>
+                      <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-950 font-bold text-[10px]">
+                        {req.status.replace(/_/g, ' ')}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-md bg-stone-100 text-stone-800 font-bold text-[10px]">
+                        {req.eventType.replace(/_/g, ' ')}
+                      </span>
+                      <span className="text-[11px] text-stone-500">
+                        Coordinator: <strong>{req.assignedCoordinatorName || 'Unassigned'}</strong>
+                      </span>
+                    </div>
+                    <h4 className="font-display text-lg font-bold text-stone-900">
+                      {req.eventTitle} — {req.clientName} ({req.clientPhone})
+                    </h4>
+                    <div className="text-stone-600 flex flex-wrap items-center gap-x-2.5 gap-y-1 tabular-nums">
+                      <span className="inline-flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-amber-800" />
+                        {req.eventDateBS} BS ({req.eventDateAD}) · {req.shift} · {req.startTime} – {req.endTime}
+                      </span>
+                      <span className="text-stone-300">·</span>
+                      <span className="inline-flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-amber-800" />
+                        {req.totalPax} Pax ({req.paxBreakdown.vipHeads} VIP, {req.paxBreakdown.eldersRequiringAccess} Elders, {req.paxBreakdown.children} Kids)
+                      </span>
+                      <span className="text-stone-300">·</span>
+                      <span>
+                        {req.eventScope === 'INSIDE_NEPAL'
+                          ? `${req.cityOrLocality ? req.cityOrLocality + ', ' : ''}${req.district}, ${req.province}`
+                          : `${req.cityOrLocality}, ${req.country}`}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="text-left sm:text-right tabular-nums shrink-0">
+                    <span className="text-[10px] text-stone-400 uppercase block">
+                      Total Event Budget ({req.budgetFlexibility})
+                    </span>
+                    <strong className="font-display text-base font-bold text-amber-950">
+                      {req.budgetCurrency} {req.totalBudget.toLocaleString()}
+                    </strong>
+                    <div className="text-[11px] text-stone-500">
+                      {utsavomanagedCount} UTSAVO Managed · {clientOwnCount} Client Own
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gathered Vendor Functions & Global Standards Dossier */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                  <div className="lg:col-span-2 p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
+                    <strong className="block text-stone-900">
+                      Client Vendor Functions Matrix ({activeVendors.length} Standard + {req.customVendorFunctions.length} Custom)
+                    </strong>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {activeVendors.map((vf) => (
+                        <div key={vf.key} className="p-2.5 rounded-xl bg-white border border-stone-200">
+                          <div className="flex items-center justify-between gap-2">
+                            <strong className="text-stone-900 truncate">{vf.label}</strong>
+                            <span className="text-[10px] font-bold text-amber-900 shrink-0 tabular-nums">
+                              {req.budgetCurrency} {vf.allocatedBudgetAmount.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-stone-600 mt-0.5">
+                            Mode: <strong>{vf.mode.replace(/_/g, ' ')}</strong> · Tier: {vf.selectedTier}
+                          </div>
+                          {vf.preferredVendorOrVenueName && (
+                            <div className="text-[11px] text-blue-900 mt-0.5">
+                              Preferred / Own Vendor: {vf.preferredVendorOrVenueName}
+                            </div>
+                          )}
+                          {vf.specifications && (
+                            <div className="text-[11px] text-emerald-800 mt-0.5 truncate">
+                              Specs: {vf.specifications}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      {req.customVendorFunctions.map((cv) => (
+                        <div key={cv.id} className="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200">
+                          <div className="flex items-center justify-between gap-2">
+                            <strong className="text-amber-950 truncate">{cv.title} (Custom)</strong>
+                            <span className="text-[10px] font-bold text-amber-900 tabular-nums">
+                              {req.budgetCurrency} {cv.budgetAmount.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-stone-700 mt-0.5">
+                            {cv.mode.replace(/_/g, ' ')} · {cv.specifications}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
+                    <strong className="block text-stone-900">Global Standards &amp; Culinary Brief</strong>
+                    <div className="text-[11px] text-stone-700 space-y-1">
+                      <div>
+                        <strong>Styles:</strong> {req.globalStandards.culinaryStyles.join(', ')}
+                      </div>
+                      <div>
+                        <strong>Dietary:</strong> {req.globalStandards.dietarySeparations.join(', ')}
+                      </div>
+                      <div>
+                        <strong>Weather:</strong> {req.globalStandards.weatherBackupContingency}
+                      </div>
+                      <div>
+                        <strong>Curfew &amp; Genset:</strong> {req.globalStandards.permitsAndCurfewCompliance ? '10 PM DAO Compliant' : 'Standard'} · Power/Safety: {req.globalStandards.powerBackupAndSafetySpecs}
+                      </div>
+                      <div>
+                        <strong>Care Plan:</strong> {req.globalStandards.accessibilityEldersKidsPlan || 'Standard access'}
+                      </div>
+                      {req.globalStandards.specialDreamsAndNonNegotiables && (
+                        <div className="p-2 bg-white rounded-lg border border-stone-200 mt-1">
+                          <strong>Client Non-Negotiables:</strong> {req.globalStandards.specialDreamsAndNonNegotiables}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Admin Assignment, Action Log & Direct Client Chat */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-1">
+                  <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2.5">
+                    <div className="font-bold text-stone-900 flex items-center gap-1.5">
+                      <Headphones className="w-3.5 h-3.5 text-amber-800" />
+                      <span>Producer Assignment &amp; Lifecycle Control</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        value={coordNameDraft[req.id] ?? req.assignedCoordinatorName ?? ''}
+                        onChange={(e) =>
+                          setCoordNameDraft((prev) => ({ ...prev, [req.id]: e.target.value }))
+                        }
+                        placeholder="Lead Producer Name"
+                        className="px-2.5 py-1.5 bg-white border border-stone-300 rounded-lg"
+                      />
+                      <input
+                        type="text"
+                        value={coordPhoneDraft[req.id] ?? req.assignedCoordinatorPhone ?? ''}
+                        onChange={(e) =>
+                          setCoordPhoneDraft((prev) => ({ ...prev, [req.id]: e.target.value }))
+                        }
+                        placeholder="Coordinator Phone (+977...)"
+                        className="px-2.5 py-1.5 bg-white border border-stone-300 rounded-lg"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={managedUpdateDraft[req.id] || ''}
+                        onChange={(e) =>
+                          setManagedUpdateDraft((prev) => ({ ...prev, [req.id]: e.target.value }))
+                        }
+                        placeholder="Log sourcing milestone update (visible to client)..."
+                        className="flex-1 px-2.5 py-1.5 bg-white border border-stone-300 rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          updateManagedEventByAdmin(req.id, {
+                            assignedCoordinatorName: coordNameDraft[req.id] ?? req.assignedCoordinatorName,
+                            assignedCoordinatorPhone: coordPhoneDraft[req.id] ?? req.assignedCoordinatorPhone,
+                            newTeamActionUpdate: (managedUpdateDraft[req.id] || '').trim() || undefined,
+                          });
+                          setManagedUpdateDraft((prev) => ({ ...prev, [req.id]: '' }));
+                          notify(`Logged producer update on Managed Event #${req.requestRef}.`);
+                        }}
+                        className="px-3 py-1.5 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg font-bold whitespace-nowrap shrink-0"
+                      >
+                        Save Log
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(
+                        [
+                          ['BRIEF_SUBMITTED', 'Brief Received'],
+                          ['BLUEPRINT_REVIEW', 'Blueprint Review'],
+                          ['VENDOR_SOURCING_ACTIVE', 'Sourcing Vendors'],
+                          ['COORDINATION_LOCKED', 'Coordination Locked'],
+                          ['EXECUTION_READY', 'Execution Ready'],
+                        ] as const
+                      ).map(([statusKey, label]) => (
+                        <button
+                          key={statusKey}
+                          type="button"
+                          onClick={() => {
+                            updateManagedEventByAdmin(req.id, {
+                              status: statusKey,
+                              assignedCoordinatorName: coordNameDraft[req.id] ?? req.assignedCoordinatorName,
+                              assignedCoordinatorPhone: coordPhoneDraft[req.id] ?? req.assignedCoordinatorPhone,
+                            });
+                            notify(`Updated Managed Event #${req.requestRef} to ${label}.`);
+                          }}
+                          className={`px-2.5 py-1 rounded-lg font-bold text-[11px] whitespace-nowrap shrink-0 ${
+                            req.status === statusKey
+                              ? 'bg-amber-900 text-white'
+                              : 'bg-white border border-stone-300 text-stone-700 hover:bg-stone-100'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-amber-50/40 border border-amber-200 space-y-2.5 flex flex-col justify-between">
+                    <div>
+                      <strong className="block text-amber-950 mb-2">
+                        Client Direct Coordination Messages ({req.coordinationMessages.length})
+                      </strong>
+                      <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+                        {req.coordinationMessages.map((m) => (
+                          <div
+                            key={m.id}
+                            className={`p-2 rounded-xl text-[11px] ${
+                              m.senderRole === 'UTSAVO_TEAM'
+                                ? 'bg-amber-900 text-white ml-6'
+                                : 'bg-white border border-stone-200 text-stone-800 mr-6'
+                            }`}
+                          >
+                            <div className="font-bold opacity-80">
+                              {m.senderName} ({m.channel.replace(/_/g, ' ')})
+                            </div>
+                            <div>{m.text}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={managedReplyDraft[req.id] || ''}
+                        onChange={(e) =>
+                          setManagedReplyDraft((prev) => ({ ...prev, [req.id]: e.target.value }))
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && (managedReplyDraft[req.id] || '').trim()) {
+                            e.preventDefault();
+                            sendManagedEventMessage(req.id, {
+                              senderRole: 'UTSAVO_TEAM',
+                              senderName: coordNameDraft[req.id] || req.assignedCoordinatorName || 'UTSAVO Producer Desk',
+                              channel: 'PORTAL_CHAT',
+                              text: managedReplyDraft[req.id].trim(),
+                            });
+                            setManagedReplyDraft((prev) => ({ ...prev, [req.id]: '' }));
+                          }
+                        }}
+                        placeholder="Reply directly to client..."
+                        className="flex-1 px-2.5 py-1.5 bg-white border border-stone-300 rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const txt = (managedReplyDraft[req.id] || '').trim();
+                          if (!txt) return;
+                          sendManagedEventMessage(req.id, {
+                            senderRole: 'UTSAVO_TEAM',
+                            senderName: coordNameDraft[req.id] || req.assignedCoordinatorName || 'UTSAVO Producer Desk',
+                            channel: 'PORTAL_CHAT',
+                            text: txt,
+                          });
+                          setManagedReplyDraft((prev) => ({ ...prev, [req.id]: '' }));
+                          notify(`Sent coordination reply to ${req.clientName}.`);
+                        }}
+                        className="px-3.5 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-lg font-bold inline-flex items-center gap-1 whitespace-nowrap shrink-0"
+                      >
+                        <Send className="w-3 h-3" />
+                        <span>Reply</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* PANEL 1: STAR HOTEL VENUE REQUESTS */}
       {subTab === 'STAR_HOTELS' && (

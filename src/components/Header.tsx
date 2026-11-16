@@ -15,8 +15,8 @@ import { PWAInstallButton } from './PWAInstallButton';
 import { AuspiciousNotificationCenter } from './AuspiciousNotificationCenter';
 
 interface HeaderProps {
-  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS';
-  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
+  activeView: 'EXPLORE' | 'MANAGED_EVENT' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS';
+  setActiveView: (view: 'EXPLORE' | 'MANAGED_EVENT' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
   onOpenAiAssistant: () => void;
   onOpenFeatures?: () => void;
   onOpenLegalContract?: () => void;
@@ -101,6 +101,16 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               {t('navExplore')}
+            </button>
+            <button
+              onClick={() => setActiveView('MANAGED_EVENT')}
+              className={`hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeView === 'MANAGED_EVENT' ? 'text-amber-950 font-bold bg-amber-50 px-2 py-1 rounded-lg' : 'text-stone-700'
+              }`}
+              title="Let UTSAVO organize your entire event under your direct control"
+            >
+              <Sparkles className="w-4 h-4 text-amber-700" />
+              <span>{language === 'ne' ? 'UTSAVO सेवा' : 'UTSAVO Organizes'}</span>
             </button>
             <button
               onClick={() => setActiveView('DESTINATION')}
@@ -363,6 +373,19 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           <span>{language === 'ne' ? 'भेन्यु खोज' : 'Explore Venues'}</span>
+        </button>
+
+        {/* UTSAVO Organizes Whole Event */}
+        <button
+          onClick={() => setActiveView('MANAGED_EVENT')}
+          className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5 ${
+            activeView === 'MANAGED_EVENT'
+              ? 'bg-amber-950 text-white font-bold shadow-xs'
+              : 'text-amber-950 bg-amber-50 border border-amber-300 hover:bg-amber-100'
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+          <span>{language === 'ne' ? 'UTSAVO सेवा' : 'UTSAVO Organizes'}</span>
         </button>
 
         {/* Destination Nepal */}

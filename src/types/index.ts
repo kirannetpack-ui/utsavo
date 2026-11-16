@@ -1291,3 +1291,172 @@ export interface FavoriteVenueAlert {
   createdAt: string;
   isRead: boolean;
 }
+
+// -------------------------------------------------------------
+// UTSAVO FULL-SERVICE MANAGED EVENT CONCIERGE (END-TO-END EVENTS)
+// -------------------------------------------------------------
+export type VendorFunctionKey =
+  | 'VENUE_AND_HALL'
+  | 'CATERING_AND_BEVERAGE'
+  | 'CULTURAL_ARTISTS_MUSIC'
+  | 'VEDIC_PUROHIT_RITUALS'
+  | 'PHOTOGRAPHY_CINEMA_DRONE'
+  | 'DECOR_MANDAP_FLORAL'
+  | 'BRIDAL_GROOM_GLAM_ATTIRE'
+  | 'SOUND_LIGHTING_AV_STAGE'
+  | 'EVENT_STAFF_HOSPITALITY'
+  | 'LOGISTICS_TRANSFERS_STAYS'
+  | 'DIGITAL_NIMANTRANA_RSVP'
+  | 'ANNAPURNA_SUSTAINABILITY_RESCUE';
+
+export type VendorFunctionMode =
+  | 'UTSAVO_FULL_MANAGE'
+  | 'CO_SELECT_MARKETPLACE'
+  | 'CLIENT_HAS_OWN_VENDOR'
+  | 'NOT_NEEDED';
+
+export type VendorServiceTier = 'ESSENTIAL' | 'PREMIUM' | 'ROYAL_LUXURY' | 'CUSTOM';
+
+export interface ManagedVendorFunctionSpec {
+  key: VendorFunctionKey;
+  label: string;
+  nepaliLabel: string;
+  categoryGroup: 'CORE_HOSPITALITY' | 'CEREMONIAL_TALENT' | 'PRODUCTION_OPS' | 'DIGITAL_AND_CARE';
+  isEnabled: boolean;
+  mode: VendorFunctionMode;
+  clientAuthorityLocked: boolean;
+  suggestedBudgetSharePercent: number;
+  allocatedBudgetAmount: number;
+  selectedTier: VendorServiceTier;
+  preferredVendorOrVenueName: string;
+  specifications: string;
+}
+
+export interface CustomManagedVendorFunction {
+  id: string;
+  title: string;
+  mode: VendorFunctionMode;
+  budgetAmount: number;
+  specifications: string;
+}
+
+export interface ManagedBlueprintTimelineSlot {
+  id: string;
+  timeSlot: string;
+  activity: string;
+  leadOwner: string;
+  notes: string;
+  included: boolean;
+}
+
+export interface ManagedBlueprintChecklistItem {
+  id: string;
+  category: 'PERMITS_CURFEW' | 'WEATHER_SAFETY' | 'VENDOR_HANDOFF' | 'GUEST_CARE';
+  item: string;
+  completed: boolean;
+}
+
+export interface ManagedEventBlueprint {
+  executiveSummary: string;
+  panchangaAndTimingAdvice: string;
+  recommendedRunOfShow: ManagedBlueprintTimelineSlot[];
+  vendorCoordinationPlaybook: string[];
+  globalRiskAndPermitsChecklist: ManagedBlueprintChecklistItem[];
+  webSources: Array<{ title: string; uri: string }>;
+  generatedWith: string;
+  generatedAt: string;
+}
+
+export interface ManagedCoordinationMessage {
+  id: string;
+  senderRole: 'CLIENT' | 'UTSAVO_TEAM';
+  senderName: string;
+  channel: 'PORTAL_CHAT' | 'WHATSAPP_BRIDGE' | 'CALLBACK_REQUEST';
+  text: string;
+  timestamp: string;
+}
+
+export interface ManagedEventRequest {
+  id: string;
+  requestRef: string;
+  wantsUtsavoFullManagement: boolean;
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  preferredContactChannel: 'PORTAL_AND_WHATSAPP' | 'PHONE_CALL' | 'VIBER' | 'EMAIL';
+  preferredCallbackWindow: string;
+
+  // Step 1: Time, Date, Pax, Budget & Scope
+  eventTitle: string;
+  eventType: EventType | 'DESTINATION_WEDDING' | 'ANNIVERSARY_RENEWAL';
+  eventScope: 'INSIDE_NEPAL' | 'OUTSIDE_NEPAL';
+  province: string;
+  district: string;
+  cityOrLocality: string;
+  country: string;
+  eventDateBS: string;
+  eventDateAD: string;
+  isDateFlexible: boolean;
+  muhuratPreference: string;
+  shift: ShiftTime;
+  startTime: string;
+  endTime: string;
+  multiDayCount: number;
+  totalPax: number;
+  paxBreakdown: {
+    adults: number;
+    eldersRequiringAccess: number;
+    children: number;
+    vipHeads: number;
+    outstationGuestsNeedingRooms: number;
+  };
+  budgetCurrency: 'NPR' | 'USD' | 'EUR' | 'GBP' | 'AUD' | 'INR';
+  totalBudget: number;
+  budgetFlexibility: 'STRICT_CEILING' | 'FLEXIBLE_15_PERCENT' | 'VALUE_OPTIMIZED';
+  venueSettingPreference:
+    | 'INDOOR_BANQUET'
+    | 'GARDEN_LAWN'
+    | 'STAR_HOTEL'
+    | 'HERITAGE_PALACE'
+    | 'DESTINATION_RESORT'
+    | 'HYBRID_INDOOR_OUTDOOR';
+
+  // Step 2: Mandatory Vendor Functions Capture (Full Client Authority)
+  vendorFunctions: ManagedVendorFunctionSpec[];
+  customVendorFunctions: CustomManagedVendorFunction[];
+
+  // Step 3: Globally Sourced Production & Guest Care Parameters
+  globalStandards: {
+    weatherBackupContingency: 'INDOOR_BACKUP_HALL' | 'WATERPROOF_MARQUEE' | 'FLEXIBLE_SHIFT' | 'NONE';
+    accessibilityEldersKidsPlan: string;
+    permitsAndCurfewCompliance: boolean;
+    powerBackupAndSafetySpecs: string;
+    vipProtocolAndWelcomeKits: string;
+    ecoZeroWastePreference: boolean;
+    hybridLivestreamNeeds: boolean;
+    culinaryStyles: string[];
+    dietarySeparations: string[];
+    barPolicy: 'NON_ALCOHOLIC' | 'SIGNATURE_COCKTAILS' | 'OPEN_PREMIUM_BAR' | 'BYOB_CORKAGE';
+    themeAndColorPalette: string;
+    specialDreamsAndNonNegotiables: string;
+  };
+
+  // Step 4: Smart Suggestive Blueprint (Client Editable)
+  blueprint: ManagedEventBlueprint;
+
+  // Step 5: Direct UTSAVO Team Coordination & Lifecycle
+  status:
+    | 'DRAFT_DISCOVERY'
+    | 'BRIEF_SUBMITTED'
+    | 'BLUEPRINT_REVIEW'
+    | 'VENDOR_SOURCING_ACTIVE'
+    | 'COORDINATION_LOCKED'
+    | 'EXECUTION_READY';
+  assignedCoordinatorName: string;
+  assignedCoordinatorPhone: string;
+  coordinationMessages: ManagedCoordinationMessage[];
+  teamActionUpdates: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+

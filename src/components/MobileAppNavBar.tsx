@@ -20,8 +20,8 @@ import {
 } from 'lucide-react';
 
 interface MobileAppNavBarProps {
-  activeView: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS';
-  setActiveView: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
+  activeView: 'EXPLORE' | 'MANAGED_EVENT' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS';
+  setActiveView: (view: 'EXPLORE' | 'MANAGED_EVENT' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
   onOpenFeatures?: () => void;
 }
 
@@ -43,12 +43,12 @@ export const MobileAppNavBar: React.FC<MobileAppNavBarProps> = ({
       isActive: activeView === 'EXPLORE',
     },
     {
-      id: 'DESTINATION',
-      label: language === 'ne' ? 'डेस्टिनेशन' : 'Destination',
-      shortLabel: 'Destination',
-      icon: Mountain,
-      onClick: () => setActiveView('DESTINATION'),
-      isActive: activeView === 'DESTINATION',
+      id: 'MANAGED_EVENT',
+      label: language === 'ne' ? 'UTSAVO सेवा' : 'UTSAVO Organizes',
+      shortLabel: 'UTSAVO',
+      icon: Sparkles,
+      onClick: () => setActiveView('MANAGED_EVENT'),
+      isActive: activeView === 'MANAGED_EVENT',
     },
     {
       id: 'VENDORS',

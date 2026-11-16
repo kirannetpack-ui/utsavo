@@ -39,9 +39,10 @@ import {
 
 interface HeroSectionProps {
   onOpenStaffPool?: (autoOpenRegister?: boolean) => void;
+  onOpenManagedEvent?: () => void;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStaffPool }) => {
+export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStaffPool, onOpenManagedEvent }) => {
   const { t, language } = useLanguage();
   const { filters, setFilters, resetFilters, venues, setActiveModal, openVenueOnboarding } = useMarketplace();
 
@@ -623,8 +624,41 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStaffPool }) => 
           </div>
         </div>
 
+        {/* UTSAVO Full-Service Managed Event Concierge Banner */}
+        <div className="max-w-5xl mx-auto mt-6 p-5 bg-white rounded-2xl border-2 border-amber-800/30 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="w-11 h-11 rounded-xl bg-amber-900 text-amber-200 flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-amber-900">
+                {language === 'ne'
+                  ? 'पूर्ण इभेन्ट व्यवस्थापन · ग्राहकको पूर्ण अधिकार'
+                  : 'UTSAVO Full-Service Managed Event · 100% Client Authority'}
+              </div>
+              <h3 className="font-display text-base sm:text-lg font-bold text-stone-900 mt-0.5">
+                {language === 'ne'
+                  ? 'के तपाईं आफ्नो सम्पूर्ण उत्सव UTSAVO ले नै व्यवस्थित गरिदियोस् भन्ने चाहनुहुन्छ?'
+                  : 'Want UTSAVO Itself to Organize Your Whole Event From Start to Finish?'}
+              </h3>
+              <p className="text-xs text-stone-600 mt-1 max-w-2xl leading-relaxed">
+                {language === 'ne'
+                  ? 'मिति, समय, अतिथि संख्या, बजेट र आवश्यक १२+ भेन्डर कार्यहरू अनुसार स्मार्ट सुझाव लिनुहोस्—तर प्रत्येक विकल्प छान्ने र परिमार्जन गर्ने पूर्ण अधिकार तपाईंकै रहनेछ, साथै UTSAVO टिमसँग सोझै समन्वय गर्न सक्नुहुनेछ।'
+                  : 'Answer smart intake questions on date, time, pax, budget & mandatory vendor functions. Receive globally sourced suggestions while retaining full authority over every vendor choice & coordinating directly with UTSAVO producers anytime.'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onOpenManagedEvent?.()}
+            className="w-full md:w-auto px-5 py-3 bg-amber-900 hover:bg-amber-950 text-white rounded-xl text-xs font-bold shadow-sm transition-colors flex items-center justify-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            <span>{language === 'ne' ? 'UTSAVO इभेन्ट प्लानर खोल्नुहोस् →' : 'Launch Managed Event Planner →'}</span>
+          </button>
+        </div>
+
         {/* Front Page Celebration Workforce & Gig Employment Pool Banner */}
-        <div className="max-w-5xl mx-auto mt-6 p-4 sm:p-5 bg-gradient-to-r from-amber-950 via-stone-900 to-amber-900 rounded-2xl text-white shadow-xl border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
+        <div className="max-w-5xl mx-auto mt-4 p-4 sm:p-5 bg-gradient-to-r from-amber-950 via-stone-900 to-amber-900 rounded-2xl text-white shadow-xl border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden">
           <div className="flex items-start gap-3.5">
             <div className="w-11 h-11 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center shrink-0">
               <Users className="w-5 h-5 text-amber-300" />

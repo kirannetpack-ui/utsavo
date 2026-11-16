@@ -130,6 +130,28 @@
         "createdAt": { "type": "string", "description": "Timestamp" }
       },
       "required": ["venueId", "celebrationTitle", "hostName", "reviewQuote", "overallRating"]
+    },
+    "ManagedEventRequest": {
+      "title": "UTSAVO Full-Service Managed Event Request",
+      "description": "End-to-end client-authorized managed event dossier with vendor functions, suggestive blueprint, and direct coordination log",
+      "type": "object",
+      "properties": {
+        "requestRef": { "type": "string", "maxLength": 40, "description": "Reference code" },
+        "clientName": { "type": "string", "maxLength": 120, "description": "Client name" },
+        "clientEmail": { "type": "string", "format": "email", "description": "Client email" },
+        "eventTitle": { "type": "string", "maxLength": 180, "description": "Celebration or event title" },
+        "eventType": { "type": "string", "maxLength": 50, "description": "Event category" },
+        "totalPax": { "type": "number", "description": "Expected guest count" },
+        "totalBudget": { "type": "number", "description": "Target event budget" },
+        "budgetCurrency": { "type": "string", "maxLength": 10, "description": "Budget currency code" },
+        "status": {
+          "type": "string",
+          "enum": ["DRAFT_DISCOVERY", "BRIEF_SUBMITTED", "BLUEPRINT_REVIEW", "VENDOR_SOURCING_ACTIVE", "COORDINATION_LOCKED", "EXECUTION_READY"],
+          "description": "Managed event lifecycle status"
+        },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      },
+      "required": ["requestRef", "clientName", "clientEmail", "eventTitle", "status"]
     }
   },
   "firestore": {
@@ -164,6 +186,10 @@
     "/social_posts/{postId}": {
       "schema": "SocialCelebrationPost",
       "description": "Social celebration photos and testimonials"
+    },
+    "/managedEventRequests/{requestId}": {
+      "schema": "ManagedEventRequest",
+      "description": "UTSAVO Full-Service Managed Event client briefs, vendor functions, and team coordination"
     }
   }
 }

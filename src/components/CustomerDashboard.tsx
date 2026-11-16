@@ -51,9 +51,11 @@ import {
   Wallet,
 } from 'lucide-react';
 
+import { ManagedEventRequest, VendorFunctionMode } from '../types';
+
 interface CustomerDashboardProps {
   onOpenReviewModal: (bookingId: string, venueId: string) => void;
-  onNavigateView?: (view: 'EXPLORE' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
+  onNavigateView?: (view: 'EXPLORE' | 'MANAGED_EVENT' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
 }
 
 export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
@@ -95,11 +97,16 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
     favoriteVenueAlerts,
     unreadFavoriteVenueAlertsCount,
     sseConnectionStatus,
+    managedEventRequests,
+    updateManagedEventByClient,
+    sendManagedEventMessage,
   } = useMarketplace();
 
   // Internal tab state synced with context
   const activeTab = customerDashboardTab;
   const setActiveTab = setCustomerDashboardTab;
+
+  const [managedChatDraft, setManagedChatDraft] = useState<Record<string, string>>({});
 
   // Filter state inside SAVED tab
   const [savedFilterCategory, setSavedFilterCategory] = useState<'ALL' | 'VENUES' | 'VENDORS'>('ALL');
@@ -271,6 +278,26 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                 {unreadFavoriteVenueAlertsCount > 0
                   ? unreadFavoriteVenueAlertsCount
                   : favoriteVenueAlerts.length}
+              </span>
+            </button>
+
+            {/* TAB 6: UTSAVO Organizes Whole Event */}
+            <button
+              onClick={() => setActiveTab('MANAGED_EVENTS')}
+              className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeTab === 'MANAGED_EVENTS'
+                  ? 'bg-amber-900 text-white shadow-sm font-bold'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Sparkles className={`w-3.5 h-3.5 ${activeTab === 'MANAGED_EVENTS' ? 'text-amber-300' : 'text-amber-800'}`} />
+              <span>{language === 'ne' ? 'UTSAVO पूर्ण इभेन्ट' : 'UTSAVO Organizes'}</span>
+              <span
+                className={`ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold tabular-nums ${
+                  activeTab === 'MANAGED_EVENTS' ? 'bg-amber-800 text-amber-200' : 'bg-stone-200 text-stone-700'
+                }`}
+              >
+                {managedEventRequests.length}
               </span>
             </button>
           </div>
@@ -1591,6 +1618,232 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
       {/* TAB: REAL-TIME FAVORITE VENUE ALERTS */}
       {activeTab === 'FAVORITE_ALERTS' && (
         <FavoriteVenueAlertsPanel onNavigateView={onNavigateView} />
+      )}
+
+      {/* TAB: UTSAVO FULL-SERVICE MANAGED EVENTS */}
+      {activeTab === 'MANAGED_EVENTS' && (
+        <div className="space-y-5">
+          <div className="p-5 bg-white rounded-3xl border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-900">
+                {language === 'ne' ? 'पूर्ण इभेन्ट व्यवस्थापन र समन्वय' : 'UTSAVO Managed Event Dossiers · Client Authority'}
+              </span>
+              <h3 className="font-display text-xl font-bold text-stone-900 mt-0.5">
+                Events Organized by UTSAVO Under Your Direct Control
+              </h3>
+              <p className="text-xs text-stone-500 mt-0.5">
+                Adjust any vendor function ownership mode, track UTSAVO producer sourcing actions, or coordinate directly with your dedicated team.
+              </p>
+            </div>
+            {onNavigateView && (
+              <button
+                type="button"
+                onClick={() => onNavigateView('MANAGED_EVENT')}
+                className="px-4 py-2.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl text-xs font-bold whitespace-nowrap shrink-0 cursor-pointer"
+              >
+                Open Full Managed Event Studio →
+              </button>
+            )}
+          </div>
+
+          {managedEventRequests.length === 0 ? (
+            <div className="p-10 bg-white rounded-3xl border border-stone-200 text-center space-y-3">
+              <Sparkles className="w-8 h-8 text-amber-700 mx-auto" />
+              <h4 className="font-bold text-stone-900 text-sm">No Managed Event Dossiers Yet</h4>
+              <p className="text-xs text-stone-500 max-w-md mx-auto">
+                Start the smart UTSAVO Managed Event Planner to gather your time, date, pax, budget, vendor functions, and global standards.
+              </p>
+              {onNavigateView && (
+                <button
+                  type="button"
+                  onClick={() => onNavigateView('MANAGED_EVENT')}
+                  className="px-4 py-2 bg-amber-900 text-white rounded-xl text-xs font-bold"
+                >
+                  Launch Managed Event Planner →
+                </button>
+              )}
+            </div>
+          ) : (
+            managedEventRequests.map((req: ManagedEventRequest) => {
+              const enabledFunctions = req.vendorFunctions.filter((vf) => vf.isEnabled);
+              return (
+                <div key={req.id} className="p-5 sm:p-6 bg-white rounded-3xl border border-stone-200 space-y-5 text-xs">
+                  <div className="flex flex-wrap items-start justify-between gap-3 border-b border-stone-100 pb-4">
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-mono font-bold text-stone-500">#{req.requestRef}</span>
+                        <span className="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-950 font-bold text-[10px]">
+                          {req.status.replace(/_/g, ' ')}
+                        </span>
+                        <span className="text-stone-500 font-semibold">
+                          Client Authority: {req.vendorFunctions.some((v) => v.clientAuthorityLocked) ? 'Locked Specs' : 'Open & Editable'}
+                        </span>
+                      </div>
+                      <h4 className="font-display text-lg font-bold text-stone-900">
+                        {req.eventTitle} ({req.eventType.replace(/_/g, ' ')})
+                      </h4>
+                      <div className="text-stone-600 flex flex-wrap items-center gap-x-2.5 gap-y-1 tabular-nums">
+                        <span>{req.eventDateBS} BS ({req.eventDateAD}) · {req.shift} ({req.startTime} – {req.endTime})</span>
+                        <span>·</span>
+                        <span>{req.totalPax} Guests</span>
+                        <span>·</span>
+                        <span>
+                          {req.eventScope === 'INSIDE_NEPAL'
+                            ? `${req.cityOrLocality ? req.cityOrLocality + ', ' : ''}${req.district}, ${req.province}`
+                            : `${req.cityOrLocality}, ${req.country}`}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="text-left sm:text-right tabular-nums shrink-0">
+                      <span className="text-[10px] text-stone-400 uppercase block">Target Budget ({req.budgetFlexibility})</span>
+                      <strong className="font-display text-base font-bold text-amber-950">
+                        {req.budgetCurrency} {req.totalBudget.toLocaleString()}
+                      </strong>
+                      {req.assignedCoordinatorName && (
+                        <div className="text-[11px] text-emerald-800 font-semibold mt-0.5">
+                          Lead Producer: {req.assignedCoordinatorName} ({req.assignedCoordinatorPhone})
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Client-Authoritative Quick Mode Controls per Active Vendor Function */}
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <strong className="text-stone-900">
+                        Active Vendor Functions ({enabledFunctions.length} active + {req.customVendorFunctions.length} custom)
+                      </strong>
+                      <span className="text-[11px] text-stone-500">
+                        You may switch any vendor function ownership directly below:
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                      {enabledFunctions.map((vf) => (
+                        <div key={vf.key} className="p-3 rounded-2xl bg-stone-50 border border-stone-200 space-y-1.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <strong className="text-stone-900 truncate">{vf.label}</strong>
+                            <span className="text-[10px] font-bold text-amber-900 tabular-nums shrink-0">
+                              {req.budgetCurrency} {vf.allocatedBudgetAmount.toLocaleString()}
+                            </span>
+                          </div>
+                          <select
+                            value={vf.mode}
+                            onChange={(e) => {
+                              const nextMode = e.target.value as VendorFunctionMode;
+                              updateManagedEventByClient(req.id, {
+                                vendorFunctions: req.vendorFunctions.map((item) =>
+                                  item.key === vf.key ? { ...item, mode: nextMode, clientAuthorityLocked: true } : item
+                                ),
+                              });
+                            }}
+                            className="w-full px-2 py-1 bg-white border border-stone-300 rounded-lg text-[11px] font-semibold text-stone-800"
+                          >
+                            <option value="UTSAVO_FULL_MANAGE">UTSAVO Full Manage</option>
+                            <option value="CO_SELECT_MARKETPLACE">Co-Select Marketplace</option>
+                            <option value="CLIENT_HAS_OWN_VENDOR">Client Has Own Vendor</option>
+                            <option value="NOT_NEEDED">Not Needed</option>
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Team Progress & Two-Way Direct Coordination Thread */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2 border-t border-stone-100">
+                    <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
+                      <strong className="block text-stone-900">
+                        UTSAVO Producer Updates ({req.teamActionUpdates.length})
+                      </strong>
+                      <ul className="space-y-1.5 text-[11px] text-stone-700 max-h-40 overflow-y-auto">
+                        {req.teamActionUpdates.map((upd, idx) => (
+                          <li key={idx} className="flex items-start gap-1.5">
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                            <span>{upd}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="pt-2 border-t border-stone-200 flex items-center justify-between gap-2">
+                        <span className="text-[11px] text-stone-500">Direct phone/chat escalation:</span>
+                        <WhatsAppViberButtons
+                          phone={req.assignedCoordinatorPhone || '+9779801122334'}
+                          messageText={`Namaste UTSAVO Concierge Team! Coordinating on Managed Event Brief #${req.requestRef} (${req.eventTitle}, ${req.eventDateBS} BS).`}
+                          variant="badges"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-amber-50/40 border border-amber-200 space-y-2.5 flex flex-col justify-between">
+                      <div>
+                        <strong className="block text-amber-950 mb-2">
+                          Direct Coordination with UTSAVO Team ({req.coordinationMessages.length})
+                        </strong>
+                        <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                          {req.coordinationMessages.map((msg) => (
+                            <div
+                              key={msg.id}
+                              className={`p-2.5 rounded-xl text-[11px] ${
+                                msg.senderRole === 'CLIENT'
+                                  ? 'bg-amber-900 text-white ml-6'
+                                  : 'bg-white border border-stone-200 text-stone-800 mr-6'
+                              }`}
+                            >
+                              <div className="font-bold opacity-80 mb-0.5">
+                                {msg.senderName} · {msg.channel.replace(/_/g, ' ')}
+                              </div>
+                              <div>{msg.text}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 pt-1">
+                        <input
+                          type="text"
+                          value={managedChatDraft[req.id] || ''}
+                          onChange={(e) =>
+                            setManagedChatDraft((prev) => ({ ...prev, [req.id]: e.target.value }))
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && (managedChatDraft[req.id] || '').trim()) {
+                              e.preventDefault();
+                              sendManagedEventMessage(req.id, {
+                                senderRole: 'CLIENT',
+                                senderName: req.clientName || currentUser.name,
+                                channel: 'PORTAL_CHAT',
+                                text: managedChatDraft[req.id].trim(),
+                              });
+                              setManagedChatDraft((prev) => ({ ...prev, [req.id]: '' }));
+                            }
+                          }}
+                          placeholder="Message UTSAVO producer directly (vendor change, visit request, tasting)..."
+                          className="flex-1 px-3 py-1.5 bg-white border border-stone-300 rounded-xl text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const txt = (managedChatDraft[req.id] || '').trim();
+                            if (!txt) return;
+                            sendManagedEventMessage(req.id, {
+                              senderRole: 'CLIENT',
+                              senderName: req.clientName || currentUser.name,
+                              channel: 'PORTAL_CHAT',
+                              text: txt,
+                            });
+                            setManagedChatDraft((prev) => ({ ...prev, [req.id]: '' }));
+                          }}
+                          className="px-3.5 py-1.5 bg-amber-900 hover:bg-amber-950 text-white rounded-xl font-bold whitespace-nowrap shrink-0"
+                        >
+                          Send
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       )}
 
     </div>

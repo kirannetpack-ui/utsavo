@@ -59,6 +59,7 @@ export const AdminDashboard: React.FC = () => {
     cancellationRecords,
     starHotelRequests,
     outsideNepalRequests,
+    managedEventRequests,
   } = useMarketplace();
 
   const [adminTab, setAdminTab] = useState<'OVERVIEW' | 'VERIFICATION' | 'CONCIERGE_SOURCING' | 'CATEGORIES' | 'GOVT_COMPLIANCE' | 'SETTLEMENTS' | 'AUDIT_LOGS'>('OVERVIEW');
@@ -78,6 +79,7 @@ export const AdminDashboard: React.FC = () => {
 
   const pendingGovtDirectivesCount = govtDirectives.filter(d => d.status === 'PENDING_ADMIN_DECISION').length;
   const pendingConciergeCount =
+    managedEventRequests.filter((r) => r.status === 'BRIEF_SUBMITTED' || r.status === 'BLUEPRINT_REVIEW' || r.status === 'VENDOR_SOURCING_ACTIVE').length +
     starHotelRequests.filter((r) => r.status === 'SUBMITTED_TO_ADMIN' || r.status === 'ADMIN_SCOUTING_HOTELS').length +
     outsideNepalRequests.filter((r) => r.status === 'DOSSIER_GATHERED' || r.status === 'PARTNER_HOTEL_SCOUTING').length;
 
@@ -186,11 +188,11 @@ export const AdminDashboard: React.FC = () => {
             }`}
           >
             <Building2 className="w-3.5 h-3.5 text-amber-500" />
-            <span>Star Hotels &amp; Global</span>
+            <span>Managed, Hotels &amp; Global</span>
             <span className={`px-1.5 py-0.2 text-[10px] font-bold rounded-full tabular-nums ${
               adminTab === 'CONCIERGE_SOURCING' ? 'bg-amber-500 text-stone-950' : 'bg-amber-100 text-amber-900'
             }`}>
-              {pendingConciergeCount > 0 ? pendingConciergeCount : starHotelRequests.length + outsideNepalRequests.length}
+              {pendingConciergeCount > 0 ? pendingConciergeCount : managedEventRequests.length + starHotelRequests.length + outsideNepalRequests.length}
             </span>
           </button>
 

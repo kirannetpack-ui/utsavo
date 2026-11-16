@@ -74,6 +74,15 @@ service cloud.firestore {
         data.targetDestination is string && data.targetDestination.size() <= 150;
     }
 
+    function isValidManagedEventRequest(data) {
+      return data.keys().hasAll(['requestRef', 'clientName', 'clientEmail', 'eventTitle', 'status']) &&
+        data.requestRef is string && data.requestRef.size() <= 40 &&
+        data.clientName is string && data.clientName.size() <= 120 &&
+        data.clientEmail is string && data.clientEmail.size() <= 120 &&
+        data.eventTitle is string && data.eventTitle.size() <= 180 &&
+        data.status in ['DRAFT_DISCOVERY', 'BRIEF_SUBMITTED', 'BLUEPRINT_REVIEW', 'VENDOR_SOURCING_ACTIVE', 'COORDINATION_LOCKED', 'EXECUTION_READY'];
+    }
+
     // 1. Users Collection
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
@@ -146,6 +155,18 @@ service cloud.firestore {
       allow update: if true;    // Like counter increments
       allow delete: if isAdmin();
     }
+
+    // 10. UTSAVO Full-Service Managed Event Requests & Direct Team Coordination
+    match /managedEventRequests/{requestId} {
+      allow get: if isAdmin() || (isSignedIn() && resource.data.clientEmail == request.auth.token.email);
+      allow list: if isAdmin() || (isSignedIn() && resource.data.clientEmail == request.auth.token.email);
+      allow create: if isValidManagedEventRequest(incoming());
+      allow update: if isValidManagedEventRequest(incoming()) && (
+        isAdmin() || (isSignedIn() && existing().clientEmail == request.auth.token.email)
+      );
+      allow delete: if isAdmin();
+    }
   }
 }
+
 
