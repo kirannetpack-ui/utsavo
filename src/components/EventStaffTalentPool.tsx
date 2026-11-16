@@ -80,7 +80,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
   // Multi-Selection State for Vendors
   const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
   const [isBulkShiftModalOpen, setIsBulkShiftModalOpen] = useState(false);
-  const [bulkShiftDateBS, setBulkShiftDateBS] = useState('2081 Mangsir 20');
+  const [bulkShiftDateBS, setBulkShiftDateBS] = useState('2083 Mangsir 19');
   const [bulkShiftTime, setBulkShiftTime] = useState('EVENING');
   const [bulkVenueName, setBulkVenueName] = useState('The Regal Pavilion');
   const [bulkShiftNotes, setBulkShiftNotes] = useState('Formal black & white banquet attire required. Dinner service starts at 6:30 PM.');
@@ -1237,7 +1237,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
                     type="text"
                     value={bulkShiftDateBS}
                     onChange={(e) => setBulkShiftDateBS(e.target.value)}
-                    placeholder="e.g. 2081 Mangsir 20"
+                    placeholder="e.g. 2083 Mangsir 19"
                     className="w-full px-3 py-2 rounded-xl border border-stone-300"
                   />
                 </div>

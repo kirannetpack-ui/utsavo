@@ -1045,16 +1045,16 @@ let favoriteVenueAlertsStore: ServerFavoriteVenueAlert[] = [
     alertKind: 'LAST_MINUTE_CANCELLATION',
     title: 'Last-Minute Evening Slot Released at The Regal Pavilion',
     message:
-      'Booking #UTS-2081-4890 was released by the prior host. Grand Kailash Ballroom is now immediately open for 2081 Mangsir 14 (Trayodashi Vivah Muhurat) Evening Shift.',
-    dateBS: '2081 Mangsir 14',
-    dateAD: '2024-11-29',
+      'Booking #UTS-2083-4890 was released by the prior host. Grand Kailash Ballroom is now immediately open for 2083 Mangsir 09 (Vivah Muhurat) Evening Shift.',
+    dateBS: '2083 Mangsir 09',
+    dateAD: '2026-11-25',
     shift: 'EVENING',
     hallName: 'Grand Kailash Ballroom',
-    tithi: 'Trayodashi (त्रयोदशी)',
+    tithi: 'Purnima / Pratipada',
     nakshatra: 'Rohini (रोहिणी)',
     auspiciousTime: '04:30 PM - 10:30 PM',
     discountOrIncentiveNote: 'Priority Express Rebooking · 10% Deposit Transfer Fee Waived',
-    sourceBookingRef: 'UTS-2081-4890',
+    sourceBookingRef: 'UTS-2083-4890',
     createdAt: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
     isRead: false,
   },
@@ -1067,12 +1067,12 @@ let favoriteVenueAlertsStore: ServerFavoriteVenueAlert[] = [
     alertKind: 'PANCHANGA_DATE_OPEN',
     title: 'Basanta Panchami Shubha Lagna Open at Lalitpur Royal Palace',
     message:
-      'Universal auspicious Abhijit Muhurat on Basanta Panchami (2081 Magh 22) has verified Day Shift availability across Patan Imperial Courtyard.',
-    dateBS: '2081 Magh 22',
-    dateAD: '2025-02-04',
+      'Universal auspicious Abhijit Muhurat on Basanta Panchami (2083 Magh 28) has verified Day Shift availability across Patan Imperial Courtyard.',
+    dateBS: '2083 Magh 28',
+    dateAD: '2027-02-11',
     shift: 'DAY',
     hallName: 'Patan Imperial Courtyard',
-    tithi: 'Panchami (वसन्त पञ्चमी)',
+    tithi: 'Shukla Panchami (वसन्त पञ्चमी)',
     nakshatra: 'Revati (रेवती)',
     auspiciousTime: 'Abhijit Muhurat (11:45 AM - 12:35 PM)',
     discountOrIncentiveNote: 'Complimentary Vedic Mandap Floral Arch for Favorite Watchers',
@@ -1088,13 +1088,13 @@ let favoriteVenueAlertsStore: ServerFavoriteVenueAlert[] = [
     alertKind: 'PANCHANGA_DATE_OPEN',
     title: 'Spring Vivah Muhurat Open at Pokhara Lakeside Resort',
     message:
-      'Newly confirmed clear evening schedule for 2081 Falgun 08 (Saptami • Anuradha Nakshatra) with Phewa Sunset Lawn access.',
-    dateBS: '2081 Falgun 08',
-    dateAD: '2025-02-20',
+      'Newly confirmed clear evening schedule for 2083 Falgun 15 (Shashthi • Swati Nakshatra) with Phewa Sunset Lawn access.',
+    dateBS: '2083 Falgun 15',
+    dateAD: '2027-02-27',
     shift: 'EVENING',
     hallName: 'Annapurna & Phewa Sunset Lawn',
-    tithi: 'Saptami (सप्तमी)',
-    nakshatra: 'Anuradha (अनुराधा)',
+    tithi: 'Shashthi (षष्ठी)',
+    nakshatra: 'Swati (स्वाती)',
     auspiciousTime: '01:00 PM - 06:00 PM',
     discountOrIncentiveNote: 'Lakeside Ferry Welcome & Couple Sunset Boating Included',
     createdAt: new Date(Date.now() - 1000 * 60 * 95).toISOString(),
@@ -1107,18 +1107,18 @@ let favoriteVenueAlertsStore: ServerFavoriteVenueAlert[] = [
     district: 'Bhaktapur',
     locality: 'Suryabinayak / Durbar Marg',
     alertKind: 'LAST_MINUTE_CANCELLATION',
-    title: 'Freed Pushya Nakshatra Slot at Bhaktapur Durbar Banquet',
+    title: 'Freed Uttarayana Slot at Bhaktapur Durbar Banquet',
     message:
-      'Hold expired on Suryabinayak Main Hall for 2081 Falgun 14 Morning Shift (Trayodashi • Pushya Nakshatra). Ideal for Bratabandha or intimate Vivah.',
-    dateBS: '2081 Falgun 14',
-    dateAD: '2025-02-26',
+      'Hold expired on Suryabinayak Main Hall for 2083 Falgun 18 Morning Shift (Navami • Anuradha Nakshatra). Ideal for Bratabandha or intimate Vivah.',
+    dateBS: '2083 Falgun 18',
+    dateAD: '2027-03-02',
     shift: 'MORNING',
     hallName: 'Suryabinayak Main Hall',
-    tithi: 'Trayodashi (त्रयोदशी)',
-    nakshatra: 'Pushya (पुष्य नक्षत्र)',
+    tithi: 'Navami (नवमी)',
+    nakshatra: 'Anuradha (अनुराधा)',
     auspiciousTime: '08:00 AM - 12:30 PM',
     discountOrIncentiveNote: 'Complimentary Juju Dhau Welcome Service',
-    sourceBookingRef: 'UTS-2081-3918-HOLD',
+    sourceBookingRef: 'UTS-2083-3918-HOLD',
     createdAt: new Date(Date.now() - 1000 * 60 * 140).toISOString(),
     isRead: false,
   },
@@ -1241,7 +1241,7 @@ apiRouter.post('/favorite-venue-alerts/publish', (req, res) => {
         ? `A prior reservation${body.sourceBookingRef ? ` (#${body.sourceBookingRef})` : ''} was cancelled, opening ${dateBS} (${shift} Shift)${body.hallName ? ` at ${body.hallName}` : ''}.`
         : `${venueName} has verified availability on auspicious Panchanga date ${dateBS} (${shift} Shift)${body.hallName ? ` · ${body.hallName}` : ''}.`),
     dateBS,
-    dateAD: dateAD || '2025-02-20',
+    dateAD: dateAD || '2027-02-27',
     shift,
     hallName: body.hallName ? String(body.hallName) : undefined,
     tithi: body.tithi ? String(body.tithi) : undefined,
@@ -1415,8 +1415,8 @@ apiRouter.post('/managed-event/suggest-blueprint', async (req, res) => {
   const locationLabel = [dossier.cityOrLocality, dossier.district, dossier.province, dossier.country]
     .filter(Boolean)
     .join(', ') || 'Kathmandu Valley, Nepal';
-  const eventDateBS = String(dossier.eventDateBS || '2081 Magh 22').slice(0, 60);
-  const eventDateAD = String(dossier.eventDateAD || '2025-02-04').slice(0, 40);
+  const eventDateBS = String(dossier.eventDateBS || '2083 Magh 28').slice(0, 60);
+  const eventDateAD = String(dossier.eventDateAD || '2027-02-11').slice(0, 40);
   const shift = String(dossier.shift || 'FULL_DAY').slice(0, 20);
   const startTime = String(dossier.startTime || '09:30 AM').slice(0, 20);
   const endTime = String(dossier.endTime || '10:00 PM').slice(0, 20);

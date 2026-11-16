@@ -50,7 +50,7 @@ export const LegalContractQuotationGenerator: React.FC<LegalContractQuotationGen
   // Document Fields State
   const [docData, setDocData] = useState({
     contractRef: `UTS-KRA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-    dateIssuedBS: '2081 Mangsir 14',
+    dateIssuedBS: '2083 Kartik 30',
     dateIssuedAD: new Date().toISOString().split('T')[0],
     
     // Party A (Venue)
@@ -73,8 +73,8 @@ export const LegalContractQuotationGenerator: React.FC<LegalContractQuotationGen
 
     // Event Specs
     eventType: 'WEDDING' as EventType,
-    eventDateBS: '2081 Magh 24 (Auspicious Vivaha Muhurat)',
-    eventDateAD: '2025-02-06',
+    eventDateBS: '2083 Magh 28 (Basanta Panchami Vivaha Muhurat)',
+    eventDateAD: '2027-02-11',
     shift: 'DAY' as ShiftTime,
     hallName: 'Kailash Ballroom & Imperial Lawn',
     guaranteedGuests: 450,

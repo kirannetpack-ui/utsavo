@@ -12,29 +12,84 @@ import { getAdjacentDistricts } from '../data/nepalGeography';
 import {
   Building2,
   MapPin,
-  Users,
   ShieldCheck,
   Star,
-  CheckCircle,
   Sparkles,
-  SlidersHorizontal,
   Car,
   Zap,
-  Music,
   Flame,
   ChevronRight,
-  Info,
   Tag,
-  Percent,
   Bookmark,
   Eye,
   Camera,
   Wand2,
+  Trees,
+  Volume2,
 } from 'lucide-react';
 import { WhatsAppViberButtons } from './WhatsAppViberButtons';
 import { createVenueInquiryMessage } from '../utils/communication';
 import { SocialCelebrationWall } from './SocialCelebrationWall';
 import { SmartVenueMatcher } from './SmartVenueMatcher';
+import { VenueAdvancedFilterBar } from './VenueAdvancedFilterBar';
+
+const hasOutdoorGarden = (venue: Venue): boolean => {
+  if (venue.halls.some((h) => h.type === 'GARDEN_LAWN' || h.type === 'ROOFTOP' || h.type === 'POOLSIDE')) {
+    return true;
+  }
+  const haystack = [
+    venue.name,
+    venue.tagline,
+    ...venue.gallery,
+    ...venue.halls.flatMap((h) => [h.name, ...h.features]),
+  ]
+    .join(' ')
+    .toLowerCase();
+  return /lawn|garden|courtyard|open-air|patio|outdoor/.test(haystack);
+};
+
+const hasSoundSystem = (venue: Venue): boolean => {
+  const haystack = [
+    venue.tagline,
+    venue.eventManagementPolicy?.inHouseServicesDescription || '',
+    ...venue.halls.flatMap((h) => h.features),
+  ]
+    .join(' ')
+    .toLowerCase();
+  return /sound|acoustic|jbl|audio|speaker|pa system|dolby/.test(haystack);
+};
+
+const hasAirConditioning = (venue: Venue): boolean => {
+  const haystack = venue.halls.flatMap((h) => h.features).join(' ').toLowerCase();
+  return /\b(ac|hvac)\b|air condition|air-condition|climate control/.test(haystack);
+};
+
+const matchesSelectedAmenity = (venue: Venue, amenityId: string): boolean => {
+  switch (amenityId) {
+    case 'OUTDOOR_GARDEN':
+      return hasOutdoorGarden(venue);
+    case 'SOUND_SYSTEM':
+      return hasSoundSystem(venue);
+    case 'AIR_CONDITIONING':
+      return hasAirConditioning(venue);
+    case 'MANDAP_SETUP':
+      return Boolean(venue.hasMandapSetup);
+    case 'POWER_BACKUP':
+      return Boolean(venue.hasPowerBackup);
+    case 'CAR_PARKING_100':
+      return venue.parkingCapacityCars >= 100;
+    case 'VIP_LOUNGE':
+      return Boolean(venue.hasVipLounge);
+    case 'WHEELCHAIR_ACCESS':
+      return Boolean(venue.hasWheelchairAccess);
+    case 'OUTSIDE_PLANNERS':
+      return Boolean(venue.eventManagementPolicy?.allowsOutsideOrganizers);
+    case 'LIVE_MUSIC':
+      return Boolean(venue.hasLiveMusicPermit);
+    default:
+      return true;
+  }
+};
 
 export const VenueCatalog: React.FC = () => {
   const { t, language } = useLanguage();
@@ -129,7 +184,7 @@ export const VenueCatalog: React.FC = () => {
         return false;
       }
 
-      // 7. Amenity filter
+      // 7. Quick-tab & Multi-select Advanced Amenity filters
       if (selectedAmenity === 'SAVED_ONLY' && !isVenueSaved(venue.id)) return false;
       if (selectedAmenity === 'ACTIVE_OFFERS' && !(venue.offers || []).some((o) => o.isActive)) return false;
       if (selectedAmenity === 'POWER_BACKUP' && !venue.hasPowerBackup) return false;
@@ -139,9 +194,21 @@ export const VenueCatalog: React.FC = () => {
       if (selectedAmenity === 'OUTSIDE_PLANNERS' && !venue.eventManagementPolicy?.allowsOutsideOrganizers) return false;
       if (filters.allowsOutsideOrganizersOnly && !venue.eventManagementPolicy?.allowsOutsideOrganizers) return false;
 
+      if (filters.selectedAmenities && filters.selectedAmenities.length > 0) {
+        const matchesAll = filters.selectedAmenities.every((amenityId) =>
+          matchesSelectedAmenity(venue, amenityId)
+        );
+        if (!matchesAll) return false;
+      }
+
       return true;
     });
   }, [venues, filters, selectedAmenity, savedVenueIds]);
+
+  const handleResetAllFilters = () => {
+    setSelectedAmenity('ALL');
+    resetFilters();
+  };
 
   // Sort venues
   const sortedVenues = useMemo(() => {
@@ -263,72 +330,14 @@ export const VenueCatalog: React.FC = () => {
               </div>
             </div>
 
-            {/* 1-Touch Quick-Filter Preset Pills (Maximum Information at Minimum Touchable) */}
-            <div className="mb-6 flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-              <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-amber-600" />
-                <span>Quick Presets:</span>
-              </span>
-
-              <button
-                onClick={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    minPerPlateBudget: 800,
-                    maxPerPlateBudget: 1500,
-                  }))
-                }
-                className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-stone-200 text-stone-700 hover:border-amber-500 hover:text-amber-900 shrink-0 transition-colors shadow-2xs"
-              >
-                💸 Under NPR 1,500/plate
-              </button>
-
-              <button
-                onClick={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    guestCount: 500,
-                    minCapacity: 500,
-                  }))
-                }
-                className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-stone-200 text-stone-700 hover:border-amber-500 hover:text-amber-900 shrink-0 transition-colors shadow-2xs"
-              >
-                👥 500+ Pax Grand Capacity
-              </button>
-
-              <button
-                onClick={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    locality: 'Sanepa',
-                  }))
-                }
-                className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-stone-200 text-stone-700 hover:border-amber-500 hover:text-amber-900 shrink-0 transition-colors shadow-2xs"
-              >
-                📍 Sanepa & Naxal
-              </button>
-
-              <button
-                onClick={() => setSelectedAmenity('PARKING_100')}
-                className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-stone-200 text-stone-700 hover:border-amber-500 hover:text-amber-900 shrink-0 transition-colors shadow-2xs"
-              >
-                🚗 100+ Cars Parking
-              </button>
-
-              <button
-                onClick={() => setSelectedAmenity('POWER_BACKUP')}
-                className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-stone-200 text-stone-700 hover:border-amber-500 hover:text-amber-900 shrink-0 transition-colors shadow-2xs"
-              >
-                ⚡ 100% Genset Backup
-              </button>
-
-              <button
-                onClick={resetFilters}
-                className="px-2.5 py-1.5 rounded-full text-xs font-medium text-stone-500 hover:text-stone-800 shrink-0 transition-colors underline"
-              >
-                Clear all
-              </button>
-            </div>
+            {/* Advanced Multi-Criteria Filter Panel (Capacity, Price Range & Specific Amenities) */}
+            <VenueAdvancedFilterBar
+              filters={filters}
+              setFilters={setFilters}
+              onResetAll={handleResetAllFilters}
+              matchingCount={sortedVenues.length}
+              totalCount={venues.length}
+            />
 
             {/* Section Header & View Controls */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-stone-200">
@@ -439,35 +448,6 @@ export const VenueCatalog: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {/* Empty State */}
-        {sortedVenues.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-2xl border border-stone-200/80 my-8">
-            <Info className="w-10 h-10 text-stone-400 mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-stone-800">
-              {language === 'ne' ? 'कुनै स्थल भेटिएन' : 'No Venues Found For This Search'}
-            </h3>
-            <p className="text-xs text-stone-500 max-w-md mx-auto mt-1 mb-5">
-              {language === 'ne'
-                ? 'कृपया जिल्ला वा अतिथि संख्याको दायरा फराकिलो बनाएर फेरि प्रयास गर्नुहोस्।'
-                : 'Try expanding your district selection or adjusting guest count filters.'}
-            </p>
-            <button
-              onClick={() =>
-                setFilters((prev) => ({
-                  ...prev,
-                  province: '',
-                  district: '',
-                  guestCount: 300,
-                  eventType: 'ALL',
-                }))
-              }
-              className="px-4 py-2 text-xs font-semibold text-white bg-amber-900 rounded-lg hover:bg-amber-950 transition-colors"
-            >
-              {language === 'ne' ? 'सबै फिल्टर हटाउनुहोस्' : 'Reset All Filters'}
-            </button>
-          </div>
-        )}
 
         {/* Venues Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
@@ -622,7 +602,19 @@ export const VenueCatalog: React.FC = () => {
                     </div>
 
                     {/* Amenities Checklist */}
-                    <div className="flex items-center gap-3 mt-3 text-[11px] text-stone-500">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-3 text-[11px] text-stone-500">
+                      {hasOutdoorGarden(venue) && (
+                        <span className="flex items-center gap-1" title="Outdoor Garden / Open Lawn">
+                          <Trees className="w-3.5 h-3.5 text-emerald-700" />
+                          <span>Garden</span>
+                        </span>
+                      )}
+                      {hasSoundSystem(venue) && (
+                        <span className="flex items-center gap-1" title="Built-in Sound System / Acoustic Audio">
+                          <Volume2 className="w-3.5 h-3.5 text-amber-700" />
+                          <span>Sound</span>
+                        </span>
+                      )}
                       {venue.hasPowerBackup && (
                         <span className="flex items-center gap-1" title="100% Generator Backup">
                           <Zap className="w-3.5 h-3.5 text-amber-600" />
@@ -701,7 +693,7 @@ export const VenueCatalog: React.FC = () => {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
               <button
-                onClick={resetFilters}
+                onClick={handleResetAllFilters}
                 className="px-4 py-2 text-xs font-semibold text-stone-800 bg-stone-100 hover:bg-stone-200 rounded-xl transition-colors"
               >
                 {language === 'ne' ? 'सबै फिल्टर रिसेट गर्नुहोस्' : 'Reset All Filters'}

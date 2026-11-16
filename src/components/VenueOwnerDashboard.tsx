@@ -107,7 +107,7 @@ export const VenueOwnerDashboard: React.FC = () => {
         discountType: 'PERCENTAGE',
         discountValue: 15,
         promoCode: 'UTSAVO15',
-        validUntilBS: '2081 Mangsir 30',
+        validUntilBS: '2083 Mangsir 29',
         minGuests: 300,
         description: 'Get a flat 15% discount on total catering billing for weddings booked on auspicious Panchanga dates in Mangsir.',
         terms: ['Minimum guarantee of 300 guests required', 'Valid on Silver and Gold catering buffet packages'],
@@ -122,7 +122,7 @@ export const VenueOwnerDashboard: React.FC = () => {
         discountType: 'COMPLIMENTARY_ADDON',
         discountValue: 35000,
         promoCode: 'FREEMANDAP',
-        validUntilBS: '2081 Poush 15',
+        validUntilBS: '2083 Poush 30',
         minGuests: 250,
         description: 'Free complete traditional Vedic Havan Mandap with marigold floral work and ambient spotlights.',
         terms: ['Applicable on Sagarmatha Lawn & Kailash Ballroom joint bookings'],
@@ -140,7 +140,7 @@ export const VenueOwnerDashboard: React.FC = () => {
   const [newOfferType, setNewOfferType] = useState<'PERCENTAGE' | 'FLAT_AMOUNT' | 'COMPLIMENTARY_ADDON'>('PERCENTAGE');
   const [newOfferValue, setNewOfferValue] = useState(15);
   const [newOfferPromo, setNewOfferPromo] = useState('SPECIAL15');
-  const [newOfferValidBS, setNewOfferValidBS] = useState('2081 Poush 30');
+  const [newOfferValidBS, setNewOfferValidBS] = useState('2083 Poush 30');
   const [newOfferMinGuests, setNewOfferMinGuests] = useState(250);
   const [newOfferDesc, setNewOfferDesc] = useState('');
 
@@ -148,7 +148,7 @@ export const VenueOwnerDashboard: React.FC = () => {
   const [kycData, setKycData] = useState<KycDocuments>(
     myVenue.kycDocuments || {
       status: myVenue.verificationStatus || 'VERIFIED',
-      lastUpdated: '2024-10-15',
+      lastUpdated: '2026-10-15',
       complianceNotes: 'Inspected and certified compliant with Department of Food Technology and Quality Control (DFTQC) standards.',
       verificationPhotos: [
         {
@@ -156,21 +156,21 @@ export const VenueOwnerDashboard: React.FC = () => {
           category: 'EXTERIOR_ENTRANCE',
           title: 'Main Security Gate & Reception Entrance',
           url: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=800&q=80',
-          uploadedAt: '2024-10-15',
+          uploadedAt: '2026-10-15',
         },
         {
           id: 'kyc-regal-2',
           category: 'KITCHEN_HYGIENE',
           title: 'Commercial Stainless Steel Kitchen & Water Filtration Plant',
           url: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=800&q=80',
-          uploadedAt: '2024-10-15',
+          uploadedAt: '2026-10-15',
         },
         {
           id: 'kyc-regal-3',
           category: 'POWER_BACKUP_GENSET',
           title: '125 kVA Silent Cummins Generator System',
           url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80',
-          uploadedAt: '2024-10-15',
+          uploadedAt: '2026-10-15',
         },
       ],
     }
@@ -194,7 +194,7 @@ export const VenueOwnerDashboard: React.FC = () => {
   const [walkInName, setWalkInName] = useState('');
   const [walkInPhone, setWalkInPhone] = useState('');
   const [walkInGuests, setWalkInGuests] = useState(300);
-  const [walkInDateBS, setWalkInDateBS] = useState('2081 Mangsir 20');
+  const [walkInDateBS, setWalkInDateBS] = useState('2083 Mangsir 19');
   const [walkInShift, setWalkInShift] = useState<ShiftTime>('DAY');
   const [walkInRate, setWalkInRate] = useState(myVenue.cateringStartingNpr || 1650);
   const [walkInDeposit, setWalkInDeposit] = useState(150000);
@@ -509,7 +509,7 @@ export const VenueOwnerDashboard: React.FC = () => {
       discountType: newOfferType,
       discountValue: newOfferValue,
       promoCode: (newOfferPromo.trim() || 'DEAL').toUpperCase(),
-      validUntilBS: newOfferValidBS.trim() || '2081 Chaitra 30',
+      validUntilBS: newOfferValidBS.trim() || '2083 Chaitra 30',
       minGuests: newOfferMinGuests,
       description: newOfferDesc.trim() || 'Special promotional celebration package.',
       terms: [`Valid on bookings of ${newOfferMinGuests}+ guests`, 'Subject to hall availability'],
@@ -859,23 +859,27 @@ export const VenueOwnerDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[
               {
-                dateBS: '2081 Mangsir 14',
-                tithi: 'Trayodashi (Bibaha Muhurat)',
+                dateBS: '2083 Mangsir 09',
+                dateAD: '2026-11-25',
+                tithi: 'Purnima / Pratipada (Vivah Muhurat)',
                 shifts: { MORNING: 'AVAILABLE', DAY: 'CONFIRMED', EVENING: 'CONFIRMED' },
               },
               {
-                dateBS: '2081 Mangsir 18',
-                tithi: 'Dwitiya (Subha Muhurat)',
+                dateBS: '2083 Mangsir 19',
+                dateAD: '2026-12-05',
+                tithi: 'Ekadashi (Saturday Subha Muhurat)',
                 shifts: { MORNING: 'AVAILABLE', DAY: 'AVAILABLE', EVENING: 'HOLD' },
               },
               {
-                dateBS: '2081 Mangsir 20',
-                tithi: 'Panchami (Universal Muhurat)',
+                dateBS: '2083 Mangsir 25',
+                dateAD: '2026-12-11',
+                tithi: 'Dwitiya (Pritibhoj / Reception)',
                 shifts: { MORNING: 'CONFIRMED', DAY: 'CONFIRMED', EVENING: 'AVAILABLE' },
               },
               {
-                dateBS: '2081 Mangsir 24',
-                tithi: 'Dashami (Bratabandha / Bibaha)',
+                dateBS: '2083 Mangsir 26',
+                dateAD: '2026-12-12',
+                tithi: 'Tritiya (Saturday Bibaha Muhurat)',
                 shifts: { MORNING: 'AVAILABLE', DAY: 'AVAILABLE', EVENING: 'AVAILABLE' },
               },
             ].map((slot, idx) => (
@@ -903,7 +907,7 @@ export const VenueOwnerDashboard: React.FC = () => {
                                 title: `Newly Released ${shiftKey} Shift on ${slot.dateBS} at ${myVenue.name}`,
                                 message: `${myVenue.name} opened ${hallObj?.name || 'Main Hall'} for ${slot.dateBS} (${slot.tithi}, ${shiftKey} Shift). Reserve directly while slot stays unbooked.`,
                                 dateBS: slot.dateBS,
-                                dateAD: '2024-12-03',
+                                dateAD: slot.dateAD,
                                 shift: shiftKey as ShiftTime,
                                 hallName: hallObj?.name,
                                 tithi: slot.tithi,
@@ -1773,7 +1777,7 @@ export const VenueOwnerDashboard: React.FC = () => {
                     type="text"
                     value={newOfferValidBS}
                     onChange={(e) => setNewOfferValidBS(e.target.value)}
-                    placeholder="e.g. 2081 Poush 30"
+                    placeholder="e.g. 2083 Poush 30"
                     className="w-full bg-white border border-stone-300 rounded-lg p-2"
                   />
                 </div>

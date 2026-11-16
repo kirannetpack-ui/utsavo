@@ -28,7 +28,7 @@ export const SEED_EVENT_ORGANIZERS: EventOrganizer[] = [
     specializations: ['WEDDING_PLANNING', 'STAGE_LIGHTING_AV', 'DECOR_AND_FLORAL', 'DESTINATION_MANAGEMENT'],
     successStandards: {
       hasPublicLiabilityInsurance: true,
-      insurancePolicyNumber: 'SHR-PLI-2081/0984 (NLG Insurance, NPR 50 Lakh Coverage)',
+      insurancePolicyNumber: 'SHR-PLI-2083/0984 (NLG Insurance, NPR 50 Lakh Coverage)',
       hasEmergencyMedicalPlan: true,
       hasFireSafetyCertification: true,
       hasRunOfShowTimelineSystem: true,

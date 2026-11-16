@@ -299,7 +299,7 @@ export const AdminDashboard: React.FC = () => {
                     <div>
                       <strong className="text-stone-900 block font-semibold">{thread.venueName}</strong>
                       <span className="text-stone-500">
-                        Host: {thread.customerName} · {thread.eventType} · {latestOffer?.dateBS || '2081 BS'}
+                        Host: {thread.customerName} · {thread.eventType} · {latestOffer?.dateBS || '2083 BS'}
                       </span>
                     </div>
                     <div className="text-right">
@@ -909,11 +909,11 @@ export const AdminDashboard: React.FC = () => {
                 [{offer.createdAt}] PARTNER_REFERRAL_HANDOFF ({offer.clientDecision}): {offer.cancellingVendorName} → Booking #{offer.bookingRef} · {offer.recommendedPartners.length} recommended peer(s) · Liability Waiver: {offer.includeLiabilityRelease ? 'CONFIRMED' : 'PENDING'}
               </div>
             ))}
-            <div>[2024-11-08 07:15:00] GOVT_COMPLIANCE_ENFORCED: Labour Act 2074 minimum wage rule NPR 668/day shift applied platform-wide.</div>
-            <div>[2024-11-04 00:20:12] AUDIT_PAYMENT_CONFIRMED: Txn ESW-2081-98214902 validated server-side. Deposit NPR 303,969 credited.</div>
-            <div>[2024-11-04 00:15:40] AUDIT_CONTRACT_SIGNED: Booking UTS-2081-4921 signed with SHA256 cryptographic hash.</div>
-            <div>[2024-11-03 16:40:00] AUDIT_OFFER_ACCEPTED: Negotiation neg-102 mutually finalized between party palace and client.</div>
-            <div>[2024-11-02 14:30:00] AUDIT_KYC_VERIFIED: The Regal Pavilion PAN 602918471 verified against Inland Revenue Department records.</div>
+            <div>[2026-11-14 07:15:00] GOVT_COMPLIANCE_ENFORCED: Labour Act 2074 minimum wage rule NPR 668/day shift applied platform-wide.</div>
+            <div>[2026-11-12 00:20:12] AUDIT_PAYMENT_CONFIRMED: Txn ESW-2083-98214902 validated server-side. Deposit NPR 303,969 credited.</div>
+            <div>[2026-11-12 00:15:40] AUDIT_CONTRACT_SIGNED: Booking UTS-2083-4921 signed with SHA256 cryptographic hash.</div>
+            <div>[2026-11-11 16:40:00] AUDIT_OFFER_ACCEPTED: Negotiation neg-102 mutually finalized between party palace and client.</div>
+            <div>[2026-11-10 14:30:00] AUDIT_KYC_VERIFIED: The Regal Pavilion PAN 602918471 verified against Inland Revenue Department records.</div>
           </div>
         </div>
       )}

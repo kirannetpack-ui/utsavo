@@ -387,9 +387,9 @@ export const SEED_VENDOR_REFERRAL_OFFERS: VendorReferralOffer[] = [
   {
     id: 'ref-offer-seed-1',
     bookingId: 'book-uts-1003',
-    bookingRef: 'UTS-2081-3918',
-    eventDateBS: '2081 Falgun 14',
-    eventDateAD: '2025-02-26',
+    bookingRef: 'UTS-2083-3918',
+    eventDateBS: '2083 Falgun 18',
+    eventDateAD: '2027-03-02',
     clientName: 'Sunita Prajapati',
     cancellingVendorId: 'venue-bhaktapur-durbar-banquet',
     cancellingVendorName: 'Bhaktapur Durbar Banquet & Juju Dhau Pavilion',

@@ -45,12 +45,12 @@ interface RealtimeAvailabilityCalendarProps {
 }
 
 const MONTH_TABS = [
-  { id: 'Mangsir', label: 'Mangsir (मंसिर)', season: 'Peak Wedding Season 2081' },
-  { id: 'Poush', label: 'Poush (पुष)', season: 'Winter Ceremonies 2081' },
-  { id: 'Magh', label: 'Magh (माघ)', season: 'Basanta Panchami 2081' },
-  { id: 'Falgun', label: 'Falgun (फागुन)', season: 'Spring Vivaha Lagan 2081' },
-  { id: 'Chaitra', label: 'Chaitra (चैत)', season: 'Chaitra Navaratri 2081' },
-  { id: 'Baishakh', label: 'Baishakh (वैशाख)', season: 'Akshaya Tritiya 2082' },
+  { id: 'Mangsir', label: 'Mangsir (मंसिर)', season: 'Peak Wedding Season 2083' },
+  { id: 'Poush', label: 'Poush (पुष)', season: 'Winter Ceremonies 2083' },
+  { id: 'Magh', label: 'Magh (माघ)', season: 'Basanta Panchami 2083' },
+  { id: 'Falgun', label: 'Falgun (फागुन)', season: 'Spring Vivaha Lagan 2083' },
+  { id: 'Chaitra', label: 'Chaitra (चैत)', season: 'Chaitra Navaratri 2083' },
+  { id: 'Baishakh', label: 'Baishakh (वैशाख)', season: 'Akshaya Tritiya 2084' },
 ];
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -157,7 +157,7 @@ Kindly confirm reservation terms and pricing. Thank you!`
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-stone-50 rounded-2xl border border-stone-200">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500 block">
-            Select Hindu Panchanga Month (२०८१ / २०८२)
+            Select Hindu Panchanga Month (२०८३ / २०८४)
           </span>
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
             {MONTH_TABS.map((m) => (
@@ -236,7 +236,7 @@ Kindly confirm reservation terms and pricing. Thank you!`
             <div className="flex items-center gap-2">
               <CalendarIcon className="w-4 h-4 text-amber-800" />
               <h4 className="font-display font-bold text-stone-900 text-sm">
-                {selectedMonth} 2081 Schedule & Auspicious Dates
+                {selectedMonth} {selectedMonth === 'Baishakh' ? '2084' : '2083'} Schedule & Auspicious Dates
               </h4>
             </div>
             <span className="text-[11px] font-semibold text-stone-500">
@@ -318,7 +318,7 @@ Kindly confirm reservation terms and pricing. Thank you!`
 
           <div className="pt-2 text-[11px] text-stone-400 flex items-center justify-between">
             <span>✨ Golden badges indicate official Nepal Panchanga Samiti dates</span>
-            <span className="text-stone-500 font-medium">Bikram Sambat 2081 / 2082</span>
+            <span className="text-stone-500 font-medium">Bikram Sambat 2083 / 2084</span>
           </div>
         </div>
 

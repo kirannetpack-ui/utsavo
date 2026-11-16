@@ -87,8 +87,8 @@ export const OutsideNepalDestinationWorkspace: React.FC<
     OutsideNepalDestinationRequest['celebrationType']
   >('DESTINATION_WEDDING');
   const [celebrationDaysCount, setCelebrationDaysCount] = useState(3);
-  const [preferredDateWindowAD, setPreferredDateWindowAD] = useState('2025-11-18 to 2025-11-21');
-  const [auspiciousMuhuratReferenceBS, setAuspiciousMuhuratReferenceBS] = useState('2082 Mangsir');
+  const [preferredDateWindowAD, setPreferredDateWindowAD] = useState('2027-11-26 to 2027-11-28');
+  const [auspiciousMuhuratReferenceBS, setAuspiciousMuhuratReferenceBS] = useState('2084 Mangsir');
   const [estimatedGuests, setEstimatedGuests] = useState(140);
   const [eldersAndKidsAccessibilityNotes, setEldersAndKidsAccessibilityNotes] = useState(
     'Grandparents require step-free suites, golf-cart transfers, and mild spice options.'
@@ -684,7 +684,7 @@ export const OutsideNepalDestinationWorkspace: React.FC<
                     required
                     value={preferredDateWindowAD}
                     onChange={(e) => setPreferredDateWindowAD(e.target.value)}
-                    placeholder="e.g. 2025-11-18 to 2025-11-21"
+                    placeholder="e.g. 2027-11-26 to 2027-11-28"
                     className="w-full px-3 py-2.5 border border-stone-300 rounded-xl tabular-nums"
                   />
                 </div>
@@ -696,7 +696,7 @@ export const OutsideNepalDestinationWorkspace: React.FC<
                     type="text"
                     value={auspiciousMuhuratReferenceBS}
                     onChange={(e) => setAuspiciousMuhuratReferenceBS(e.target.value)}
-                    placeholder="e.g. 2082 Mangsir"
+                    placeholder="e.g. 2084 Mangsir"
                     className="w-full px-3 py-2.5 border border-stone-300 rounded-xl tabular-nums"
                   />
                 </div>

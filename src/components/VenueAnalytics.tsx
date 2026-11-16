@@ -124,7 +124,7 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
   const isNepali = language === 'ne';
 
   // Timeframe filter state
-  const [timeRange, setTimeRange] = useState<'FY_2081_82' | 'PEAK_SEASON' | 'LAST_6_MONTHS' | 'ALL_TIME'>('FY_2081_82');
+  const [timeRange, setTimeRange] = useState<'FY_2083_84' | 'PEAK_SEASON' | 'LAST_6_MONTHS' | 'ALL_TIME'>('FY_2083_84');
   const [trendMetric, setTrendMetric] = useState<'combined' | 'revenue' | 'bookings' | 'inquiries'>('combined');
   const [selectedHall, setSelectedHall] = useState<string>('ALL');
   const [reportExported, setReportExported] = useState(false);
@@ -163,7 +163,7 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `UTSAVO_Analytics_${venue.name.replace(/\s+/g, '_')}_2081.csv`);
+    link.setAttribute('download', `UTSAVO_Analytics_${venue.name.replace(/\s+/g, '_')}_2083.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -183,7 +183,7 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
               {isNepali ? 'व्यापारिक विश्लेषण र भविष्यवाणी' : 'Venue Intelligence & Predictive Analytics'}
             </span>
             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
-              BS 2081/82
+              BS 2083/84
             </span>
           </div>
           <h3 className="font-display text-xl font-bold text-stone-900 mt-1">
@@ -201,12 +201,12 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
           {/* Timeframe Selector */}
           <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-xl border border-stone-200">
             <button
-              onClick={() => setTimeRange('FY_2081_82')}
+              onClick={() => setTimeRange('FY_2083_84')}
               className={`px-2.5 py-1.5 rounded-lg font-semibold transition-all ${
-                timeRange === 'FY_2081_82' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-600 hover:text-stone-900'
+                timeRange === 'FY_2083_84' ? 'bg-white text-stone-900 shadow-xs' : 'text-stone-600 hover:text-stone-900'
               }`}
             >
-              {isNepali ? 'आ.व. २०८१/८२' : 'FY 2081/82'}
+              {isNepali ? 'आ.व. २०८३/८४' : 'FY 2083/84'}
             </button>
             <button
               onClick={() => setTimeRange('PEAK_SEASON')}
@@ -272,7 +272,7 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
             </div>
             <div className="text-[11px] text-stone-500 flex items-center justify-between pt-1">
               <span>NPR {(totalAnnualRevenueLakhs * 100000).toLocaleString()} total</span>
-              <span className="text-emerald-700 font-semibold">vs 2080: +NPR 38L</span>
+              <span className="text-emerald-700 font-semibold">vs 2082: +NPR 38L</span>
             </div>
           </div>
         </div>

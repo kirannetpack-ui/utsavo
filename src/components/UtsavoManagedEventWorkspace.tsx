@@ -147,8 +147,8 @@ export const UtsavoManagedEventWorkspace: React.FC<
   const [cityOrLocality, setCityOrLocality] = useState('Baluwatar / Sanepa');
   const [country, setCountry] = useState('Nepal');
 
-  const [eventDateBS, setEventDateBS] = useState('2081 Magh 22');
-  const [eventDateAD, setEventDateAD] = useState('2025-02-04');
+  const [eventDateBS, setEventDateBS] = useState('2083 Magh 28');
+  const [eventDateAD, setEventDateAD] = useState('2027-02-11');
   const [isDateFlexible, setIsDateFlexible] = useState(false);
   const [muhuratPreference, setMuhuratPreference] = useState(
     'Abhijit / Sarva Siddhi Shubha Muhurat'
@@ -227,8 +227,8 @@ export const UtsavoManagedEventWorkspace: React.FC<
       eventType: 'WEDDING',
       eventScope: 'INSIDE_NEPAL',
       locationLabel: 'Baluwatar / Sanepa, Kathmandu, Bagmati Province',
-      eventDateBS: '2081 Magh 22',
-      eventDateAD: '2025-02-04',
+      eventDateBS: '2083 Magh 28',
+      eventDateAD: '2027-02-11',
       shift: 'FULL_DAY',
       startTime: '09:30 AM',
       endTime: '10:00 PM',
@@ -880,7 +880,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                           type="text"
                           value={eventDateBS}
                           onChange={(e) => setEventDateBS(e.target.value)}
-                          placeholder="e.g. 2081 Magh 22"
+                          placeholder="e.g. 2083 Magh 28"
                           className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl"
                         />
                       </div>

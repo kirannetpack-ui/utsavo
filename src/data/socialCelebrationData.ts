@@ -22,8 +22,8 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     overallRating: 5.0,
     cateringRating: 4.9,
     hospitalityRating: 5.0,
-    eventDateBS: '2081 Mangsir 18',
-    eventDateAD: '2024-12-03',
+    eventDateBS: '2083 Kartik 18',
+    eventDateAD: '2026-11-03',
     guestCount: 650,
     photos: [
       {
@@ -52,7 +52,7 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     likesCount: 142,
     cateringHighlights: ['Live Jalebi Counter', 'Mutton Kachi Biryani', 'Traditional Samay Baji', 'Kesar Kulfi'],
     tags: ['#KathmanduWedding', '#GrandKailash', '#BaraatVibes', '#NewariWedding', '#VerifiedBooking'],
-    createdAt: '2024-12-05T10:15:00Z',
+    createdAt: '2026-11-05T10:15:00Z',
   },
   {
     id: 'post-lalitpur-bratabandha-aarav',
@@ -69,8 +69,8 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     overallRating: 4.9,
     cateringRating: 5.0,
     hospitalityRating: 4.8,
-    eventDateBS: '2081 Magh 08',
-    eventDateAD: '2025-01-22',
+    eventDateBS: '2083 Baishakh 18',
+    eventDateAD: '2026-05-01',
     guestCount: 380,
     photos: [
       {
@@ -94,7 +94,7 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     likesCount: 98,
     cateringHighlights: ['Paneer Lababdar', 'Dal Makhani', 'Hot Jalebi with Rabdi', 'Fresh Sugarcane Juice'],
     tags: ['#Bratabandha', '#SanepaGarden', '#VedicRituals', '#LalitpurRoyal', '#SatvikBhoj'],
-    createdAt: '2025-01-24T14:30:00Z',
+    createdAt: '2026-05-03T14:30:00Z',
   },
   {
     id: 'post-pokhara-destination-aarati-bikash',
@@ -111,8 +111,8 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     overallRating: 5.0,
     cateringRating: 4.8,
     hospitalityRating: 5.0,
-    eventDateBS: '2081 Falgun 12',
-    eventDateAD: '2025-02-24',
+    eventDateBS: '2082 Falgun 12',
+    eventDateAD: '2026-02-24',
     guestCount: 320,
     photos: [
       {
@@ -136,7 +136,7 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     likesCount: 215,
     cateringHighlights: ['Thakali Jimbu Mutton', 'Fresh Himalayan Trout Fry', 'Live BBQ Counter', 'Pokhara Sel Roti'],
     tags: ['#DestinationNepal', '#PokharaWedding', '#LakesideVibes', '#AnnapurnaView', '#UTSAVODestination'],
-    createdAt: '2025-02-26T16:00:00Z',
+    createdAt: '2026-02-26T16:00:00Z',
   },
   {
     id: 'post-bhaktapur-pasni-nirvan',
@@ -153,8 +153,8 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     overallRating: 4.8,
     cateringRating: 5.0,
     hospitalityRating: 4.9,
-    eventDateBS: '2081 Poush 14',
-    eventDateAD: '2024-12-29',
+    eventDateBS: '2083 Ashwin 22',
+    eventDateAD: '2026-10-08',
     guestCount: 260,
     photos: [
       {
@@ -178,7 +178,7 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     likesCount: 84,
     cateringHighlights: ['Newari Samay Baji', 'Kheer (Rice Pudding) in Clay Pots', 'Mutton Sekuwa', 'Juju Dhau'],
     tags: ['#BhaktapurPasni', '#NewariHeritage', '#BabyNirvan', '#JujuDhau', '#FamilyCelebration'],
-    createdAt: '2024-12-31T09:00:00Z',
+    createdAt: '2026-10-10T09:00:00Z',
   },
   {
     id: 'post-chitwan-corporate-gala',
@@ -195,8 +195,8 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     overallRating: 4.9,
     cateringRating: 4.8,
     hospitalityRating: 5.0,
-    eventDateBS: '2081 Magh 24',
-    eventDateAD: '2025-02-07',
+    eventDateBS: '2083 Jestha 14',
+    eventDateAD: '2026-05-28',
     guestCount: 820,
     photos: [
       {
@@ -220,7 +220,7 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     likesCount: 167,
     cateringHighlights: ['Smoked Chitwan Duck', 'Continental Herb Roasted Chicken', 'Live Pasta Station', 'Gulab Jamun Flambé'],
     tags: ['#CorporateNepal', '#FintechSummit', '#ChitwanEvents', '#VATCompliant', '#GrandBanquet'],
-    createdAt: '2025-02-09T11:45:00Z',
+    createdAt: '2026-05-30T11:45:00Z',
   },
   {
     id: 'post-lalitpur-reception-alina-saujan',
@@ -237,8 +237,8 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     overallRating: 5.0,
     cateringRating: 4.9,
     hospitalityRating: 5.0,
-    eventDateBS: '2081 Mangsir 22',
-    eventDateAD: '2024-12-07',
+    eventDateBS: '2083 Kartik 22',
+    eventDateAD: '2026-11-07',
     guestCount: 720,
     photos: [
       {
@@ -262,6 +262,6 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     likesCount: 189,
     cateringHighlights: ['Live Tandoor Naan & Kebabs', 'Mutton Rogan Josh', 'Kaju Katli Platter', 'Mocktail Bar'],
     tags: ['#SanepaReception', '#LalitpurWeddings', '#GrandReception', '#ValetParking', '#UTSAVOCouple'],
-    createdAt: '2024-12-09T08:30:00Z',
+    createdAt: '2026-11-09T08:30:00Z',
   },
 ];

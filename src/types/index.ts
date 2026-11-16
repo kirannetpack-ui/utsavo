@@ -47,8 +47,8 @@ export interface ShiftInfo {
 
 export interface PanchangaMuhurat {
   id: string;
-  dateBS: string;         // e.g. "2081 Mangsir 14"
-  dateAD: string;         // e.g. "2024-11-29"
+  dateBS: string;         // e.g. "2083 Mangsir 19"
+  dateAD: string;         // e.g. "2026-12-05"
   tithi: string;          // e.g. "Trayodashi / त्रयोदशी"
   nakshatra: string;      // e.g. "Rohini / रोहिणी"
   eventType: EventType;
@@ -165,9 +165,9 @@ export interface VenueOffer {
   badgeText: string;             // e.g. "⚡ 15% OFF", "Save Rs. 50,000", "🎁 Free Mandap Rig"
   discountType: 'PERCENTAGE' | 'FLAT_AMOUNT' | 'COMPLIMENTARY_ADDON';
   discountValue: number;         // e.g. 15 (percent) or 50000 (NPR)
-  promoCode: string;             // e.g. "UTSAVO15", "VIVAHA2081"
-  validUntilBS: string;          // e.g. "2081 Falgun 30"
-  validUntilAD?: string;         // e.g. "2025-03-14"
+  promoCode: string;             // e.g. "UTSAVO15", "VIVAHA2083"
+  validUntilBS: string;          // e.g. "2083 Falgun 30"
+  validUntilAD?: string;         // e.g. "2027-03-14"
   minGuests?: number;            // e.g. 250
   minTotalNpr?: number;          // e.g. 300000
   description: string;
@@ -432,7 +432,7 @@ export type BookingStatus =
 
 export interface Booking {
   id: string;
-  bookingRef: string; // e.g. "UTS-2081-9842"
+  bookingRef: string; // e.g. "UTS-2083-9842"
   venueId: string;
   venueName: string;
   hallId: string;
@@ -739,7 +739,7 @@ export interface KitchenPrepSheet {
 // LEGAL CONTRACT & QUOTATION TYPES (Nepal Contract Act 2056)
 // -------------------------------------------------------------
 export interface LegalContractDocument {
-  contractRef: string; // e.g. "UTS-KRA-2081-0419"
+  contractRef: string; // e.g. "UTS-KRA-2083-0419"
   dateIssuedBS: string;
   dateIssuedAD: string;
   partyAVenue: {
@@ -943,8 +943,8 @@ export interface SocialCelebrationPost {
   overallRating: number;           // 1 to 5 (e.g. 5.0)
   cateringRating?: number;         // 1 to 5
   hospitalityRating?: number;      // 1 to 5
-  eventDateBS: string;             // e.g. "2081 Mangsir 18"
-  eventDateAD: string;             // e.g. "2024-12-03"
+  eventDateBS: string;             // e.g. "2083 Mangsir 19"
+  eventDateAD: string;             // e.g. "2026-12-05"
   guestCount: number;              // e.g. 550
   photos: SocialCelebrationPhoto[];
   coverPhoto: string;
@@ -976,8 +976,8 @@ export interface AuspiciousPushAlert {
   titleNepali: string;
   message: string;
   messageNepali: string;
-  dateBS: string;                  // e.g. "2081 Mangsir 18"
-  dateAD: string;                  // e.g. "2024-12-03"
+  dateBS: string;                  // e.g. "2083 Mangsir 19"
+  dateAD: string;                  // e.g. "2026-12-05"
   tithi: string;                   // e.g. "Dwitiya (द्वितीया)"
   nakshatra: string;               // e.g. "Mool (मूल)"
   eventType: EventType;

@@ -33,7 +33,7 @@ interface PublicInvitationCardViewProps {
 }
 
 const defaultFallbackInvitation: DigitalInvitation = {
-  id: 'inv-utsavo-2081-01',
+  id: 'inv-utsavo-2083-01',
   invitationCode: 'UTS-INV-8921',
   hostUserId: 'user-sample',
   hostName: 'Kiran Thapa & Family',
@@ -42,8 +42,8 @@ const defaultFallbackInvitation: DigitalInvitation = {
   celebrantsTitle: 'Sneha & Aayush',
   venueName: 'Heritage Garden Sanepa Party Palace',
   hallName: 'Sagarmatha Grand Ballroom & Lawn',
-  dateBS: '2081 Mangsir 14, Friday',
-  dateAD: '2024-11-29',
+  dateBS: '2083 Mangsir 19, Saturday',
+  dateAD: '2026-12-05',
   muhuratTime: '09:15 AM - 01:45 PM (Sarva Siddhi Muhurat)',
   locationAddress: 'Sanepa-2, Lalitpur, Kathmandu Valley',
   mapDirectionsUrl: 'https://maps.google.com/?q=Sanepa+Lalitpur',
@@ -63,10 +63,10 @@ const defaultFallbackInvitation: DigitalInvitation = {
     { time: '01:00 PM', title: 'Royal Vivaha Bhoj (Banquet)', description: 'Grand celebratory feast with traditional Nepali culinary spread' },
     { time: '03:30 PM', title: 'Doli & Bidai', description: 'Auspicious send-off ceremony' }
   ],
-  rsvpDeadlineBS: '2081 Mangsir 07',
+  rsvpDeadlineBS: '2083 Mangsir 12',
   enableKitchenRsvpSync: true,
   isPublished: true,
-  createdAt: '2024-10-15'
+  createdAt: '2026-10-15'
 };
 
 export const PublicInvitationCardView: React.FC<PublicInvitationCardViewProps> = ({

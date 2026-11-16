@@ -63,8 +63,8 @@ export const StarHotelRequestModal: React.FC = () => {
   const [country, setCountry] = useState('Nepal');
 
   const [eventType, setEventType] = useState<EventType>('WEDDING');
-  const [eventDateBS, setEventDateBS] = useState('2081 Falgun 14');
-  const [eventDateAD, setEventDateAD] = useState('2025-02-26');
+  const [eventDateBS, setEventDateBS] = useState('2083 Falgun 15');
+  const [eventDateAD, setEventDateAD] = useState('2027-02-27');
   const [shift, setShift] = useState<ShiftTime>('EVENING');
   const [estimatedGuests, setEstimatedGuests] = useState(300);
 
@@ -399,7 +399,7 @@ export const StarHotelRequestModal: React.FC = () => {
                     required
                     value={eventDateBS}
                     onChange={(e) => setEventDateBS(e.target.value)}
-                    placeholder="e.g. 2081 Falgun 14"
+                    placeholder="e.g. 2083 Falgun 15"
                     className="w-full px-3 py-2.5 bg-white border border-stone-300 rounded-xl tabular-nums"
                   />
                 </div>

@@ -142,7 +142,7 @@ export const PanchangaCalendarModal: React.FC = () => {
             </div>
             <h3 className="font-display text-xl sm:text-2xl font-bold">
               {language === 'ne'
-                ? 'शुभ साइत र लोकप्रिय स्थल उपलब्धता (२०८१–२०८२ BS)'
+                ? 'शुभ साइत र लोकप्रिय स्थल उपलब्धता (२०८३–२०८५ BS)'
                 : 'Auspicious Muhurats & Popular Venue Availability'}
             </h3>
             <p className="text-xs text-stone-300 mt-1">

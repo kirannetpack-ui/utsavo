@@ -462,7 +462,7 @@ export const SmartPlannerModal: React.FC = () => {
                     onChange={(e) => setPreferredMonthBS(e.target.value)}
                     className="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-medium text-stone-800"
                   >
-                    <option value="ALL">All Upcoming Auspicious Months (2081–2082 BS)</option>
+                    <option value="ALL">All Upcoming Auspicious Months (2083–2085 BS · 2026–2028)</option>
                     {NEPALI_MONTHS.map((m) => (
                       <option key={m.id} value={m.name}>
                         {m.name} ({m.nepaliName}) · {m.season}

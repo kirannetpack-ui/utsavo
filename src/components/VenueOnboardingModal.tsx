@@ -275,7 +275,7 @@ export const VenueOnboardingModal: React.FC<VenueOnboardingModalProps> = ({ isOp
       gallery: formData.gallery || ['REGAL_BALLROOM', 'HERITAGE_NEWARI', 'OPEN_LAWN'],
       verificationStatus: (formData.verificationStatus as VerificationStatus) || 'VERIFIED',
       panNumber: formData.panNumber || '601928471',
-      businessRegNumber: formData.businessRegNumber || 'REG-PALACE-2080',
+      businessRegNumber: formData.businessRegNumber || 'REG-PALACE-2083',
       contactPerson: formData.contactPerson || 'General Manager',
       phone: formData.phone || '+977-9851000000',
       email: formData.email || 'info@partyplace.com.np',

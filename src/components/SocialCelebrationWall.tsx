@@ -54,7 +54,7 @@ export const SocialCelebrationWall: React.FC<SocialCelebrationWallProps> = ({ on
     reviewQuote: '',
     detailedStory: '',
     overallRating: 5,
-    eventDateBS: '2081 Mangsir 20',
+    eventDateBS: '2083 Mangsir 19',
     guestCount: 450,
     coverPhoto: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=80',
     photoUrlInput: '',
@@ -786,7 +786,7 @@ export const SocialCelebrationWall: React.FC<SocialCelebrationWallProps> = ({ on
                   </label>
                   <input
                     type="text"
-                    placeholder="2081 Mangsir 20"
+                    placeholder="2083 Mangsir 19"
                     value={formData.eventDateBS}
                     onChange={(e) => setFormData((prev) => ({ ...prev, eventDateBS: e.target.value }))}
                     className="w-full border border-neutral-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"

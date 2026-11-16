@@ -41,7 +41,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ bookingId, venueId, on
       bookingRef: booking?.bookingRef || 'UTS-VERIFIED',
       customerName: currentUser.name,
       eventType: booking?.eventType || 'WEDDING',
-      eventDateBS: booking?.eventDateBS || '2081 BS',
+      eventDateBS: booking?.eventDateBS || '2083 BS',
       overallRating,
       ratings: {
         ambience,

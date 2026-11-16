@@ -214,7 +214,7 @@ export const EventOrganizerRegistrationModal: React.FC<EventOrganizerRegistratio
       district: formData.district || 'Kathmandu',
       province: formData.province || 'Bagmati Province',
       panNumber: formData.panNumber || '601928374',
-      businessRegNumber: formData.businessRegNumber || 'REG-EVT-2081/01',
+      businessRegNumber: formData.businessRegNumber || 'REG-EVT-2083/01',
       yearsOfExperience: Number(formData.yearsOfExperience) || 5,
       teamSize: Number(formData.teamSize) || 12,
       rating: formData.rating || 4.9,
@@ -682,7 +682,7 @@ export const EventOrganizerRegistrationModal: React.FC<EventOrganizerRegistratio
                         type="text"
                         value={formData.successStandards?.insurancePolicyNumber || ''}
                         onChange={(e) => updateSuccessStandard('insurancePolicyNumber', e.target.value)}
-                        placeholder="e.g. NLG Insurance PLI-2081/0984 (NPR 50 Lakh)"
+                        placeholder="e.g. NLG Insurance PLI-2083/0984 (NPR 50 Lakh)"
                         className="w-full text-xs bg-white border border-stone-300 rounded-lg px-2.5 py-1.5 font-mono"
                       />
                     </div>

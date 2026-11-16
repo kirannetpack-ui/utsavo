@@ -174,7 +174,7 @@ export const FeaturesShowcaseModal: React.FC<FeaturesShowcaseModalProps> = ({
       category: 'Auspicious Muhurats',
       title: 'Hindu Panchanga Auspicious Calendar',
       nepali: 'पञ्चाङ्ग शुभ मुहूर्त (विवाह/व्रतबन्ध)',
-      description: 'Verified auspicious dates for 2081/2082 approved under Nepal Panchanga Nirnayak Samiti with Sarva Siddhi Muhurat guidance.',
+      description: 'Verified auspicious dates for 2083–2085 BS approved under Nepal Panchanga Nirnayak Samiti with Sarva Siddhi Muhurat guidance.',
       icon: Calendar,
       badge: 'Samiti Approved',
       actionLabel: 'View Muhurats',
@@ -327,7 +327,7 @@ export const FeaturesShowcaseModal: React.FC<FeaturesShowcaseModalProps> = ({
         <div className="p-4 bg-stone-50 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-600">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Built for Nepal: Panche Baja, Purohits, Venues, Panchanga 2081/2082 & PWA</span>
+            <span>Built for Nepal: Panche Baja, Purohits, Venues, Panchanga 2083–2085 & PWA</span>
           </div>
           <button
             onClick={onClose}

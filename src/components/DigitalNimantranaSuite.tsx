@@ -50,7 +50,7 @@ import {
 
 // Initial mock invitation
 const initialInvitation: DigitalInvitation = {
-  id: 'inv-utsavo-2081-01',
+  id: 'inv-utsavo-2083-01',
   invitationCode: 'UTS-INV-8921',
   hostUserId: 'user-sample',
   hostName: 'Kiran Thapa & Family',
@@ -59,8 +59,8 @@ const initialInvitation: DigitalInvitation = {
   celebrantsTitle: 'Sneha & Aayush',
   venueName: 'Heritage Garden Sanepa Party Palace',
   hallName: 'Sagarmatha Grand Ballroom & Lawn',
-  dateBS: '2081 Mangsir 14, Friday',
-  dateAD: '2024-11-29',
+  dateBS: '2083 Mangsir 19, Saturday',
+  dateAD: '2026-12-05',
   muhuratTime: '09:15 AM - 01:45 PM (Sarva Siddhi Muhurat)',
   locationAddress: 'Sanepa-2, Lalitpur, Kathmandu Valley',
   mapDirectionsUrl: 'https://maps.google.com/?q=Sanepa+Lalitpur',
@@ -80,17 +80,17 @@ const initialInvitation: DigitalInvitation = {
     { time: '01:00 PM', title: 'Royal Vivaha Bhoj (Banquet)', description: 'Grand celebratory feast with traditional Nepali culinary spread' },
     { time: '03:30 PM', title: 'Doli & Bidai', description: 'Auspicious send-off ceremony' }
   ],
-  rsvpDeadlineBS: '2081 Mangsir 07',
+  rsvpDeadlineBS: '2083 Mangsir 12',
   enableKitchenRsvpSync: true,
   isPublished: true,
-  createdAt: '2024-10-15'
+  createdAt: '2026-10-15'
 };
 
 // Initial mock RSVPs
 const initialRsvps: GuestRsvpResponse[] = [
   {
     id: 'rsvp-1',
-    invitationId: 'inv-utsavo-2081-01',
+    invitationId: 'inv-utsavo-2083-01',
     guestName: 'Prof. Ram Prasad Sharma',
     phone: '+977-9841223344',
     attendanceStatus: 'ATTENDING',
@@ -100,11 +100,11 @@ const initialRsvps: GuestRsvpResponse[] = [
     transportNeeded: false,
     arrivalShift: 'DAY',
     wishesMessage: 'Wishing the auspicious couple a lifetime of joy and prosperity!',
-    submittedAt: '2024-10-18 14:20'
+    submittedAt: '2026-10-18 14:20'
   },
   {
     id: 'rsvp-2',
-    invitationId: 'inv-utsavo-2081-01',
+    invitationId: 'inv-utsavo-2083-01',
     guestName: 'Sunita & Deepak Adhikari',
     phone: '+977-9851098765',
     attendanceStatus: 'ATTENDING',
@@ -114,11 +114,11 @@ const initialRsvps: GuestRsvpResponse[] = [
     transportNeeded: false,
     arrivalShift: 'DAY',
     wishesMessage: 'Heartiest congratulations from Pokhara!',
-    submittedAt: '2024-10-19 09:12'
+    submittedAt: '2026-10-19 09:12'
   },
   {
     id: 'rsvp-3',
-    invitationId: 'inv-utsavo-2081-01',
+    invitationId: 'inv-utsavo-2083-01',
     guestName: 'Bikash & Rashmi Gurung (Sydney, Australia)',
     phone: '+61-412345678',
     attendanceStatus: 'ATTENDING',
@@ -128,11 +128,11 @@ const initialRsvps: GuestRsvpResponse[] = [
     transportNeeded: true,
     arrivalShift: 'DAY',
     wishesMessage: 'Excited to fly home to Nepal for this beautiful celebration!',
-    submittedAt: '2024-10-20 16:45'
+    submittedAt: '2026-10-20 16:45'
   },
   {
     id: 'rsvp-4',
-    invitationId: 'inv-utsavo-2081-01',
+    invitationId: 'inv-utsavo-2083-01',
     guestName: 'Pavitra Jain & Family',
     phone: '+977-9841778899',
     attendanceStatus: 'ATTENDING',
@@ -142,11 +142,11 @@ const initialRsvps: GuestRsvpResponse[] = [
     transportNeeded: false,
     arrivalShift: 'DAY',
     wishesMessage: 'Shubhkamnayein to both families!',
-    submittedAt: '2024-10-21 11:30'
+    submittedAt: '2026-10-21 11:30'
   },
   {
     id: 'rsvp-5',
-    invitationId: 'inv-utsavo-2081-01',
+    invitationId: 'inv-utsavo-2083-01',
     guestName: 'Er. Mohan Shrestha',
     phone: '+977-9801234123',
     attendanceStatus: 'NOT_ATTENDING',
@@ -156,7 +156,7 @@ const initialRsvps: GuestRsvpResponse[] = [
     transportNeeded: false,
     arrivalShift: 'DAY',
     wishesMessage: 'Sending warm blessings from abroad. Regret unable to attend in person.',
-    submittedAt: '2024-10-22 08:15'
+    submittedAt: '2026-10-22 08:15'
   }
 ];
 
@@ -590,7 +590,7 @@ export const DigitalNimantranaSuite: React.FC = () => {
                   type="text"
                   value={invitation.dateBS}
                   onChange={(e) => setInvitation({ ...invitation, dateBS: e.target.value })}
-                  placeholder="e.g. 2081 Mangsir 14, Friday"
+                  placeholder="e.g. 2083 Mangsir 19, Saturday"
                   className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-medium"
                 />
               </div>
@@ -600,7 +600,7 @@ export const DigitalNimantranaSuite: React.FC = () => {
                   type="text"
                   value={invitation.dateAD}
                   onChange={(e) => setInvitation({ ...invitation, dateAD: e.target.value })}
-                  placeholder="2024-11-29"
+                  placeholder="2026-12-05"
                   className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 />
               </div>
@@ -623,7 +623,7 @@ export const DigitalNimantranaSuite: React.FC = () => {
                   type="text"
                   value={invitation.rsvpDeadlineBS}
                   onChange={(e) => setInvitation({ ...invitation, rsvpDeadlineBS: e.target.value })}
-                  placeholder="e.g. 2081 Mangsir 07"
+                  placeholder="e.g. 2083 Mangsir 12"
                   className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 />
               </div>

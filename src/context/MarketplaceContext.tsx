@@ -1037,8 +1037,8 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         staffPhone: '+977-9841998877',
         description: 'Specializes in fresh Banarasi sweet paan, meetha paan, fire paan, and organic mukhwas for wedding receptions.',
         status: 'PERMANENT',
-        createdAt: '2024-10-15',
-        reviewedAt: '2024-10-16',
+        createdAt: '2026-10-15',
+        reviewedAt: '2026-10-16',
         adminNotes: 'Highly requested celebration booth artisan. Approved permanently across Nepal.',
       },
       {
@@ -1049,8 +1049,8 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         staffPhone: '+977-9851088776',
         description: 'Pours ceremonial authentic Newari aila from anti brass kettle into salicha for traditional bhoj banquets.',
         status: 'PERMANENT',
-        createdAt: '2024-11-01',
-        reviewedAt: '2024-11-02',
+        createdAt: '2026-11-01',
+        reviewedAt: '2026-11-02',
         adminNotes: 'Essential for Newari cultural feasts. Approved permanently.',
       },
       {
@@ -1061,7 +1061,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
         staffPhone: '+977-9801223344',
         description: 'Supervises toddler play corners, bouncy castles, and face painting during 5-hour family wedding banquets.',
         status: 'PENDING',
-        createdAt: '2024-11-05',
+        createdAt: '2026-11-05',
         adminNotes: 'New category proposal under admin review.',
       },
     ];
@@ -1274,34 +1274,34 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
     return [
       {
-        id: 'alert-mangsir-18',
+        id: 'alert-mangsir-19',
         muhuratId: 'muhurat-w-2',
         title: '🔔 Upcoming Auspicious Wedding Muhurat (शुभ विवाह साइत)',
-        titleNepali: 'मंसिर १८ — गुरु आदित्य योग विवाह लगन',
-        message: 'Upcoming prime wedding date in Nepal (2081 Mangsir 18). Recommended booking party palaces now.',
-        messageNepali: 'तपाईंको मंसिर विवाह प्राथमिकता अनुसार मंसिर १८ गते अति शुभ लग्न परेको छ। पार्टी प्यालेस बुक गर्नुहोस्।',
-        dateBS: '2081 Mangsir 18',
-        dateAD: '2024-12-03',
-        tithi: 'Dwitiya (द्वितीया)',
-        nakshatra: 'Mool (मूल)',
+        titleNepali: 'मंसिर १९ — गुरु आदित्य योग विवाह लगन',
+        message: 'Upcoming prime Saturday wedding date in Nepal (2083 Mangsir 19). Recommended booking party palaces now.',
+        messageNepali: 'तपाईंको मंसिर विवाह प्राथमिकता अनुसार मंसिर १९ गते अति शुभ लग्न परेको छ। पार्टी प्यालेस बुक गर्नुहोस्।',
+        dateBS: '2083 Mangsir 19',
+        dateAD: '2026-12-05',
+        tithi: 'Ekadashi (एकादशी)',
+        nakshatra: 'Hasta (हस्त)',
         eventType: 'WEDDING',
         auspiciousTime: '11:00 AM - 04:30 PM',
-        significance: 'Highly auspicious Lagna under Guru Aditya Yoga. Peak party palace booking demand.',
+        significance: 'Highly auspicious Saturday Lagna under Guru Aditya Yoga. Peak party palace booking demand.',
         isRead: false,
         timestamp: new Date().toISOString(),
         urgencyLevel: 'HIGH',
         matchedPreferenceReason: 'Matched preference: Wedding (विवाह) & Mangsir month',
       },
       {
-        id: 'alert-magh-22-basanta',
+        id: 'alert-magh-28-basanta',
         muhuratId: 'muhurat-w-4',
         title: '🌸 Basanta Panchami Auspicious Alert (श्रीपञ्चमी)',
-        titleNepali: 'माघ २२ — वसन्त पञ्चमी (अति शुभ अबुझ साइत)',
-        message: '2081 Magh 22 is Saraswati Puja — universally auspicious for all celebrations without horoscope matching.',
-        messageNepali: 'माघ २२ गते सरस्वती पूजा तथा वसन्त पञ्चमी — विवाह तथा पास्नीको लागि स्वतः शुभ साइत।',
-        dateBS: '2081 Magh 22',
-        dateAD: '2025-02-04',
-        tithi: 'Panchami (वसन्त पञ्चमी / श्रीपञ्चमी)',
+        titleNepali: 'माघ २८ — वसन्त पञ्चमी (अति शुभ अबुझ साइत)',
+        message: '2083 Magh 28 is Saraswati Puja — universally auspicious for all celebrations without horoscope matching.',
+        messageNepali: 'माघ २८ गते सरस्वती पूजा तथा वसन्त पञ्चमी — विवाह तथा पास्नीको लागि स्वतः शुभ साइत।',
+        dateBS: '2083 Magh 28',
+        dateAD: '2027-02-11',
+        tithi: 'Shukla Panchami (वसन्त पञ्चमी / श्रीपञ्चमी)',
         nakshatra: 'Revati (रेवती)',
         eventType: 'WEDDING',
         auspiciousTime: 'Abhijit Muhurat (11:45 AM - 12:35 PM)',
@@ -1897,8 +1897,8 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
       id: `ref-offer-${Date.now()}`,
       bookingId: params.bookingId,
       bookingRef: targetBooking?.bookingRef || `UTS-REF-${Date.now().toString().slice(-4)}`,
-      eventDateBS: targetBooking?.eventDateBS || '2081 Falgun 14',
-      eventDateAD: targetBooking?.eventDateAD || '2025-02-26',
+      eventDateBS: targetBooking?.eventDateBS || '2083 Falgun 18',
+      eventDateAD: targetBooking?.eventDateAD || '2027-03-02',
       clientName: targetBooking?.customerName || currentUser.name,
       cancellingVendorId: params.cancellingVendorId,
       cancellingVendorName: params.cancellingVendorName,
@@ -2328,7 +2328,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     > & { initialMessage?: string }
   ): ManagedEventRequest => {
     const now = new Date().toISOString();
-    const requestRef = `UTS-MGD-2082-${Math.floor(1000 + Math.random() * 9000)}`;
+    const requestRef = `UTS-MGD-2083-${Math.floor(1000 + Math.random() * 9000)}`;
     const activeVendorsCount = req.vendorFunctions.filter((v) => v.isEnabled && v.mode !== 'NOT_NEEDED').length;
 
     const initialMessages: ManagedCoordinationMessage[] = [
@@ -2650,7 +2650,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const venue = venues.find((v) => v.id === thread.venueId);
     const hall = venue?.halls.find((h) => h.id === latest.hallId) || venue?.halls[0];
 
-    const bookingRef = `UTS-2081-${Math.floor(1000 + Math.random() * 9000)}`;
+    const bookingRef = `UTS-2083-${Math.floor(1000 + Math.random() * 9000)}`;
     const depositRequired = Math.round(latest.totalNpr * 0.25);
     const commissionAmount = Math.round(latest.totalNpr * 0.05);
 
@@ -2770,8 +2770,8 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
       customerPhone: bookingData.customerPhone || '+977-9800000000',
       customerEmail: bookingData.customerEmail || 'walkin@example.com',
       eventType: bookingData.eventType || 'WEDDING',
-      eventDateBS: bookingData.eventDateBS || '2081 Mangsir 20',
-      eventDateAD: bookingData.eventDateAD || '2024-12-05',
+      eventDateBS: bookingData.eventDateBS || '2083 Mangsir 19',
+      eventDateAD: bookingData.eventDateAD || '2026-12-05',
       shift: bookingData.shift || 'DAY',
       guestCount: bookingData.guestCount || 350,
       agreedPerPlateNpr: bookingData.agreedPerPlateNpr || 1600,

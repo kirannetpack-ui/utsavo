@@ -53,8 +53,8 @@ export const VenueDetailModal: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'VIRTUAL_TOUR' | 'MENU_ENGINE' | 'MEDIA_GALLERY' | 'CALENDAR' | 'REVIEWS'>('OVERVIEW');
   const [selectedHall, setSelectedHall] = useState<HallSpace | null>(selectedVenue?.halls[0] || null);
   const [selectedShift, setSelectedShift] = useState<'MORNING' | 'DAY' | 'EVENING' | 'FULL_DAY'>('DAY');
-  const [selectedDateBS, setSelectedDateBS] = useState<string>('2081 Mangsir 18');
-  const [selectedDateAD, setSelectedDateAD] = useState<string>('2024-12-03');
+  const [selectedDateBS, setSelectedDateBS] = useState<string>('2083 Mangsir 19');
+  const [selectedDateAD, setSelectedDateAD] = useState<string>('2026-12-05');
   const [activeVideoModal, setActiveVideoModal] = useState<any | null>(null);
 
   useEffect(() => {
@@ -602,7 +602,7 @@ export const VenueDetailModal: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <span className="text-stone-500 font-medium">Selected Date:</span>
                   <span className="px-2.5 py-1 bg-white font-bold text-amber-900 border border-amber-300 rounded-lg shadow-2xs">
-                    {selectedDateBS || '2081 Mangsir 18'}
+                    {selectedDateBS || '2083 Mangsir 19'}
                   </span>
                 </div>
               </div>

@@ -1,20 +1,20 @@
 /**
  * UTSAVO — Real-Time Availability & Panchanga Muhurat Integration Engine
  * Provides live slot tracking (Available, Limited, Booked) for both Venues & Cultural Vendors.
- * Fully synchronized with Nepal Panchanga Nirnayak Samiti auspicious dates (2081 / 2082).
+ * Fully synchronized with Nepal Panchanga Nirnayak Samiti auspicious dates (2083 / 2084 BS).
  */
 
-import { PANCHANGA_AUSPICIOUS_MUHURATS, NEPALI_MONTHS } from '../data/panchangaCalendar';
+import { PANCHANGA_AUSPICIOUS_MUHURATS } from '../data/panchangaCalendar';
 import { PanchangaMuhurat, ShiftTime } from '../types';
 
 export type SlotState = 'AVAILABLE' | 'HOLD' | 'BOOKED';
 
 export interface DayAvailability {
-  dateBS: string;          // e.g. "2081 Mangsir 14"
-  dateAD: string;          // e.g. "2024-11-29"
+  dateBS: string;          // e.g. "2083 Mangsir 19"
+  dateAD: string;          // e.g. "2026-12-05"
   monthName: string;       // e.g. "Mangsir"
-  dayNumber: number;       // e.g. 14
-  dayOfWeek: string;       // e.g. "Friday"
+  dayNumber: number;       // e.g. 19
+  dayOfWeek: string;       // e.g. "Saturday"
   isAuspicious: boolean;
   muhurat?: PanchangaMuhurat;
   shifts: {
@@ -28,15 +28,14 @@ export interface DayAvailability {
   notes?: string;
 }
 
-// Generate realistic calendar days for Nepali months
-// Mangsir 2081 has 30 days starting on Saturday
+// Verified 2083–2084 BS Nepali calendar month start dates & day-of-week indices
 const MONTH_LENGTHS: Record<string, { days: number; startDayIndex: number; yearBS: number; startYearAD: number; startMonthAD: number; startDayAD: number }> = {
-  Mangsir: { days: 30, startDayIndex: 6, yearBS: 2081, startYearAD: 2024, startMonthAD: 11, startDayAD: 16 }, // Nov 16, 2024
-  Poush: { days: 29, startDayIndex: 1, yearBS: 2081, startYearAD: 2024, startMonthAD: 12, startDayAD: 16 },
-  Magh: { days: 30, startDayIndex: 3, yearBS: 2081, startYearAD: 2025, startMonthAD: 1, startDayAD: 14 },
-  Falgun: { days: 30, startDayIndex: 5, yearBS: 2081, startYearAD: 2025, startMonthAD: 2, startDayAD: 13 },
-  Chaitra: { days: 30, startDayIndex: 0, yearBS: 2081, startYearAD: 2025, startMonthAD: 3, startDayAD: 15 },
-  Baishakh: { days: 31, startDayIndex: 2, yearBS: 2082, startYearAD: 2025, startMonthAD: 4, startDayAD: 14 },
+  Mangsir: { days: 29, startDayIndex: 2, yearBS: 2083, startYearAD: 2026, startMonthAD: 11, startDayAD: 17 }, // Nov 17, 2026 (Tue)
+  Poush: { days: 30, startDayIndex: 3, yearBS: 2083, startYearAD: 2026, startMonthAD: 12, startDayAD: 16 },   // Dec 16, 2026 (Wed)
+  Magh: { days: 29, startDayIndex: 5, yearBS: 2083, startYearAD: 2027, startMonthAD: 1, startDayAD: 15 },    // Jan 15, 2027 (Fri)
+  Falgun: { days: 30, startDayIndex: 6, yearBS: 2083, startYearAD: 2027, startMonthAD: 2, startDayAD: 13 },  // Feb 13, 2027 (Sat)
+  Chaitra: { days: 30, startDayIndex: 1, yearBS: 2083, startYearAD: 2027, startMonthAD: 3, startDayAD: 15 }, // Mar 15, 2027 (Mon)
+  Baishakh: { days: 31, startDayIndex: 3, yearBS: 2084, startYearAD: 2027, startMonthAD: 4, startDayAD: 14 }, // Apr 14, 2027 (Wed)
 };
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -65,17 +64,14 @@ export function getEntityAvailability(entityId: string, monthName: string = 'Man
     const dayOfWeek = DAY_NAMES[dayOfWeekIndex];
     const dateBS = `${monthMeta.yearBS} ${monthName} ${d < 10 ? '0' + d : d}`;
 
-    // Approximate AD date
-    const adDateObj = new Date(monthMeta.startYearAD, monthMeta.startMonthAD - 1, monthMeta.startDayAD + (d - 1));
+    // Timezone-safe UTC calendar calculation
+    const adDateObj = new Date(Date.UTC(monthMeta.startYearAD, monthMeta.startMonthAD - 1, monthMeta.startDayAD + (d - 1)));
     const dateAD = adDateObj.toISOString().split('T')[0];
 
-    // Check if this date has a verified Panchanga Muhurat
-    const muhurat = PANCHANGA_AUSPICIOUS_MUHURATS.find((m) => {
-      // Match BS month and day or AD date
-      const matchBS = m.dateBS.includes(monthName) && m.dateBS.includes(String(d));
-      const matchAD = m.dateAD === dateAD;
-      return matchBS || matchAD;
-    });
+    // Check if this exact BS or AD date has a verified Panchanga Muhurat
+    const muhurat = PANCHANGA_AUSPICIOUS_MUHURATS.find(
+      (m) => m.dateBS === dateBS || m.dateAD === dateAD
+    );
 
     // Check stored user overrides
     if (storedOverrides[dateBS]) {
@@ -93,23 +89,23 @@ export function getEntityAvailability(entityId: string, monthName: string = 'Man
 
     if (muhurat) {
       // High demand on auspicious dates: simulate popular booking pattern
-      if (d === 14) {
-        // e.g. Mangsir 14 (Supreme Sarva Siddhi)
+      if (d === 19 || d === 26 || d === 28) {
+        // e.g. Mangsir 19 / Basanta Panchami (Magh 28) / Akshaya Tritiya (Baishakh 26)
         morningState = 'BOOKED';
         dayState = 'BOOKED';
         eveningState = 'HOLD';
         fullDayState = 'BOOKED';
-      } else if (d === 18) {
+      } else if (d === 9 || d === 15) {
         morningState = 'AVAILABLE';
         dayState = 'BOOKED';
         eveningState = 'BOOKED';
         fullDayState = 'HOLD';
-      } else if (d === 24) {
+      } else if (d === 18 || d === 24 || d === 25) {
         morningState = 'AVAILABLE';
         dayState = 'AVAILABLE';
         eveningState = 'HOLD';
         fullDayState = 'AVAILABLE';
-      } else if (d === 8 || d === 22) {
+      } else if (d === 10 || d === 16 || d === 17) {
         morningState = 'BOOKED';
         dayState = 'AVAILABLE';
         eveningState = 'AVAILABLE';
@@ -291,13 +287,15 @@ export function analyzeMuhuratAcrossPopularVenues(
 
     // Realistic contention for peak sacred Muhurats across different popular venues
     const isPeakWedding =
-      muhurat.dateBS.includes('Mangsir 14') ||
-      muhurat.dateBS.includes('Baishakh 19') ||
-      muhurat.dateBS.includes('Magh 22');
+      muhurat.dateBS.includes('Mangsir 19') ||
+      muhurat.dateBS.includes('Baishakh 26') ||
+      muhurat.dateBS.includes('Magh 28') ||
+      muhurat.dateBS.includes('Magh 18');
     const isMediumDemand =
-      muhurat.dateBS.includes('Mangsir 18') ||
-      muhurat.dateBS.includes('Mangsir 24') ||
-      muhurat.dateBS.includes('Falgun 14');
+      muhurat.dateBS.includes('Mangsir 09') ||
+      muhurat.dateBS.includes('Mangsir 26') ||
+      muhurat.dateBS.includes('Falgun 15') ||
+      muhurat.dateBS.includes('Falgun 18');
 
     const availableShifts: ShiftTime[] = [];
     (['MORNING', 'DAY', 'EVENING', 'FULL_DAY'] as ShiftTime[]).forEach((s) => {

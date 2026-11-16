@@ -269,9 +269,10 @@ function evaluateVenueAvailabilityOnDate(
   }
 
   const isPeakWedding =
-    muhurat.dateBS.includes('Mangsir 14') ||
-    muhurat.dateBS.includes('Baishakh 19') ||
-    muhurat.dateBS.includes('Magh 22');
+    muhurat.dateBS.includes('Mangsir 19') ||
+    muhurat.dateBS.includes('Baishakh 26') ||
+    muhurat.dateBS.includes('Magh 28') ||
+    muhurat.dateBS.includes('Magh 18');
 
   if (dayEntry?.overallStatus === 'BOOKED' || (isPeakWedding && venueRankIdx === 0)) {
     return {
@@ -317,13 +318,21 @@ export function suggestAndCrossReferenceMuhurats(
   bookings: Booking[],
   negotiations: NegotiationThread[]
 ): MuhuratCrossReferenceResult[] {
+  const todayIso = new Date().toISOString().split('T')[0];
+
   // Select matching eventType Muhurats plus Abujha/Universal Sarva Siddhi dates when helpful
   let candidateMuhurats = PANCHANGA_AUSPICIOUS_MUHURATS.filter((m) => {
     if (m.eventType === profile.eventType) return true;
     // Include Akshaya Tritiya universal celebration option for any event type if not already included
-    if (m.dateBS.includes('Baishakh 19') && profile.eventType !== 'WEDDING') return true;
+    if (m.dateBS.includes('Baishakh 26') && profile.eventType !== 'WEDDING') return true;
     return false;
   });
+
+  // Always prioritize upcoming & future auspicious dates relative to today
+  const futureOnly = candidateMuhurats.filter((m) => m.dateAD >= todayIso);
+  if (futureOnly.length > 0) {
+    candidateMuhurats = futureOnly;
+  }
 
   if (profile.preferredMonthBS && profile.preferredMonthBS !== 'ALL') {
     const byMonth = candidateMuhurats.filter((m) =>
