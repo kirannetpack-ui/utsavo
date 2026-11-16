@@ -40,6 +40,7 @@ import { ExcessFoodRescueSocialCause } from './components/ExcessFoodRescueSocial
 import { CancellationPolicyReferralHub } from './components/CancellationPolicyReferralHub';
 import { StarHotelRequestModal } from './components/StarHotelRequestModal';
 import { UtsavoManagedEventWorkspace } from './components/UtsavoManagedEventWorkspace';
+import { MobileNavDrawer } from './components/MobileNavDrawer';
 
 const MainShell: React.FC = () => {
   const {
@@ -125,6 +126,8 @@ const MainShell: React.FC = () => {
   };
 
   const [isAiAssistantOpen, setIsAiAssistantOpen] = useState(false);
+  const [aiInitialTab, setAiInitialTab] = useState<'CHAT' | 'LIVE_VOICE'>('CHAT');
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
   const [autoOpenStaffRegister, setAutoOpenStaffRegister] = useState(false);
 
   // If viewing a standalone guest invitation link (e.g. /invite/:code or from QR scan)
@@ -149,9 +152,29 @@ const MainShell: React.FC = () => {
       <Header
         activeView={activeView}
         setActiveView={setActiveView}
-        onOpenAiAssistant={() => setIsAiAssistantOpen(true)}
+        onOpenAiAssistant={() => {
+          setAiInitialTab('CHAT');
+          setIsAiAssistantOpen(true);
+        }}
         onOpenFeatures={() => setIsFeaturesModalOpen(true)}
         onOpenLegalContract={() => setIsLegalContractOpen(true)}
+        onOpenMobileMenu={() => setIsMobileDrawerOpen(true)}
+      />
+
+      {/* Swipe-to-Dismiss Mobile Navigation Drawer */}
+      <MobileNavDrawer
+        isOpen={isMobileDrawerOpen}
+        onClose={() => setIsMobileDrawerOpen(false)}
+        activeView={activeView}
+        setActiveView={setActiveView}
+        onOpenAiChat={() => {
+          setAiInitialTab('CHAT');
+          setIsAiAssistantOpen(true);
+        }}
+        onOpenLiveVoice={() => {
+          setAiInitialTab('LIVE_VOICE');
+          setIsAiAssistantOpen(true);
+        }}
       />
 
       {/* Main Content Area */}
@@ -287,6 +310,7 @@ const MainShell: React.FC = () => {
       <GeminiChatbotModal
         isOpen={isAiAssistantOpen}
         onClose={() => setIsAiAssistantOpen(false)}
+        initialTab={aiInitialTab}
       />
       <ReviewModal
         bookingId={reviewBookingId}
@@ -320,7 +344,10 @@ const MainShell: React.FC = () => {
 
       {/* Floating AI Assistant Trigger (Bottom Right, adjusted above mobile bottom nav) */}
       <button
-        onClick={() => setIsAiAssistantOpen(true)}
+        onClick={() => {
+          setAiInitialTab('CHAT');
+          setIsAiAssistantOpen(true);
+        }}
         className="fixed bottom-20 lg:bottom-6 right-5 z-40 bg-amber-900 hover:bg-amber-950 text-white p-3.5 rounded-full shadow-xl transition-transform hover:scale-105 flex items-center gap-2 border border-amber-700/50"
         title="Open UTSAVO Gemini AI Assistant"
       >
@@ -336,6 +363,7 @@ const MainShell: React.FC = () => {
         activeView={activeView}
         setActiveView={setActiveView}
         onOpenFeatures={() => setIsFeaturesModalOpen(true)}
+        onOpenDrawer={() => setIsMobileDrawerOpen(true)}
       />
 
       {/* Footer */}

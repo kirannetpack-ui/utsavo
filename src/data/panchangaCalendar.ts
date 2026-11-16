@@ -250,13 +250,145 @@ export const PANCHANGA_AUSPICIOUS_MUHURATS: PanchangaMuhurat[] = [
     auspiciousTime: '07:30 AM - 11:00 AM',
     significance: 'Vastu Shanti & auspicious housewarming entrance.',
   },
+  {
+    id: 'muhurat-g-2',
+    dateBS: '2081 Falgun 19',
+    dateAD: '2025-03-03',
+    tithi: 'Chaturthi (शुक्ल चतुर्थी)',
+    nakshatra: 'Ashwini (अश्विनी)',
+    eventType: 'GRIHA_PRAVESH',
+    auspiciousTime: '08:45 AM - 12:15 PM',
+    significance: 'Amrita Siddhi Yoga housewarming entrance with morning Rudrabhishek and family prasad feast.',
+  },
+
+  // Reception Gala (प्रीतिभोज / Reception)
+  {
+    id: 'muhurat-r-1',
+    dateBS: '2081 Mangsir 19',
+    dateAD: '2024-12-04',
+    tithi: 'Tritiya (तृतीया)',
+    nakshatra: 'Purvashadha (पूर्वाषाढा)',
+    eventType: 'RECEPTION',
+    auspiciousTime: '04:00 PM - 09:30 PM',
+    significance: 'Post-Vivah Shubha Pritibhoj evening alignment with smooth evening hospitality flow under 10 PM DAO window.',
+  },
+  {
+    id: 'muhurat-r-2',
+    dateBS: '2081 Magh 25',
+    dateAD: '2025-02-07',
+    tithi: 'Ashtami (अष्टमी)',
+    nakshatra: 'Krittika (कृत्तिका)',
+    eventType: 'RECEPTION',
+    auspiciousTime: '05:00 PM - 10:00 PM',
+    significance: 'Friday weekend evening auspicious Lagna tailored for grand ballroom receptions and VIP family dining.',
+  },
+  {
+    id: 'muhurat-r-3',
+    dateBS: '2081 Falgun 10',
+    dateAD: '2025-02-22',
+    tithi: 'Dashami (दशमी)',
+    nakshatra: 'Mool (मूल)',
+    eventType: 'RECEPTION',
+    auspiciousTime: '01:00 PM - 09:30 PM',
+    significance: 'Saturday daytime-to-evening garden lawn and banquet reception window with pleasant Basanta temperatures.',
+  },
+
+  // Engagement / Tika / Swayambar (टीका / मगनी)
+  {
+    id: 'muhurat-e-1',
+    dateBS: '2081 Mangsir 12',
+    dateAD: '2024-11-27',
+    tithi: 'Ekadashi (एकादशी)',
+    nakshatra: 'Hasta (हस्त)',
+    eventType: 'ENGAGEMENT',
+    auspiciousTime: '10:00 AM - 02:30 PM',
+    significance: 'Shubha Tika & Ring Exchange Muhurat blessed by Hasta Nakshatra harmony and family agreement.',
+  },
+  {
+    id: 'muhurat-e-2',
+    dateBS: '2081 Magh 18',
+    dateAD: '2025-01-31',
+    tithi: 'Chaturthi (माघ शुक्ल चतुर्थी)',
+    nakshatra: 'Uttarabhadrapada (उत्तरभाद्रपदा)',
+    eventType: 'ENGAGEMENT',
+    auspiciousTime: '11:30 AM - 04:00 PM',
+    significance: 'Siddha Yoga day engagement Lagna ideal for intimate lunch celebrations and traditional Swayambar.',
+  },
+  {
+    id: 'muhurat-e-3',
+    dateBS: '2081 Falgun 04',
+    dateAD: '2025-02-16',
+    tithi: 'Chaturthi (फाल्गुन कृष्ण चतुर्थी)',
+    nakshatra: 'Swati (स्वाती)',
+    eventType: 'ENGAGEMENT',
+    auspiciousTime: '02:00 PM - 07:30 PM',
+    significance: 'Evening Sangeet & Ring Ceremony alignment with clear Hemanta-spring transition weather.',
+  },
+
+  // Corporate Gala & Inaugurations (व्यावसायिक सम्मेलन / शुभारम्भ)
+  {
+    id: 'muhurat-c-1',
+    dateBS: '2081 Mangsir 21',
+    dateAD: '2024-12-06',
+    tithi: 'Panchami (शुक्ल पञ्चमी)',
+    nakshatra: 'Shravana (श्रवण)',
+    eventType: 'CORPORATE_GALA',
+    auspiciousTime: '09:30 AM - 05:30 PM',
+    significance: 'Vyapar Vriddhi Shravana Yoga — auspicious for corporate summits, annual milestone galas & brand launches.',
+  },
+  {
+    id: 'muhurat-c-2',
+    dateBS: '2081 Falgun 12',
+    dateAD: '2025-02-24',
+    tithi: 'Ekadashi (एकादशी)',
+    nakshatra: 'Purvashadha (पूर्वाषाढा)',
+    eventType: 'CORPORATE_GALA',
+    auspiciousTime: '10:00 AM - 08:30 PM',
+    significance: 'Full-day conference & evening awards gala alignment with strong Abhijit midday keynote window.',
+  },
+
+  // Birthday & Jubilee (जन्मोत्सव / शुभ दिवस)
+  {
+    id: 'muhurat-j-1',
+    dateBS: '2081 Mangsir 16',
+    dateAD: '2024-12-01',
+    tithi: 'Pratipada (शुक्ल प्रतिपदा)',
+    nakshatra: 'Jyeshtha (ज्येष्ठा)',
+    eventType: 'BIRTHDAY_JUBILEE',
+    auspiciousTime: '04:30 PM - 09:30 PM',
+    significance: 'Ayushya Vardhak Sunday evening celebration Muhurat suited for 25th/50th Jubilees & milestone birthdays.',
+  },
+  {
+    id: 'muhurat-j-2',
+    dateBS: '2081 Baishakh 12',
+    dateAD: '2025-04-25',
+    tithi: 'Dwadashi (द्वादशी)',
+    nakshatra: 'Uttarabhadrapada (उत्तरभाद्रपदा)',
+    eventType: 'BIRTHDAY_JUBILEE',
+    auspiciousTime: '11:00 AM - 07:00 PM',
+    significance: 'Baishakh spring celebration alignment ideal for golden anniversaries and outdoor garden family feasts.',
+  },
+
+  // Other / General Auspicious Celebration (सर्वार्थ सिद्धि उत्सव)
+  {
+    id: 'muhurat-o-1',
+    dateBS: '2081 Baishakh 19',
+    dateAD: '2025-05-02',
+    tithi: 'Tritiya (अक्षय तृतीया - Akshaya Tritiya)',
+    nakshatra: 'Rohini (रोहिणी)',
+    eventType: 'OTHER_CELEBRATION',
+    auspiciousTime: 'Full Day Auspicious (अक्षय शुभ मुहूर्त)',
+    significance: 'Akshaya Tritiya — Swayamsiddha Abujha Muhurat universally auspicious for any family or community celebration.',
+  },
 ];
 
 /**
  * Filter auspicious dates by event type
  */
 export function getMuhuratsForEventType(eventType: EventType): PanchangaMuhurat[] {
-  return PANCHANGA_AUSPICIOUS_MUHURATS.filter((m) => m.eventType === eventType);
+  const exact = PANCHANGA_AUSPICIOUS_MUHURATS.filter((m) => m.eventType === eventType);
+  if (exact.length > 0) return exact;
+  return PANCHANGA_AUSPICIOUS_MUHURATS.filter((m) => m.eventType === 'OTHER_CELEBRATION');
 }
 
 /**

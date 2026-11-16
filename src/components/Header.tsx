@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { UserRole } from '../types';
-import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Tag, Music, UtensilsCrossed, FileText, Layers, Bookmark, Briefcase, Bell, Heart, Scale } from 'lucide-react';
+import { Calendar, Sparkles, Building2, Shield, User, Globe, ChevronDown, Check, LogIn, LogOut, Bot, Award, Mountain, Menu, Music, UtensilsCrossed, FileText, Layers, Bookmark, Briefcase, Bell, Heart, Scale } from 'lucide-react';
 import { auth, loginWithGoogle, logoutUser, testFirestoreConnection } from '../firebase/config';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { BrandLogo } from './BrandLogo';
@@ -20,6 +20,7 @@ interface HeaderProps {
   onOpenAiAssistant: () => void;
   onOpenFeatures?: () => void;
   onOpenLegalContract?: () => void;
+  onOpenMobileMenu?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -28,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAiAssistant,
   onOpenFeatures,
   onOpenLegalContract,
+  onOpenMobileMenu,
 }) => {
   const { language, setLanguage, t } = useLanguage();
   const {
@@ -83,14 +85,26 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-6 h-18">
           
-          {/* Zone 1: Official Brand Identity */}
-          <button
-            onClick={() => setActiveView('EXPLORE')}
-            className="flex items-center text-left focus:outline-none group cursor-pointer"
-            title="UTSAVO — Nepal's Smart Celebration Marketplace"
-          >
-            <BrandLogo variant="light" size="md" />
-          </button>
+          {/* Zone 1: Mobile Menu Trigger + Official Brand Identity */}
+          <div className="flex items-center gap-2 shrink-0">
+            {onOpenMobileMenu && (
+              <button
+                type="button"
+                onClick={onOpenMobileMenu}
+                aria-label="Open mobile navigation drawer"
+                className="lg:hidden p-2 -ml-1 rounded-xl text-stone-700 hover:text-amber-950 hover:bg-stone-100 transition-colors cursor-pointer"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+            )}
+            <button
+              onClick={() => setActiveView('EXPLORE')}
+              className="flex items-center text-left focus:outline-none group cursor-pointer"
+              title="UTSAVO — Nepal's Smart Celebration Marketplace"
+            >
+              <BrandLogo variant="light" size="md" />
+            </button>
+          </div>
 
           {/* Zone 2: Navigation Links */}
           <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-stone-600">

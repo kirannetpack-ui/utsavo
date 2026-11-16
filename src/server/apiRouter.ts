@@ -4,7 +4,7 @@
  */
 
 import { Router, type Response } from 'express';
-import { GoogleGenAI, Type } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
 
 export const apiRouter = Router();
 
@@ -37,32 +37,91 @@ apiRouter.get('/health', (_req, res) => {
   });
 });
 
-// 1. Multi-Turn Chatbot Endpoint (gemini-3.8-flash)
+// 1. Multi-Turn Chatbot Endpoint (gemini-4-hydrogen / gemini-3.1-flash-lite with role system instructions)
+const CHAT_ROLE_INSTRUCTIONS: Record<string, string> = {
+  EVENT_PLANNER:
+    'You are UTSAVO Event Producer & Planning Assistant for Nepal. Guide clients on wedding (Bibaha), reception, Bratabandha, Pasni, party palace selection, run-of-show logistics, sound curfews (10:00 PM DAO rule), and catering menus across Nepal in warm, structured English or Nepali.',
+  PANCHANGA_PANDIT:
+    'You are UTSAVO Hindu Panchanga & Vedic Ritual Advisor. Explain Samiti auspicious dates, Tithi, Nakshatra, Lagan windows, seasonal suitability, and ceremonial requirements (Vivah Mandap, Havan, Bratabandha, Griha Pravesh) clearly and respectfully.',
+  NEGOTIATION_STRATEGIST:
+    'You are UTSAVO Hospitality Commercial Strategist. Help hosts calculate per-plate costs + 10% Service Charge + 13% IRD VAT, spot off-season concession opportunities, and structure fair counter-offers for venues in NPR.',
+  DESTINATION_CONCIERGE:
+    'You are UTSAVO Destination & NRI Celebration Concierge specializing in Pokhara, Kathmandu, Nagarkot, Chitwan, and Nepali diaspora events abroad. Cover guest room blocks, travel logistics, visas, customs for wedding attire, and mountain weather backups.',
+};
+
 apiRouter.post('/chat', async (req, res) => {
   try {
-    const { messages, systemInstruction } = req.body;
-    if (!messages || !Array.isArray(messages)) {
+    const {
+      messages,
+      systemInstruction,
+      rolePreset = 'EVENT_PLANNER',
+      modelTier = 'GENERAL',
+      useSearchGrounding = false,
+    } = req.body || {};
+
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: 'messages array is required' });
     }
 
-    const defaultInstruction =
-      'You are UTSAVO AI, Nepal\'s premier event and celebration planning assistant. You guide users on wedding (Bibaha) customs, Bratabandha, Pasni, Newari bhoj, Terai Mithila traditions, Hindu Panchanga auspicious Muhurats, party palace selections, and catering budgets across Nepal\'s 7 provinces. Provide polite, culturally respectful, warm, and structured guidance in English and Nepali.';
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(503).json({
+        error: 'GEMINI_API_KEY is missing in environment configuration.',
+      });
+    }
 
-    const formattedContents = messages.map((m: { role: string; text: string }) => ({
-      role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.text }],
-    }));
+    const chosenInstruction =
+      (typeof systemInstruction === 'string' && systemInstruction.trim()) ||
+      CHAT_ROLE_INSTRUCTIONS[String(rolePreset)] ||
+      CHAT_ROLE_INSTRUCTIONS.EVENT_PLANNER;
+
+    // Route strictly using active free-tier-capable Gemini 4 / 3.1 models
+    let selectedModel = 'gemini-4-hydrogen';
+    let thinkingLevel: ThinkingLevel = ThinkingLevel.MEDIUM;
+
+    if (modelTier === 'FAST') {
+      selectedModel = 'gemini-3.1-flash-lite';
+      thinkingLevel = ThinkingLevel.MINIMAL;
+    } else if (modelTier === 'DEEP') {
+      selectedModel = 'gemini-4-hydrogen';
+      thinkingLevel = ThinkingLevel.HIGH;
+    }
+
+    const formattedContents = messages
+      .slice(-30)
+      .map((m: { role: string; text: string }) => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: String(m.text || '') }],
+      }));
+
+    const config: any = {
+      systemInstruction: chosenInstruction,
+      thinkingConfig: { thinkingLevel },
+    };
+
+    if (useSearchGrounding) {
+      config.tools = [{ googleSearch: {} }];
+    }
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: selectedModel,
       contents: formattedContents,
-      config: {
-        systemInstruction: systemInstruction || defaultInstruction,
-      },
+      config,
     });
+
+    const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+    const webSources = groundingChunks
+      .filter((c: any) => c.web)
+      .map((c: any) => ({
+        title: String(c.web.title || 'Verified Web Source'),
+        uri: String(c.web.uri || ''),
+      }))
+      .filter((s: any) => s.uri);
 
     res.json({
       text: response.text || 'No response generated.',
+      modelUsed: selectedModel,
+      thinkingLevel,
+      sources: webSources,
     });
   } catch (err: any) {
     console.error('Chat API Error:', err);
@@ -70,7 +129,7 @@ apiRouter.post('/chat', async (req, res) => {
   }
 });
 
-// 2. Google Search Grounding Endpoint (gemini-3.8-flash with googleSearch)
+// 2. Google Search Grounding Endpoint (gemini-4-hydrogen with googleSearch)
 apiRouter.post('/search', async (req, res) => {
   try {
     const { query } = req.body;
@@ -79,7 +138,7 @@ apiRouter.post('/search', async (req, res) => {
     }
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-4-hydrogen',
       contents: `Search and provide verified, up-to-date celebration, venue, Panchanga, or cultural information for Nepal: ${query}`,
       config: {
         tools: [{ googleSearch: {} }],
@@ -104,7 +163,7 @@ apiRouter.post('/search', async (req, res) => {
   }
 });
 
-// 3. Google Maps Grounding Endpoint (gemini-3.8-flash with googleMaps)
+// 3. Google Maps Grounding Endpoint (gemini-4-hydrogen with googleMaps)
 apiRouter.post('/maps', async (req, res) => {
   try {
     const { query, latitude, longitude } = req.body;
@@ -128,7 +187,7 @@ apiRouter.post('/maps', async (req, res) => {
     }
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-4-hydrogen',
       contents: `Find celebration venues, party palaces, landmark directions, and banquet accessibility in Nepal: ${query}`,
       config,
     });
@@ -351,7 +410,7 @@ D. Actionable Recommendation for Platform Admin (Whether to Apply or Maintain)
 `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: 'gemini-4-hydrogen',
       contents: prompt,
       config: {
         tools: [{ googleSearch: {} }],

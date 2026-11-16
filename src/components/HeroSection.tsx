@@ -621,6 +621,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenStaffPool, onOpe
               <span>{language === 'ne' ? 'सबै हेर्नुहोस्' : 'View all'}</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveModal('SMART_PLANNER')}
+              className="text-stone-900 hover:text-amber-950 font-bold underline ml-1 whitespace-nowrap shrink-0"
+            >
+              {language === 'ne' ? 'आवश्यकता र साइत मिलान (SmartPlanner)' : 'Cross-Reference With Requirements →'}
+            </button>
           </div>
         </div>
 

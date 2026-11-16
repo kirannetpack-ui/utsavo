@@ -236,23 +236,31 @@ export const VenueCatalog: React.FC = () => {
           <SmartVenueMatcher onApplyFiltersToCatalog={() => setExploreMode('VENUES')} />
         ) : (
           <>
-            {/* Smart Venue Matcher Compact Bar in Explore Grid */}
+            {/* Smart Venue Matcher & SmartPlanner Compact Bar in Explore Grid */}
             <div className="mb-5 p-3.5 sm:px-5 rounded-2xl bg-white border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2.5 text-xs sm:text-sm text-stone-700">
                 <Sparkles className="w-4 h-4 text-amber-800 shrink-0" />
                 <span>
-                  <strong className="text-stone-900">Smart Venue Matcher:</strong> Get AI-ranked top 3
-                  best-fit Nepal party palaces tailored to your guest count, district, and NPR budget.
+                  <strong className="text-stone-900">Smart Venue &amp; Panchanga Planning:</strong> Match your guest count, NPR budget, and auspicious Hindu Panchanga dates with live availability.
                 </span>
               </div>
-              <button
-                type="button"
-                onClick={() => setExploreMode('SMART_MATCHER')}
-                className="px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-950 text-white text-xs font-bold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 self-start sm:self-auto"
-              >
-                <Wand2 className="w-3.5 h-3.5 text-amber-300" />
-                <span>Find My Top 3 Matches</span>
-              </button>
+              <div className="flex flex-wrap items-center gap-2 shrink-0 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setActiveModal('SMART_PLANNER')}
+                  className="px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-900 border border-stone-300 text-xs font-bold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <span>SmartPlanner &amp; Muhurats</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setExploreMode('SMART_MATCHER')}
+                  className="px-4 py-2 rounded-xl bg-amber-900 hover:bg-amber-950 text-white text-xs font-bold flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  <Wand2 className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Find My Top 3 Matches</span>
+                </button>
+              </div>
             </div>
 
             {/* 1-Touch Quick-Filter Preset Pills (Maximum Information at Minimum Touchable) */}

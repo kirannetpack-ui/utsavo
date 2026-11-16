@@ -10,6 +10,8 @@ import { fileURLToPath } from 'url';
 import { apiRouter } from './src/server/apiRouter';
 
 import fs from 'fs';
+import http from 'http';
+import { attachLiveVoiceWebSocket } from './src/server/liveVoiceHandler';
 
 dotenv.config();
 
@@ -86,7 +88,10 @@ async function startServer() {
     });
   }
 
-  app.listen(port, '0.0.0.0', () => {
+  const httpServer = http.createServer(app);
+  attachLiveVoiceWebSocket(httpServer);
+
+  httpServer.listen(port, '0.0.0.0', () => {
     console.log(`UTSAVO Server running on http://0.0.0.0:${port}`);
   });
 }

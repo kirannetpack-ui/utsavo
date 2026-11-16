@@ -152,12 +152,48 @@
         "createdAt": { "type": "string", "description": "Creation timestamp" }
       },
       "required": ["requestRef", "clientName", "clientEmail", "eventTitle", "status"]
+    },
+    "UserWorkspacePreferences": {
+      "title": "User Workspace Preferences",
+      "description": "Authenticated user's saved venues, saved vendors, and planner defaults synced across devices",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128, "description": "Firebase Auth UID of the owner" },
+        "savedVenueIds": { "type": "array", "description": "Bookmarked venue IDs (max 100)" },
+        "savedVendorIds": { "type": "array", "description": "Bookmarked cultural vendor IDs (max 100)" },
+        "preferredLanguage": { "type": "string", "enum": ["en", "ne"], "description": "Preferred UI language" },
+        "updatedAt": { "type": "string", "maxLength": 64, "description": "ISO timestamp of last update" }
+      },
+      "required": ["uid", "savedVenueIds", "savedVendorIds", "updatedAt"]
+    },
+    "AiChatSession": {
+      "title": "Gemini AI Planning Chat Session",
+      "description": "Persisted multi-turn Gemini chatbot conversation owned by an authenticated user",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128, "description": "Owner Firebase Auth UID" },
+        "title": { "type": "string", "maxLength": 160, "description": "Conversation title" },
+        "rolePreset": { "type": "string", "maxLength": 60, "description": "Active chatbot role preset" },
+        "modelTier": { "type": "string", "enum": ["FAST", "GENERAL", "DEEP"], "description": "Selected Gemini model tier" },
+        "messages": { "type": "array", "description": "Bounded message thread items (max 100)" },
+        "createdAt": { "type": "string", "maxLength": 64, "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "maxLength": 64, "description": "Last update timestamp" }
+      },
+      "required": ["uid", "title", "rolePreset", "modelTier", "messages", "createdAt", "updatedAt"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": "User",
       "description": "User account profiles"
+    },
+    "/users/{userId}/workspace/{docId}": {
+      "schema": "UserWorkspacePreferences",
+      "description": "Private user workspace preferences including bookmarked venues and vendors"
+    },
+    "/users/{userId}/chatSessions/{sessionId}": {
+      "schema": "AiChatSession",
+      "description": "Private multi-turn Gemini AI planning chat sessions for authenticated users"
     },
     "/bookings/{bookingId}": {
       "schema": "Booking",

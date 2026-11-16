@@ -6,32 +6,29 @@
 
 import React from 'react';
 import { useLanguage } from '../context/LanguageContext';
-import { useMarketplace } from '../context/MarketplaceContext';
 import {
   Building2,
-  Mountain,
   Music,
   UtensilsCrossed,
-  Award,
-  Calendar,
-  Layers,
   Sparkles,
   Briefcase,
+  Menu,
 } from 'lucide-react';
 
 interface MobileAppNavBarProps {
   activeView: 'EXPLORE' | 'MANAGED_EVENT' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS';
   setActiveView: (view: 'EXPLORE' | 'MANAGED_EVENT' | 'ORGANIZERS' | 'VENDORS' | 'NIMANTRANA' | 'DASHBOARD' | 'DESTINATION' | 'STAFF_POOL' | 'SOCIAL_CAUSE' | 'CANCELLATIONS') => void;
   onOpenFeatures?: () => void;
+  onOpenDrawer?: () => void;
 }
 
 export const MobileAppNavBar: React.FC<MobileAppNavBarProps> = ({
   activeView,
   setActiveView,
   onOpenFeatures,
+  onOpenDrawer,
 }) => {
   const { language } = useLanguage();
-  const { setActiveModal } = useMarketplace();
 
   const navItems = [
     {
@@ -75,12 +72,23 @@ export const MobileAppNavBar: React.FC<MobileAppNavBarProps> = ({
       isActive: activeView === 'NIMANTRANA',
     },
     {
-      id: 'ORGANIZERS',
-      label: language === 'ne' ? 'अर्गनाइजर' : 'Planners',
-      shortLabel: 'Planners',
-      icon: Award,
-      onClick: () => setActiveView('ORGANIZERS'),
-      isActive: activeView === 'ORGANIZERS',
+      id: 'MENU_DRAWER',
+      label: language === 'ne' ? 'सबै मेनु' : 'All Sections',
+      shortLabel: language === 'ne' ? 'मेनु' : 'Sections',
+      icon: Menu,
+      onClick: () => {
+        if (onOpenDrawer) {
+          onOpenDrawer();
+        } else if (onOpenFeatures) {
+          onOpenFeatures();
+        }
+      },
+      isActive:
+        activeView === 'ORGANIZERS' ||
+        activeView === 'DESTINATION' ||
+        activeView === 'SOCIAL_CAUSE' ||
+        activeView === 'CANCELLATIONS' ||
+        activeView === 'DASHBOARD',
     },
   ];
 

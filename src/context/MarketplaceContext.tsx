@@ -55,7 +55,13 @@ import {
 import { SEED_MANAGED_EVENT_REQUESTS } from '../data/managedEventTemplates';
 import { STANDARD_CATERING_PACKAGES, MASTER_MENU_ITEMS } from '../data/menuCatalog';
 import { doc, setDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import { db, auth } from '../firebase/config';
+import {
+  saveUserWorkspacePreferences,
+  subscribeUserWorkspacePreferences,
+  syncAuthenticatedUserProfile,
+} from '../firebase/userWorkspaceSync';
 import { PANCHANGA_AUSPICIOUS_MUHURATS } from '../data/panchangaCalendar';
 import { SEED_VENUES } from '../data/venuesData';
 import { SEED_BOOKINGS, SEED_NEGOTIATIONS, SEED_REVIEWS } from '../data/seedMarketplaceState';
@@ -550,6 +556,71 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     }
   }, [savedVendorIds]);
+
+  const firestoreHydratedRef = useRef(false);
+  const authenticatedUidRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    let unsubPrefs: (() => void) | null = null;
+    const unsubAuth = onAuthStateChanged(auth, (fbUser) => {
+      if (unsubPrefs) {
+        unsubPrefs();
+        unsubPrefs = null;
+      }
+      if (!fbUser) {
+        authenticatedUidRef.current = null;
+        firestoreHydratedRef.current = false;
+        return;
+      }
+
+      authenticatedUidRef.current = fbUser.uid;
+      setCurrentUser((prev) => ({
+        ...prev,
+        id: fbUser.uid,
+        email: fbUser.email || prev.email,
+        name: fbUser.displayName ? `${fbUser.displayName}` : prev.name,
+      }));
+
+      syncAuthenticatedUserProfile(fbUser).catch((err) => {
+        console.warn('User profile sync note:', err);
+      });
+
+      unsubPrefs = subscribeUserWorkspacePreferences(
+        fbUser.uid,
+        (remotePrefs) => {
+          firestoreHydratedRef.current = true;
+          if (remotePrefs) {
+            if (Array.isArray(remotePrefs.savedVenueIds) && remotePrefs.savedVenueIds.length > 0) {
+              setSavedVenueIds(remotePrefs.savedVenueIds);
+            }
+            if (Array.isArray(remotePrefs.savedVendorIds) && remotePrefs.savedVendorIds.length > 0) {
+              setSavedVendorIds(remotePrefs.savedVendorIds);
+            }
+          } else {
+            saveUserWorkspacePreferences(fbUser.uid, savedVenueIds, savedVendorIds).catch((err) =>
+              console.warn('Initial workspace preference sync note:', err)
+            );
+          }
+        },
+        (err) => {
+          console.warn('Workspace preference listener note:', err);
+        }
+      );
+    });
+
+    return () => {
+      if (unsubPrefs) unsubPrefs();
+      unsubAuth();
+    };
+  }, []);
+
+  useEffect(() => {
+    const uid = authenticatedUidRef.current;
+    if (!uid || !auth.currentUser || !firestoreHydratedRef.current) return;
+    saveUserWorkspacePreferences(uid, savedVenueIds, savedVendorIds).catch((err) =>
+      console.warn('Workspace preference save note:', err)
+    );
+  }, [savedVenueIds, savedVendorIds]);
 
   const toggleSaveVenue = (venueId: string) => {
     setSavedVenueIds((prev) =>
