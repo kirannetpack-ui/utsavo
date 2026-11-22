@@ -11,12 +11,12 @@ export default defineConfig(() => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.png', 'utsavo-logo.png', 'utsavo-icon.png', 'apple-touch-icon.png'],
+        includeAssets: ['favicon.png', 'sagunoo-icon.svg', 'sagunoo-icon.png', 'apple-touch-icon.png'],
         manifest: {
-          name: 'UTSAVO — Nepal Celebration Marketplace',
-          short_name: 'UTSAVO',
-          description: "Smart Celebration Marketplace for Party Palaces, Cultural Artists, and Digital Nimantrana in Nepal",
-          theme_color: '#991b1b',
+          name: 'SAGUNOO — Nepal Celebration Platform',
+          short_name: 'SAGUNOO',
+          description: "Nepal's Auspicious Celebration Platform for Party Palaces, Cultural Artists, Managed Events, and Digital Nimantrana",
+          theme_color: '#7A0E26',
           background_color: '#fbfbf9',
           display: 'standalone',
           orientation: 'portrait-primary',

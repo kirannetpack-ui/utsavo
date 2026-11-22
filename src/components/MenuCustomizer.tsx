@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Advanced Catering & Menu Customizer Engine
+ * SAGUNOO - Advanced Catering & Menu Customizer Engine
  * Priority Feature 8: Dynamic dishes selection, live counters, and NPR tax calculations
  */
 

@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Nepal Government Statutory Regulatory Directives & Rules Seed Data
+ * SAGUNOO - Nepal Government Statutory Regulatory Directives & Rules Seed Data
  * Covers: Labour Act 2074, Local Administration Act 2028 (10 PM Curfew),
  * IRD 13% VAT & TDS, Food Safety Act 2081, and Consumer Protection Act 2075.
  */

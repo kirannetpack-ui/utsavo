@@ -1,5 +1,5 @@
 /**
- * UTSAVO — AI Negotiation Summary View
+ * SAGUNOO — AI Negotiation Summary View
  * Provides both customer and venue vendor with a transparent, auditable record of all
  * price counter-offers, concessions, tax breakdowns, and accepted/active agreement terms.
  */
@@ -118,7 +118,7 @@ export const NegotiationSummaryView: React.FC<NegotiationSummaryViewProps> = ({
       .join('\n');
 
     const recordText = [
-      `UTSAVO TRANSPARENT NEGOTIATION & AGREEMENT RECORD`,
+      `SAGUNOO TRANSPARENT NEGOTIATION & AGREEMENT RECORD`,
       `Enquiry: #${thread.enquiryId} | Status: ${thread.status}`,
       `Venue: ${thread.venueName} | Customer: ${thread.customerName} (${thread.customerPhone})`,
       `Event: ${thread.eventType} on ${latestOffer.dateBS} BS (${latestOffer.dateAD} AD) · ${latestOffer.shift} Shift`,

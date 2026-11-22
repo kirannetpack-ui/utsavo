@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Global Destination Celebrations Outside Nepal & Star Hotel Concierge Seed Data
+ * SAGUNOO — Global Destination Celebrations Outside Nepal & Star Hotel Concierge Seed Data
  */
 
 import {
@@ -49,7 +49,7 @@ export const INTERNATIONAL_DESTINATIONS_OUTSIDE_NEPAL: InternationalDestinationP
     headline: '5-Star Palm Beachfront & Starlit Arabian Desert Dune Celebrations',
     bestMonths: 'November – March',
     directFlightsFromKtm: 'Direct 4.5-hr flights Kathmandu → Dubai / Abu Dhabi daily',
-    visaAdvisoryForNepaliGuests: 'UTSAVO coordinates group 30/60-day UAE tourist visas through licensed hotel sponsors.',
+    visaAdvisoryForNepaliGuests: 'SAGUNOO coordinates group 30/60-day UAE tourist visas through licensed hotel sponsors.',
     vedicHavanFeasibility: 'Permitted on designated private hotel beach lawns & sand-dune majlis with smokeless Havan kits.',
     recommendedArchetype: 'FIVE_STAR_LUXURY_RESORT',
     startingBudgetUsd: 48000,
@@ -161,7 +161,7 @@ export const OUTSIDE_NEPAL_WOW_MOMENTS = [
 export const SEED_STAR_HOTEL_REQUESTS: StarHotelSourcingRequest[] = [
   {
     id: 'htl-req-1',
-    requestRef: 'UTS-HTL-8421',
+    requestRef: 'SGN-HTL-8421',
     clientName: 'Prakash & Anjali Pradhan',
     clientEmail: 'prakash.pradhan@gmail.com',
     clientPhone: '+977-9851044821',
@@ -207,7 +207,7 @@ export const SEED_STAR_HOTEL_REQUESTS: StarHotelSourcingRequest[] = [
   },
   {
     id: 'htl-req-2',
-    requestRef: 'UTS-HTL-8490',
+    requestRef: 'SGN-HTL-8490',
     clientName: 'Dr. Ramesh & Meera Adhikari',
     clientEmail: 'meera.adhikari@outlook.com',
     clientPhone: '+977-9841229018',
@@ -242,7 +242,7 @@ export const SEED_STAR_HOTEL_REQUESTS: StarHotelSourcingRequest[] = [
 export const SEED_OUTSIDE_NEPAL_REQUESTS: OutsideNepalDestinationRequest[] = [
   {
     id: 'intl-req-1',
-    requestRef: 'UTS-INTL-5092',
+    requestRef: 'SGN-INTL-5092',
     clientName: 'Aayush Adhikari & Elena Vance',
     clientEmail: 'aayush.elena@gmail.com',
     clientPhone: '+44 7700 900412',

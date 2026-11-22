@@ -1,5 +1,5 @@
 /**
- * UTSAVO — QR Code Generation & High-Resolution Export Utility
+ * SAGUNOO — QR Code Generation & High-Resolution Export Utility
  * Generates unique, downloadable QR codes and printable wedding card badges
  * linking directly to specific digital invitation E-Cards.
  */
@@ -290,7 +290,7 @@ export async function generatePrintableCeremonyCardBadge(
   // 9. Footer
   ctx.font = '500 24px sans-serif';
   ctx.fillStyle = '#78716c';
-  ctx.fillText('UTSAVO — Nepal\'s Smart Celebration Marketplace', width / 2, 1500);
+  ctx.fillText('SAGUNOO — Nepal\'s Smart Celebration Marketplace', width / 2, 1500);
 
   return canvas.toDataURL('image/png');
 }

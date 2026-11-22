@@ -1,8 +1,8 @@
 /**
- * UTSAVO — Client Star Hotel Venue Request & Admin Concierge Modal
+ * SAGUNOO — Client Star Hotel Venue Request & Admin Concierge Modal
  * Allows clients to request any 3-Star, 4-Star, 5-Star, Heritage, or 7-Star hotel
  * (specific property names or open recommendations in Nepal or worldwide) so the
- * UTSAVO System Admin can source availability, negotiate corporate rates, and list it.
+ * SAGUNOO System Admin can source availability, negotiate corporate rates, and list it.
  */
 
 import React, { useState } from 'react';
@@ -34,7 +34,7 @@ const STAR_TIER_OPTIONS: Array<{ value: StarHotelTier; label: string; hint: stri
   { value: '4_STAR', label: '4-Star Boutique / Business', hint: 'e.g. Aloft, Courtyard, Barahi, Fishtail' },
   { value: '3_STAR', label: '3-Star Classic Banquet', hint: 'Comfortable rooms & courtyard ballroom' },
   { value: '7_STAR_ULTRA_LUXURY', label: '7-Star Ultra-Luxury', hint: 'Royal palace suites & full-property buyout' },
-  { value: 'ANY_TOP_STAR', label: 'Any Verified 3★–5★ Option', hint: 'Let UTSAVO Admin curate the best match' },
+  { value: 'ANY_TOP_STAR', label: 'Any Verified 3★–5★ Option', hint: 'Let SAGUNOO Admin curate the best match' },
 ];
 
 const BANQUET_SETTINGS: Array<{
@@ -126,7 +126,7 @@ export const StarHotelRequestModal: React.FC = () => {
               <span>
                 {language === 'ne'
                   ? 'तारे होटल भेन्यु सोर्सिङ सेवा'
-                  : 'UTSAVO Star Hotel Venue Concierge'}
+                  : 'SAGUNOO Star Hotel Venue Concierge'}
               </span>
             </div>
             <h3 className="font-display text-xl sm:text-2xl font-bold">
@@ -137,7 +137,7 @@ export const StarHotelRequestModal: React.FC = () => {
             <p className="text-xs text-stone-300 mt-1 max-w-2xl">
               {language === 'ne'
                 ? 'तपाईंले चाहेको तारे होटल र मिति पठाउनुहोस्; हाम्रो सिस्टम एडमिनले हल उपलब्धता, कोठा ब्लक र कर्पोरेट दर मिलाई प्रणालीमा जोड्नेछ।'
-                : 'Specify any 3-Star to 7-Star hotel inside Nepal or abroad. UTSAVO System Admin checks banquet holds, negotiates group room & plate rates, and secures it for you.'}
+                : 'Specify any 3-Star to 7-Star hotel inside Nepal or abroad. SAGUNOO System Admin checks banquet holds, negotiates group room & plate rates, and secures it for you.'}
             </p>
           </div>
           <button
@@ -160,7 +160,7 @@ export const StarHotelRequestModal: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 block">
-                    Dispatched to UTSAVO System Admin Desk
+                    Dispatched to SAGUNOO System Admin Desk
                   </span>
                   <h4 className="font-display text-xl font-bold text-stone-900 tabular-nums">
                     Request Reference #{submittedRequest.requestRef}

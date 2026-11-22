@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Professional Event Organizers & Production Directory
+ * SAGUNOO - Professional Event Organizers & Production Directory
  * Connects event hosts, wedding couples, and corporate clients with certified Event Planners.
  * Integrates global success standards (Liability Insurance, Run-of-Show, Tech Riders),
  * and cross-matches with venues that welcome external event organizers.
@@ -216,7 +216,7 @@ export const EventOrganizersDirectory: React.FC<EventOrganizersDirectoryProps> =
               </span>
             </div>
             <p className="text-xs text-stone-600 leading-relaxed">
-              <strong>-6 hr Load-In No-Show Window:</strong> Missing pre-event rigging/load-in freezes final milestone payout and dispatches standby UTSAVO production leads; client cancellations after production fabrication cover incurred third-party sub-vendor costs. <strong>Continuity Peer Referral:</strong> Cancelling planners transfer full CAD Run-of-Show packets to an alternate vetted agency with optional <strong>5–10% B2B Finder Fee</strong> & explicit <strong>Third-Party Referral Liability Release</strong> once the client executes the new agreement.
+              <strong>-6 hr Load-In No-Show Window:</strong> Missing pre-event rigging/load-in freezes final milestone payout and dispatches standby SAGUNOO production leads; client cancellations after production fabrication cover incurred third-party sub-vendor costs. <strong>Continuity Peer Referral:</strong> Cancelling planners transfer full CAD Run-of-Show packets to an alternate vetted agency with optional <strong>5–10% B2B Finder Fee</strong> & explicit <strong>Third-Party Referral Liability Release</strong> once the client executes the new agreement.
             </p>
           </div>
         </div>

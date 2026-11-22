@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Destination Celebrations in Nepal (नेपाल डेस्टिनेशन उत्सव)
+ * SAGUNOO - Destination Celebrations in Nepal (नेपाल डेस्टिनेशन उत्सव)
  * Global client intake, tourism promotion, iconic package discovery,
  * and AI-powered global requirements sourcing engine.
  */
@@ -222,7 +222,7 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
     e.preventDefault();
     setIsSubmitting(true);
 
-    const refCode = `UTS-DEST-NP-${Math.floor(1000 + Math.random() * 9000)}`;
+    const refCode = `SGN-DEST-NP-${Math.floor(1000 + Math.random() * 9000)}`;
     const newInquiry: DestinationInquiry = {
       id: `inq-${Date.now()}`,
       inquiryRef: refCode,
@@ -279,7 +279,7 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
       phone: hotelPhone || '+977-9851000000',
       email: hotelEmail || 'info@destinations-nepal.com',
       isVerified: true,
-      featuredBadges: ['UTSAVO Verified Haven', `${hotelAltitude}m Elevation`],
+      featuredBadges: ['SAGUNOO Verified Haven', `${hotelAltitude}m Elevation`],
     };
 
     addDestinationHotel(newHotel);
@@ -300,7 +300,7 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
       placeName: servicePlaceName || 'Annapurna & Kathmandu Valley',
       providerName: serviceProvider || 'Nepal Celebration Specialists',
       phone: servicePhone || '+977-9801234567',
-      email: serviceEmail || 'concierge@utsavo.com',
+      email: serviceEmail || 'concierge@sagunoo.com',
       startingPriceUsd: Number(servicePriceUsd) || 2000,
       startingPriceNpr: Number(servicePriceNpr) || 260000,
       priceModel: servicePriceModel,
@@ -1517,7 +1517,7 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
             </div>
 
             <p className="text-sm text-stone-700 leading-relaxed max-w-2xl">
-              Thank you, <strong className="text-stone-950">{submittedInquiry.clientName}</strong>! Your customized celebration dossier for <strong className="text-stone-950">{submittedInquiry.targetDestination}</strong> has been received by UTSAVO's Chief Destination Concierge. An itemized proposal with hotel room blocks, helicopter logistics, and Panchanga Muhurat timing is being routed to <strong className="text-stone-950">{submittedInquiry.clientEmail}</strong>.
+              Thank you, <strong className="text-stone-950">{submittedInquiry.clientName}</strong>! Your customized celebration dossier for <strong className="text-stone-950">{submittedInquiry.targetDestination}</strong> has been received by SAGUNOO's Chief Destination Concierge. An itemized proposal with hotel room blocks, helicopter logistics, and Panchanga Muhurat timing is being routed to <strong className="text-stone-950">{submittedInquiry.clientEmail}</strong>.
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-white/80 rounded-xl border border-stone-200 text-xs">
@@ -1895,7 +1895,7 @@ export const DestinationCelebrationHub: React.FC<DestinationCelebrationHubProps>
                   </div>
                   <div>
                     <h4 className="font-display text-base font-bold text-white">
-                      UTSAVO AI Global Sourcing Engine
+                      SAGUNOO AI Global Sourcing Engine
                     </h4>
                     <p className="text-xs text-stone-300">
                       Instantly query live Google Search grounding for Nepal visa laws, bridal jewelry customs, seasonal weather & itemized costs.

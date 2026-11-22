@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Hindu Panchanga Samiti Auspicious Dates & Cultural Festivals Modal
+ * SAGUNOO - Hindu Panchanga Samiti Auspicious Dates & Cultural Festivals Modal
  * Sanctioned Subha Muhurats (विवाह, व्रतबन्ध, पास्नी, गृह प्रवेश) & Ethnic Festivals of Nepal
  * Automatically evaluates Muhurat dates against popular venues, confirmed bookings & soft holds.
  */
@@ -52,8 +52,8 @@ export const PanchangaCalendarModal: React.FC = () => {
   // Re-evaluate automatically whenever availability overrides change across tabs/modals
   useEffect(() => {
     const onUpdated = () => setAvailabilityRefreshTick((n) => n + 1);
-    window.addEventListener('utsavo:availability_updated', onUpdated);
-    return () => window.removeEventListener('utsavo:availability_updated', onUpdated);
+    window.addEventListener('sagunoo:availability_updated', onUpdated);
+    return () => window.removeEventListener('sagunoo:availability_updated', onUpdated);
   }, []);
 
   // Automatic availability analysis across top popular venues for every Muhurat

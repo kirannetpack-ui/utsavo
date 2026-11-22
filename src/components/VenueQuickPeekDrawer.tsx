@@ -1,5 +1,5 @@
 /**
- * UTSAVO - 1-Tap Venue Quick-Peek Drawer
+ * SAGUNOO - 1-Tap Venue Quick-Peek Drawer
  * Designed for "Maximum Information at Minimum Touchable":
  * Instant glanceable inspection of capacity, per-plate price, parking, sound curfew,
  * verified PAN/VAT, generator specs, and direct 1-tap WhatsApp / booking triggers.
@@ -67,7 +67,7 @@ export const VenueQuickPeekDrawer: React.FC<VenueQuickPeekDrawerProps> = ({
     e.stopPropagation();
     const cleanPhone = venue.phone.replace(/[^0-9]/g, '');
     const message = encodeURIComponent(
-      `Namaste ${venue.name}, I found your party palace on UTSAVO Nepal. I would like to inquire about booking availability and per-plate catering packages.`
+      `Namaste ${venue.name}, I found your party palace on SAGUNOO Nepal. I would like to inquire about booking availability and per-plate catering packages.`
     );
     window.open(`https://wa.me/${cleanPhone.slice(-10)}?text=${message}`, '_blank');
   };
@@ -76,8 +76,8 @@ export const VenueQuickPeekDrawer: React.FC<VenueQuickPeekDrawerProps> = ({
     e.stopPropagation();
     if (navigator.share) {
       navigator.share({
-        title: `${venue.name} - UTSAVO Nepal`,
-        text: `Check out ${venue.name} in ${venue.locality}, ${venue.district} on UTSAVO!`,
+        title: `${venue.name} - SAGUNOO Nepal`,
+        text: `Check out ${venue.name} in ${venue.locality}, ${venue.district} on SAGUNOO!`,
         url: window.location.href,
       }).catch(() => {});
     } else {

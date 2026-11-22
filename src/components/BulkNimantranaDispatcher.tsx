@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Bulk WhatsApp & Viber Invitation Dispatcher & Real-Time Guest Status Tracker
+ * SAGUNOO — Bulk WhatsApp & Viber Invitation Dispatcher & Real-Time Guest Status Tracker
  * Supports:
  * 1. CSV / Excel (.xlsx, .xls) bulk contact imports
  * 2. Downloadable CSV sample template
@@ -221,7 +221,7 @@ export const BulkNimantranaDispatcher: React.FC<BulkNimantranaDispatcherProps> =
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'utsavo-nimantrana-guest-template.csv');
+    link.setAttribute('download', 'sagunoo-nimantrana-guest-template.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

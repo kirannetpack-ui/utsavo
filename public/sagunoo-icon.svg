@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="SAGUNOO — Himalayan Diya and Unity Crest">
+  <rect x="0" y="0" width="512" height="512" rx="96" fill="#7A0E26" />
+  <!-- Faceted Golden Octagonal Mandala Border -->
+  <polygon points="172,48 340,48 464,172 464,340 340,464 172,464 48,340 48,172" fill="none" stroke="#EAB308" stroke-width="8" stroke-linejoin="round" />
+  <polygon points="184,78 328,78 434,184 434,328 328,434 184,434 78,328 78,184" fill="none" stroke="#EAB308" stroke-width="6" stroke-linejoin="round" />
+  <path d="M256 48 L184 78 M256 48 L328 78 M464 256 L434 184 M464 256 L434 328 M256 464 L184 434 M256 464 L328 434 M48 256 L78 184 M48 256 L78 328" stroke="#EAB308" stroke-width="5" stroke-linecap="round" />
+  <!-- Sacred Golden Diyo Flame & Lamp -->
+  <path d="M256 112 C276 144 286 164 286 180 C286 198 273 210 256 210 C239 210 226 198 226 180 C226 164 236 144 256 112 Z" fill="none" stroke="#EAB308" stroke-width="9" stroke-linejoin="round" />
+  <path d="M256 150 C264 166 268 176 268 184 C268 193 263 199 256 199 C249 199 244 193 244 184 C244 176 248 166 256 150 Z" fill="none" stroke="#EAB308" stroke-width="7" stroke-linejoin="round" />
+  <path d="M210 196 L302 196 C294 224 276 236 256 236 C236 236 218 224 210 196 Z" fill="none" stroke="#EAB308" stroke-width="8" stroke-linejoin="round" />
+  <!-- Twin Himalayan Snow-Capped Peaks -->
+  <path d="M84 316 L194 206 L288 300 M428 316 L318 206 L224 300" fill="none" stroke="#EAB308" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M156 244 L178 266 L196 248 L216 268 L234 250 M278 250 L296 268 L316 248 L334 266 L356 244" fill="none" stroke="#EAB308" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Interlocking Twin Unity Rings (OO) -->
+  <circle cx="222" cy="360" r="52" fill="none" stroke="#EAB308" stroke-width="9" />
+  <circle cx="222" cy="360" r="38" fill="none" stroke="#EAB308" stroke-width="6" />
+  <circle cx="290" cy="360" r="52" fill="none" stroke="#EAB308" stroke-width="9" />
+  <circle cx="290" cy="360" r="38" fill="none" stroke="#EAB308" stroke-width="6" />
+</svg>

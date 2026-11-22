@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Advanced Venue Filter Component
+ * SAGUNOO - Advanced Venue Filter Component
  * Multi-criteria filtering by capacity range, catering & rental price range, and verified amenities
  */
 

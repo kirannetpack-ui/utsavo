@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Cultural Artists & Specialized Celebration Vendors Directory
+ * SAGUNOO — Cultural Artists & Specialized Celebration Vendors Directory
  * Turnkey talent: Panche Baja, Dhime Baja, Vedic Purohits, Photographers, Makeup Artists & Attire
  */
 
@@ -684,7 +684,7 @@ export const CulturalVendorsDirectory: React.FC<CulturalVendorsDirectoryProps> =
             <div className="p-5 bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-white flex items-center justify-between">
               <div>
                 <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-                  Utsavo Cultural Guild Registration
+                  Sagunoo Cultural Guild Registration
                 </span>
                 <h3 className="font-display text-xl font-bold">Register as Artist or Vendor</h3>
                 <p className="text-xs text-stone-300">
@@ -703,7 +703,7 @@ export const CulturalVendorsDirectory: React.FC<CulturalVendorsDirectoryProps> =
               <div className="p-10 text-center space-y-3">
                 <CheckCircle className="w-12 h-12 text-emerald-600 mx-auto animate-bounce" />
                 <h4 className="font-display text-lg font-bold text-stone-900">
-                  Welcome to the Utsavo Cultural Guild!
+                  Welcome to the Sagunoo Cultural Guild!
                 </h4>
                 <p className="text-xs text-stone-600">
                   Your troupe profile has been registered and verified. Couples and venues can now connect with you via WhatsApp and Viber.
@@ -870,7 +870,7 @@ export const CulturalVendorsDirectory: React.FC<CulturalVendorsDirectoryProps> =
                       required
                       value={newVendor.email}
                       onChange={(e) => setNewVendor({ ...newVendor, email: e.target.value })}
-                      placeholder="artist@utsavo.np"
+                      placeholder="artist@sagunoo.com.np"
                       className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                     />
                   </div>

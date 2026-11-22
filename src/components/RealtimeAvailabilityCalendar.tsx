@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Real-Time Availability & Auspicious Panchanga Calendar Component
+ * SAGUNOO — Real-Time Availability & Auspicious Panchanga Calendar Component
  * Used across both Venue Detail Modal and Cultural Vendors Directory.
  * Displays:
  * 1. Live slot availability (Available, Limited, Booked)
@@ -100,8 +100,8 @@ export const RealtimeAvailabilityCalendar: React.FC<RealtimeAvailabilityCalendar
         refreshAvailability();
       }
     };
-    window.addEventListener('utsavo:availability_updated', handleUpdate);
-    return () => window.removeEventListener('utsavo:availability_updated', handleUpdate);
+    window.addEventListener('sagunoo:availability_updated', handleUpdate);
+    return () => window.removeEventListener('sagunoo:availability_updated', handleUpdate);
   }, [entityId, selectedMonth]);
 
   const handleSelectDay = (day: DayAvailability) => {
@@ -139,7 +139,7 @@ export const RealtimeAvailabilityCalendar: React.FC<RealtimeAvailabilityCalendar
 
   // WhatsApp Inquiry message for selected date
   const waInquiryMessage = selectedDay
-    ? `🙏 *UTSAVO Real-Time Booking Inquiry* 🙏
+    ? `🙏 *SAGUNOO Real-Time Booking Inquiry* 🙏
 
 Hello ${entityName},
 

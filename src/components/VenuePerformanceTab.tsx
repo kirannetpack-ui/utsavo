@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Venue Performance Tab (Past 6 Months Recharts Analytics)
+ * SAGUNOO — Venue Performance Tab (Past 6 Months Recharts Analytics)
  * Visualizes 6-month booking trends, inquiry volume, and average negotiation outcomes
  * (acceptance rate, initial vs. final agreed per-plate NPR, and counter-offer spread).
  */
@@ -325,7 +325,7 @@ export const VenuePerformanceTab: React.FC<VenuePerformanceTabProps> = ({
     link.setAttribute('href', encodeURI(csv));
     link.setAttribute(
       'download',
-      `UTSAVO_Venue_Performance_6M_${venue.name.replace(/\s+/g, '_')}.csv`
+      `SAGUNOO_Venue_Performance_6M_${venue.name.replace(/\s+/g, '_')}.csv`
     );
     document.body.appendChild(link);
     link.click();

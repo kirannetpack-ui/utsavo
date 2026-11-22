@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Professional Event Organizer Registration Modal
+ * SAGUNOO - Professional Event Organizer Registration Modal
  * Grounded in global event management standards (MPI, ILEA, Event Safety Alliance)
  * Multi-step wizard capturing company credentials, insurance, technical riders,
  * run-of-show protocols, safety measures, portfolio photos/videos, and pricing.
@@ -987,8 +987,8 @@ export const EventOrganizerRegistrationModal: React.FC<EventOrganizerRegistratio
                     <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                     <span>
                       {language === 'ne'
-                        ? 'इभेन्ट अर्गनाइजर प्रोफाइल सफलतापूर्वक दर्ता भयो! UTSAVO नेटवर्कमा सक्रिय गरिँदैछ...'
-                        : 'Event Organizer registered successfully! Publishing to UTSAVO global directory...'}
+                        ? 'इभेन्ट अर्गनाइजर प्रोफाइल सफलतापूर्वक दर्ता भयो! SAGUNOO नेटवर्कमा सक्रिय गरिँदैछ...'
+                        : 'Event Organizer registered successfully! Publishing to SAGUNOO global directory...'}
                     </span>
                   </div>
                 )}

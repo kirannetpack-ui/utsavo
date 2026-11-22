@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Venue Detail & Multi-Hall Modal
+ * SAGUNOO - Venue Detail & Multi-Hall Modal
  * Overview, Hall Spaces, Live Shift Calendar, Menu Customizer & Verified Reviews
  */
 
@@ -471,7 +471,7 @@ export const VenueDetailModal: React.FC = () => {
                     {dynPolicy.referralConfig.allowsPartnerReferral && (
                       <div className="text-stone-700 leading-relaxed">
                         <strong>Vendor Cancellation Substitute &amp; Referral Guarantee:</strong>{' '}
-                        If venue initiates cancellation, client receives 100% refund OR chooses from 1–3 vetted peer venues with direct UTSAVO escrow transfer ({dynPolicy.referralConfig.referralFeeModel === 'COURTESY_ZERO_FEE' ? '0% emergency courtesy fee' : 'B2B partner fee covered by vendor'}).
+                        If venue initiates cancellation, client receives 100% refund OR chooses from 1–3 vetted peer venues with direct SAGUNOO escrow transfer ({dynPolicy.referralConfig.referralFeeModel === 'COURTESY_ZERO_FEE' ? '0% emergency courtesy fee' : 'B2B partner fee covered by vendor'}).
                       </div>
                     )}
 

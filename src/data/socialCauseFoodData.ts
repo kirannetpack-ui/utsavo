@@ -1,8 +1,8 @@
 /**
- * UTSAVO - Annapurna Seva: Excess Feast Food Recovery & Social Cause
+ * SAGUNOO - Annapurna Seva: Excess Feast Food Recovery & Social Cause
  * Grounded in Nepal's voluntary client consent model & DFTQC food safety norms.
  * Surplus untouched kitchen food redirected to verified humanitarian organizations
- * or UTSAVO's Direct Rapid Rescue & Cold-Chain Van.
+ * or SAGUNOO's Direct Rapid Rescue & Cold-Chain Van.
  */
 
 import { ExcessFoodRescuePledge } from '../types';
@@ -17,9 +17,9 @@ export const SEED_FOOD_RESCUE_PLEDGES: ExcessFoodRescuePledge[] = [
     clientPhone: '+977-9851023456',
     clientConsentGiven: true,
     clientConsentTimestamp: '2026-10-20T21:30:00Z',
-    clientConsentDeclaration: 'I voluntarily authorize UTSAVO Annapurna Seva to pack and dispatch all surplus untouched feast food to Manav Sewa Ashram with love and prayers.',
+    clientConsentDeclaration: 'I voluntarily authorize SAGUNOO Annapurna Seva to pack and dispatch all surplus untouched feast food to Manav Sewa Ashram with love and prayers.',
     partnerType: 'UTSAVO_DIRECT_RESCUE',
-    organizationName: 'UTSAVO Annapurna Seva Direct Rapid Van',
+    organizationName: 'SAGUNOO Annapurna Seva Direct Rapid Van',
     estimatedSurplusPortions: 95,
     foodCategory: 'TRADITIONAL_NEPALI_FEAST',
     eventEndTime: '21:00',
@@ -83,10 +83,10 @@ export const SEED_FOOD_RESCUE_PLEDGES: ExcessFoodRescuePledge[] = [
 export const REGISTERED_FOOD_CHARITY_PARTNERS = [
   {
     id: 'charity-01',
-    name: 'UTSAVO Annapurna Seva (उत्सव अन्नपूर्णा सेवा)',
-    category: 'UTSAVO Direct Rapid Rescue Van & Volunteers',
+    name: 'SAGUNOO Annapurna Seva (उत्सव अन्नपूर्णा सेवा)',
+    category: 'SAGUNOO Direct Rapid Rescue Van & Volunteers',
     coverageDistricts: ['Kathmandu', 'Lalitpur', 'Bhaktapur', 'Pokhara', 'Chitwan'],
-    description: 'UTSAVO’s dedicated food relief vehicles equipped with stainless temperature-regulated hot containers and rapid delivery directly to verified night shelters and ashrams.',
+    description: 'SAGUNOO’s dedicated food relief vehicles equipped with stainless temperature-regulated hot containers and rapid delivery directly to verified night shelters and ashrams.',
     contactPhone: '+977-9801008728',
     dftqcCertified: true,
     isUtsavoDirect: true,

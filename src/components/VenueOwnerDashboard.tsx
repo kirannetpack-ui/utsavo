@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Venue Owner & Manager Business Portal
+ * SAGUNOO - Venue Owner & Manager Business Portal
  * Complete ERP: Scheduling, Inquiries, Walk-In Reservations, Analytics,
  * Menu & Pricing Management (Per-Plate & Dishes), Unlimited Media Gallery (Photos & Videos),
  * and Event Management Policies (In-House vs Outside Event Organizers).
@@ -106,7 +106,7 @@ export const VenueOwnerDashboard: React.FC = () => {
         badgeText: '⚡ 15% OFF Subha Muhurat',
         discountType: 'PERCENTAGE',
         discountValue: 15,
-        promoCode: 'UTSAVO15',
+        promoCode: 'SAGUNOO15',
         validUntilBS: '2083 Mangsir 29',
         minGuests: 300,
         description: 'Get a flat 15% discount on total catering billing for weddings booked on auspicious Panchanga dates in Mangsir.',

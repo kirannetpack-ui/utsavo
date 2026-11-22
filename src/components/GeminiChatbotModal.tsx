@@ -1,5 +1,5 @@
 /**
- * UTSAVO - AI Celebration Planning Assistant & Gemini Intelligence Hub
+ * SAGUNOO - AI Celebration Planning Assistant & Gemini Intelligence Hub
  * Features:
  * 1. Multi-turn chat with conversation history, role system instructions & model tier routing (gemini-4-hydrogen / gemini-3.1-flash-lite)
  * 2. Real-time bidirectional Voice Conversations via Gemini Live API (gemini-3.8-live WebSocket PCM streaming)
@@ -59,28 +59,28 @@ const ROLE_PRESETS: RolePresetOption[] = [
     label: 'Event Producer & Planner',
     shortDesc: 'Full event logistics, party palaces, guest flow & menus',
     systemInstruction:
-      'You are UTSAVO Event Producer & Planning Assistant for Nepal. Guide clients on wedding (Bibaha), reception, Bratabandha, Pasni, party palace selection, run-of-show logistics, sound curfews (10:00 PM DAO rule), and catering menus across Nepal in warm, structured English or Nepali.',
+      'You are SAGUNOO Event Producer & Planning Assistant for Nepal. Guide clients on wedding (Bibaha), reception, Bratabandha, Pasni, party palace selection, run-of-show logistics, sound curfews (10:00 PM DAO rule), and catering menus across Nepal in warm, structured English or Nepali.',
   },
   {
     id: 'PANCHANGA_PANDIT',
     label: 'Panchanga & Ritual Advisor',
     shortDesc: 'Samiti auspicious dates, Tithi, Nakshatra & Lagan timings',
     systemInstruction:
-      'You are UTSAVO Hindu Panchanga & Vedic Ritual Advisor. Explain Samiti auspicious dates, Tithi, Nakshatra, Lagan windows, seasonal suitability, and ceremonial requirements (Vivah Mandap, Havan, Bratabandha, Griha Pravesh) clearly and respectfully.',
+      'You are SAGUNOO Hindu Panchanga & Vedic Ritual Advisor. Explain Samiti auspicious dates, Tithi, Nakshatra, Lagan windows, seasonal suitability, and ceremonial requirements (Vivah Mandap, Havan, Bratabandha, Griha Pravesh) clearly and respectfully.',
   },
   {
     id: 'NEGOTIATION_STRATEGIST',
     label: 'Budget & Negotiation Strategist',
     shortDesc: 'Per-plate NPR math, 10% SC + 13% VAT & counter-offer tips',
     systemInstruction:
-      'You are UTSAVO Hospitality Commercial Strategist. Help hosts calculate per-plate costs + 10% Service Charge + 13% IRD VAT, spot off-season concession opportunities, and structure fair counter-offers for venues in NPR.',
+      'You are SAGUNOO Hospitality Commercial Strategist. Help hosts calculate per-plate costs + 10% Service Charge + 13% IRD VAT, spot off-season concession opportunities, and structure fair counter-offers for venues in NPR.',
   },
   {
     id: 'DESTINATION_CONCIERGE',
     label: 'Destination & NRI Concierge',
     shortDesc: 'Pokhara, Nagarkot, Chitwan & Nepali diaspora abroad events',
     systemInstruction:
-      'You are UTSAVO Destination & NRI Celebration Concierge specializing in Pokhara, Kathmandu, Nagarkot, Chitwan, and Nepali diaspora events abroad. Cover guest room blocks, travel logistics, visas, customs for wedding attire, and mountain weather backups.',
+      'You are SAGUNOO Destination & NRI Celebration Concierge specializing in Pokhara, Kathmandu, Nagarkot, Chitwan, and Nepali diaspora events abroad. Cover guest room blocks, travel logistics, visas, customs for wedding attire, and mountain weather backups.',
   },
 ];
 
@@ -756,7 +756,7 @@ export const GeminiChatbotModal: React.FC<{
               <Sparkles className="w-3.5 h-3.5" />
               <span>Gemini AI Celebration Suite · Chat, Live Voice &amp; Grounding</span>
             </div>
-            <h3 className="font-display text-xl font-bold">UTSAVO Smart Assistant</h3>
+            <h3 className="font-display text-xl font-bold">SAGUNOO Smart Assistant</h3>
             <p className="text-xs text-stone-300 mt-0.5">
               Powered by {activeTierMeta.modelName} &amp; Live Voice (gemini-3.8-live) with Search &amp; Maps Grounding
             </p>

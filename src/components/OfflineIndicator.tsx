@@ -1,5 +1,5 @@
 /**
- * UTSAVO — PWA Offline Indicator
+ * SAGUNOO — PWA Offline Indicator
  * Notifies users when they lose internet connectivity, assuring them that cached venues,
  * downloaded quotation drafts, and saved invitations remain accessible offline.
  */

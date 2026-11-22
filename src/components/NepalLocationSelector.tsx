@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Universal Nepal Location Selector (State & District Combobox)
+ * SAGUNOO - Universal Nepal Location Selector (State & District Combobox)
  * Strict Compliance:
  * 1. Lists all 77 districts across Nepal so any district can be chosen directly.
  * 2. Provides full free-form typing input with instant fuzzy search in Nepali & English.

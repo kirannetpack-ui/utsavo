@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Real-Time Favorite Venue SSE Toast Notification
+ * SAGUNOO - Real-Time Favorite Venue SSE Toast Notification
  * Slides in whenever an SSE push event delivers a newly opened Panchanga date
  * or last-minute cancellation slot for a venue saved in the customer's favorites.
  */

@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Scannable Real QR Code Component
+ * SAGUNOO — Scannable Real QR Code Component
  * Generates an authentic scannable QR code linking directly to the guest invitation card.
  */
 
@@ -56,7 +56,7 @@ export const ScannableQrCode: React.FC<ScannableQrCodeProps> = ({
   const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (dataUrl) {
-      triggerFileDownload(dataUrl, `UTSAVO-QR-${code || 'invitation'}.png`);
+      triggerFileDownload(dataUrl, `SAGUNOO-QR-${code || 'invitation'}.png`);
     }
   };
 

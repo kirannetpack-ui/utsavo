@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Comprehensive Feature Showcase & Quick Navigator
+ * SAGUNOO — Comprehensive Feature Showcase & Quick Navigator
  * Shows all features of the App & PWA in one organized, interactive matrix.
  */
 
@@ -46,9 +46,9 @@ export const FeaturesShowcaseModal: React.FC<FeaturesShowcaseModalProps> = ({
     {
       id: 'managed_event',
       category: 'Full-Service Concierge',
-      title: 'UTSAVO Managed Event Studio',
-      nepali: 'UTSAVO पूर्ण इभेन्ट व्यवस्थापन',
-      description: 'Have UTSAVO organize your entire event using smart intake on time, date, pax, budget, mandatory 12+ vendor functions & global protocols under 100% client control.',
+      title: 'SAGUNOO Managed Event Studio',
+      nepali: 'SAGUNOO पूर्ण इभेन्ट व्यवस्थापन',
+      description: 'Have SAGUNOO organize your entire event using smart intake on time, date, pax, budget, mandatory 12+ vendor functions & global protocols under 100% client control.',
       icon: Sparkles,
       badge: 'Client Authority',
       actionLabel: 'Launch Concierge',
@@ -230,7 +230,7 @@ export const FeaturesShowcaseModal: React.FC<FeaturesShowcaseModalProps> = ({
       category: 'Mobile & Desktop App',
       title: 'Progressive Web App (PWA) & Offline Mode',
       nepali: 'प्रोग्रेसिभ वेब एप (PWA)',
-      description: 'Install UTSAVO to your mobile home screen. Fast, responsive, and keeps cached venues & invitations accessible without internet.',
+      description: 'Install SAGUNOO to your mobile home screen. Fast, responsive, and keeps cached venues & invitations accessible without internet.',
       icon: Smartphone,
       badge: 'Installable PWA',
       actionLabel: 'App Features Active',
@@ -252,7 +252,7 @@ export const FeaturesShowcaseModal: React.FC<FeaturesShowcaseModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-display text-xl font-bold">UTSAVO Feature Matrix</h3>
+                <h3 className="font-display text-xl font-bold">SAGUNOO Feature Matrix</h3>
                 <span className="px-2 py-0.5 rounded-full bg-amber-500/30 text-amber-200 text-[10px] uppercase font-bold tracking-wider">
                   Complete Suite
                 </span>

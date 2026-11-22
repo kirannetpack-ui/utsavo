@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Auspicious Notification Center & Panchanga Preferences Drawer
+ * SAGUNOO - Auspicious Notification Center & Panchanga Preferences Drawer
  * Manages upcoming auspicious alerts, push simulation, and profile preferences.
  */
 

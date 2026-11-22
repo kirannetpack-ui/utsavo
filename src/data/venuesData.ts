@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Authentic Venue & Party Palace Seed Data
+ * SAGUNOO - Authentic Venue & Party Palace Seed Data
  * Verified venues across Nepal's key provinces and celebration hubs
  */
 
@@ -91,7 +91,7 @@ export const SEED_VENUES: Venue[] = [
         badgeText: '⚡ 15% OFF Subha Muhurat',
         discountType: 'PERCENTAGE',
         discountValue: 15,
-        promoCode: 'UTSAVO15',
+        promoCode: 'SAGUNOO15',
         validUntilBS: '2083 Mangsir 29',
         validUntilAD: '2026-12-15',
         minGuests: 300,

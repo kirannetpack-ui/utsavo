@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Post-Event Verified Review Modal
+ * SAGUNOO - Post-Event Verified Review Modal
  * Section 15: Multi-dimensional rating (Ambience, Catering, Service, Cleanliness, Price Transparency)
  */
 
@@ -38,7 +38,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({ bookingId, venueId, on
 
     addVerifiedReview({
       venueId,
-      bookingRef: booking?.bookingRef || 'UTS-VERIFIED',
+      bookingRef: booking?.bookingRef || 'SGN-VERIFIED',
       customerName: currentUser.name,
       eventType: booking?.eventType || 'WEDDING',
       eventDateBS: booking?.eventDateBS || '2083 BS',

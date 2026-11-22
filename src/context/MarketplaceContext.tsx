@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Marketplace State & Persistence Context
+ * SAGUNOO - Marketplace State & Persistence Context
  * Central engine governing venues, negotiations, bookings, agreements, and role switching
  */
 
@@ -347,7 +347,7 @@ interface MarketplaceContextType {
     }
   ) => void;
 
-  // UTSAVO Full-Service Managed Events (Client-Authoritative & Team Coordinated)
+  // SAGUNOO Full-Service Managed Events (Client-Authoritative & Team Coordinated)
   managedEventRequests: ManagedEventRequest[];
   submitManagedEventRequest: (
     req: Omit<
@@ -482,7 +482,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }, [outsideNepalRequests]);
 
-  // UTSAVO Full-Service Managed Events State (Persisted)
+  // SAGUNOO Full-Service Managed Events State (Persisted)
   const [managedEventRequests, setManagedEventRequests] = useState<ManagedEventRequest[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -1840,7 +1840,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     if (vendorPolicies[vendorId]) return vendorPolicies[vendorId];
     return createDynamicPolicyFromPreset({
       vendorId,
-      vendorName: vendorName || 'UTSAVO Partner',
+      vendorName: vendorName || 'SAGUNOO Partner',
       stakeholderCategory,
       preset: 'MODERATE_STANDARD',
     });
@@ -1896,7 +1896,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const newOffer: VendorReferralOffer = {
       id: `ref-offer-${Date.now()}`,
       bookingId: params.bookingId,
-      bookingRef: targetBooking?.bookingRef || `UTS-REF-${Date.now().toString().slice(-4)}`,
+      bookingRef: targetBooking?.bookingRef || `SGN-REF-${Date.now().toString().slice(-4)}`,
       eventDateBS: targetBooking?.eventDateBS || '2083 Falgun 18',
       eventDateAD: targetBooking?.eventDateAD || '2027-03-02',
       clientName: targetBooking?.customerName || currentUser.name,
@@ -2071,7 +2071,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     req: Omit<StarHotelSourcingRequest, 'id' | 'requestRef' | 'status' | 'createdAt' | 'updatedAt'>
   ): StarHotelSourcingRequest => {
     const now = new Date().toISOString();
-    const requestRef = `UTS-HTL-${Math.floor(1000 + Math.random() * 9000)}`;
+    const requestRef = `SGN-HTL-${Math.floor(1000 + Math.random() * 9000)}`;
     const newReq: StarHotelSourcingRequest = {
       ...req,
       id: `htl-req-${Date.now()}`,
@@ -2167,7 +2167,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
       id: newVenueId,
       name: proposal.hotelName,
       nepaliName: `${proposal.hotelName} (${proposal.starCategory})`,
-      tagline: `${proposal.starCategory} · Sourced & Verified by UTSAVO Admin Concierge (${proposal.districtOrCity})`,
+      tagline: `${proposal.starCategory} · Sourced & Verified by SAGUNOO Admin Concierge (${proposal.districtOrCity})`,
       province: 'Bagmati Province',
       district: proposal.districtOrCity || 'Kathmandu',
       municipality: `${proposal.districtOrCity || 'Kathmandu'} Hospitality Hub`,
@@ -2180,9 +2180,9 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
       verificationStatus: 'VERIFIED',
       panNumber: '609001122',
       businessRegNumber: `CONCIERGE-${reqItem.requestRef}`,
-      contactPerson: reqItem.adminAssignedCoordinator || 'UTSAVO Star Hotel Concierge',
+      contactPerson: reqItem.adminAssignedCoordinator || 'SAGUNOO Star Hotel Concierge',
       phone: '+977-9801234567',
-      email: 'concierge@utsavo.com',
+      email: 'concierge@sagunoo.com',
       rating: 4.9,
       reviewCount: 42,
       responseRatePercent: 99,
@@ -2248,7 +2248,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     req: Omit<OutsideNepalDestinationRequest, 'id' | 'requestRef' | 'status' | 'createdAt' | 'updatedAt'>
   ): OutsideNepalDestinationRequest => {
     const now = new Date().toISOString();
-    const requestRef = `UTS-INTL-${Math.floor(1000 + Math.random() * 9000)}`;
+    const requestRef = `SGN-INTL-${Math.floor(1000 + Math.random() * 9000)}`;
     const newReq: OutsideNepalDestinationRequest = {
       ...req,
       id: `intl-req-${Date.now()}`,
@@ -2320,7 +2320,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     );
   };
 
-  // UTSAVO Full-Service Managed Events Actions
+  // SAGUNOO Full-Service Managed Events Actions
   const submitManagedEventRequest = (
     req: Omit<
       ManagedEventRequest,
@@ -2328,14 +2328,14 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     > & { initialMessage?: string }
   ): ManagedEventRequest => {
     const now = new Date().toISOString();
-    const requestRef = `UTS-MGD-2083-${Math.floor(1000 + Math.random() * 9000)}`;
+    const requestRef = `SGN-MGD-2083-${Math.floor(1000 + Math.random() * 9000)}`;
     const activeVendorsCount = req.vendorFunctions.filter((v) => v.isEnabled && v.mode !== 'NOT_NEEDED').length;
 
     const initialMessages: ManagedCoordinationMessage[] = [
       {
         id: `mgd-msg-auto-${Date.now()}`,
         senderRole: 'UTSAVO_TEAM',
-        senderName: req.assignedCoordinatorName || 'Aarav Shrestha (Senior UTSAVO Event Director)',
+        senderName: req.assignedCoordinatorName || 'Aarav Shrestha (Senior SAGUNOO Event Director)',
         channel: 'PORTAL_CHAT',
         text: `Namaste ${sanitizeText(req.clientName, 80)}! Your Full-Service Managed Event Brief (#${requestRef}) with ${activeVendorsCount} active vendor functions is live with our team. You may adjust any option or message us right here anytime.`,
         timestamp: now,
@@ -2556,7 +2556,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
       vatNpr: params.vatNpr,
       totalNpr: params.totalNpr,
       validUntil: new Date(Date.now() + 72 * 3600 * 1000).toISOString(),
-      notes: 'Initial quotation offer submitted by customer via UTSAVO.',
+      notes: 'Initial quotation offer submitted by customer via SAGUNOO.',
     };
 
     const newThread: NegotiationThread = {
@@ -2650,7 +2650,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const venue = venues.find((v) => v.id === thread.venueId);
     const hall = venue?.halls.find((h) => h.id === latest.hallId) || venue?.halls[0];
 
-    const bookingRef = `UTS-2083-${Math.floor(1000 + Math.random() * 9000)}`;
+    const bookingRef = `SGN-2083-${Math.floor(1000 + Math.random() * 9000)}`;
     const depositRequired = Math.round(latest.totalNpr * 0.25);
     const commissionAmount = Math.round(latest.totalNpr * 0.05);
 
@@ -2757,7 +2757,7 @@ export const MarketplaceProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const createWalkInBooking = (bookingData: Partial<Booking>) => {
-    const bookingRef = `UTS-OFFLINE-${Math.floor(1000 + Math.random() * 9000)}`;
+    const bookingRef = `SGN-OFFLINE-${Math.floor(1000 + Math.random() * 9000)}`;
     const fullBooking: Booking = {
       id: `book-offline-${Date.now()}`,
       bookingRef,

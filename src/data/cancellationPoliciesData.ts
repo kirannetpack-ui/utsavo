@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Global Event Industry & Nepal Statutory Cancellation Policy Engine
+ * SAGUNOO — Global Event Industry & Nepal Statutory Cancellation Policy Engine
  * Covers Clients, Vendors/Venues, Cultural Artists, Event Planners, and Gig Talent Pool Staff,
  * including Past-Deadline (Date & Time Over) Resolution and Cancelling Vendor Referral Workflows.
  *
@@ -47,10 +47,10 @@ export const GLOBAL_STAKEHOLDER_POLICY_FRAMEWORKS: StakeholderPolicyFramework[] 
       'Cutoff Passed / Event Date & Time Over (Client No-Show): 0% cash refund; 100% of contracted food, hall lock, and booked staff costs are deemed consumed under Muluki Civil Code Sec. 535 (actual direct loss).',
       'Remaining Balance Settlement: Unpaid balance becomes immediately due upon confirmed hall readiness and kitchen prep logs unless waived by the vendor.',
       '48-Hour Emergency Medical / Bereavement Grace Window: If the client submits verified hospital or official emergency documentation within 48 hours after the missed date, the vendor’s dynamic goodwill credit (0%–25% off-season voucher) may be applied.',
-      'Evidence Freeze: UTSAVO locks hall readiness timestamps, KitchenPrepSheet counts, and staff clock-in records for formal mediation or District Court / Consumer Court audit.',
+      'Evidence Freeze: SAGUNOO locks hall readiness timestamps, KitchenPrepSheet counts, and staff clock-in records for formal mediation or District Court / Consumer Court audit.',
     ],
     partnerReferralAndBackfill:
-      'If a client downsizes or cancels early, UTSAVO prioritizes re-listing the auspicious Muhurat date; if another host books the freed slot (Mitigation of Damages rule), vendors may rebate re-booked hall rental.',
+      'If a client downsizes or cancels early, SAGUNOO prioritizes re-listing the auspicious Muhurat date; if another host books the freed slot (Mitigation of Damages rule), vendors may rebate re-booked hall rental.',
     legalAndGlobalBasis:
       'Global Banquet Tiers + Nepal Muluki Civil Code 2074 Sec. 531 (Force Majeure) & Sec. 535 (Mitigation of Actual Loss).',
   },
@@ -69,7 +69,7 @@ export const GLOBAL_STAKEHOLDER_POLICY_FRAMEWORKS: StakeholderPolicyFramework[] 
     pastDeadlineProcess: [
       'Vendor No-Show / Gate Locked Past Load-In Deadline: Immediate 100% escrow refund reversal to client + 15%–25% Emergency Backfill Compensation Credit charged to defaulting partner.',
       'Deficient Delivery at Event Time (No Genset / Missing Hall): Documented via timestamped client/planner evidence within 6 hours triggers partial/full escrow holdback under Consumer Protection Act 2075 Sec. 3.',
-      'Active Partner Referral Dispatch: Cancelling or distressed vendor initiates urgent peer transfer via UTSAVO Referral Network to salvage guest reception.',
+      'Active Partner Referral Dispatch: Cancelling or distressed vendor initiates urgent peer transfer via SAGUNOO Referral Network to salvage guest reception.',
     ],
     partnerReferralAndBackfill:
       'Cancelling vendors can choose (A) Direct Equal-or-Greater Substitute under the original price, or (B) Warm Peer Referral to 1–3 matching verified venues/vendors (0% Courtesy Emergency Hand-off or 5%–10% B2B Referral Commission) with client consent & direct escrow transfer.',
@@ -113,7 +113,7 @@ export const GLOBAL_STAKEHOLDER_POLICY_FRAMEWORKS: StakeholderPolicyFramework[] 
     pastDeadlineProcess: [
       'Planner / Agency No-Show Past Setup Load-In Window (-6 hrs before event): Immediate escrow freeze + automatic venue-manager escalation + liability insurance claim trigger.',
       'Client Post-Deadline Termination (Day-Of / Post-Event): All production hours, technical riders, and third-party vendor commitments already deployed are 100% billable with itemized Run-of-Show proof.',
-      'Continuity Peer Agency Handover: If lead producer faces certified force majeure/medical incapacitation, agency transfers complete Run-of-Show dossier to an insured peer planner on UTSAVO.',
+      'Continuity Peer Agency Handover: If lead producer faces certified force majeure/medical incapacitation, agency transfers complete Run-of-Show dossier to an insured peer planner on SAGUNOO.',
     ],
     partnerReferralAndBackfill:
       'Turnkey planners may hand off or co-produce via certified partner agencies with Public Liability Insurance verification and optional 5%–10% B2B producer referral terms.',
@@ -161,9 +161,9 @@ export const GLOBAL_REFERRAL_STANDARDS = [
     title: 'Option B: Peer Partner Warm Referral (Direct Contracting)',
     subtitle: 'Cancelling vendor recommends 1–3 available peers & passes event specs',
     points: [
-      'Cancelling vendor selects 1–3 vetted peers from UTSAVO with matching date/district/capacity availability.',
+      'Cancelling vendor selects 1–3 vetted peers from SAGUNOO with matching date/district/capacity availability.',
       'Transparent B2B Referral Fee toggle: 0% Emergency Courtesy Hand-off (life/health emergencies) OR 5%–10% standard B2B referral commission (zero markup to client).',
-      'Direct Escrow Transfer: Client can move 100% of held UTSAVO deposit directly to the accepted referral partner without re-paying.',
+      'Direct Escrow Transfer: Client can move 100% of held SAGUNOO deposit directly to the accepted referral partner without re-paying.',
       'Includes Global-Standard Referral Liability Release once the client contracts directly with the referred partner.',
     ],
   },
@@ -173,7 +173,7 @@ export const GLOBAL_REFERRAL_STANDARDS = [
     subtitle: 'Full financial restoration when client chooses an independent search',
     points: [
       'If the client declines all recommended substitutes or referrals, 100% of escrowed deposits are unlocked for immediate refund.',
-      'UTSAVO Concierge flags client for priority standby alert on newly freed Subha Muhurat slots across nearby districts.',
+      'SAGUNOO Concierge flags client for priority standby alert on newly freed Subha Muhurat slots across nearby districts.',
     ],
   },
 ];
@@ -387,7 +387,7 @@ export const SEED_VENDOR_REFERRAL_OFFERS: VendorReferralOffer[] = [
   {
     id: 'ref-offer-seed-1',
     bookingId: 'book-uts-1003',
-    bookingRef: 'UTS-2083-3918',
+    bookingRef: 'SGN-2083-3918',
     eventDateBS: '2083 Falgun 18',
     eventDateAD: '2027-03-02',
     clientName: 'Sunita Prajapati',
@@ -495,7 +495,7 @@ export function calculateCancellationOutcome(
         'Nepal Muluki Civil Code 2074 Sec. 531 (Supervening Impossibility / Force Majeure): Future performance discharged without punitive damages; advance adjusted fairly or held as 100% 12-month credit.',
       processSteps: [
         'Verify official natural disaster, strike/bandh, curfew, or government shutdown notice.',
-        `Lock 100% of NPR ${depositPaidNpr.toLocaleString()} paid deposit into a ${policy.forceMajeureCreditMonths}-month transferable UTSAVO date credit (or mutually agree on unincurred cost refund).`,
+        `Lock 100% of NPR ${depositPaidNpr.toLocaleString()} paid deposit into a ${policy.forceMajeureCreditMonths}-month transferable SAGUNOO date credit (or mutually agree on unincurred cost refund).`,
         'Issue Force Majeure Reschedule Addendum under Contract Act 2056 without penalty.',
       ],
       referralAvailable: policy.referralConfig.allowsPartnerReferral,

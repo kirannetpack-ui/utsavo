@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Digital Nimantrana Suite & Kitchen RSVP Sync
+ * SAGUNOO — Digital Nimantrana Suite & Kitchen RSVP Sync
  * Solves Nepal's #1 wedding catering food waste problem through real-time guest sync
  */
 
@@ -50,8 +50,8 @@ import {
 
 // Initial mock invitation
 const initialInvitation: DigitalInvitation = {
-  id: 'inv-utsavo-2083-01',
-  invitationCode: 'UTS-INV-8921',
+  id: 'inv-sagunoo-2083-01',
+  invitationCode: 'SGN-INV-8921',
   hostUserId: 'user-sample',
   hostName: 'Kiran Thapa & Family',
   hostPhone: '+977-9851023456',
@@ -90,7 +90,7 @@ const initialInvitation: DigitalInvitation = {
 const initialRsvps: GuestRsvpResponse[] = [
   {
     id: 'rsvp-1',
-    invitationId: 'inv-utsavo-2083-01',
+    invitationId: 'inv-sagunoo-2083-01',
     guestName: 'Prof. Ram Prasad Sharma',
     phone: '+977-9841223344',
     attendanceStatus: 'ATTENDING',
@@ -104,7 +104,7 @@ const initialRsvps: GuestRsvpResponse[] = [
   },
   {
     id: 'rsvp-2',
-    invitationId: 'inv-utsavo-2083-01',
+    invitationId: 'inv-sagunoo-2083-01',
     guestName: 'Sunita & Deepak Adhikari',
     phone: '+977-9851098765',
     attendanceStatus: 'ATTENDING',
@@ -118,7 +118,7 @@ const initialRsvps: GuestRsvpResponse[] = [
   },
   {
     id: 'rsvp-3',
-    invitationId: 'inv-utsavo-2083-01',
+    invitationId: 'inv-sagunoo-2083-01',
     guestName: 'Bikash & Rashmi Gurung (Sydney, Australia)',
     phone: '+61-412345678',
     attendanceStatus: 'ATTENDING',
@@ -132,7 +132,7 @@ const initialRsvps: GuestRsvpResponse[] = [
   },
   {
     id: 'rsvp-4',
-    invitationId: 'inv-utsavo-2083-01',
+    invitationId: 'inv-sagunoo-2083-01',
     guestName: 'Pavitra Jain & Family',
     phone: '+977-9841778899',
     attendanceStatus: 'ATTENDING',
@@ -146,7 +146,7 @@ const initialRsvps: GuestRsvpResponse[] = [
   },
   {
     id: 'rsvp-5',
-    invitationId: 'inv-utsavo-2083-01',
+    invitationId: 'inv-sagunoo-2083-01',
     guestName: 'Er. Mohan Shrestha',
     phone: '+977-9801234123',
     attendanceStatus: 'NOT_ATTENDING',
@@ -226,7 +226,7 @@ export const DigitalNimantranaSuite: React.FC = () => {
 
   const handleRegenerateCode = () => {
     const randomNum = Math.floor(1000 + Math.random() * 9000);
-    setInvitation({ ...invitation, invitationCode: `UTS-INV-${randomNum}` });
+    setInvitation({ ...invitation, invitationCode: `SGN-INV-${randomNum}` });
   };
 
   // Manual RSVP Modal State

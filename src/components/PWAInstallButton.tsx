@@ -1,5 +1,5 @@
 /**
- * UTSAVO — PWA Install Button & Modal
+ * SAGUNOO — PWA Install Button & Modal
  * Provides seamless installation across Android, Chrome, Edge, and iOS Safari.
  */
 
@@ -49,7 +49,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
         <button
           onClick={handleInstallClick}
           className={`px-2.5 py-1.5 text-xs font-semibold text-rose-950 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-lg transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 shadow-2xs ${className}`}
-          title="Install UTSAVO App on your phone or desktop"
+          title="Install SAGUNOO App on your phone or desktop"
         >
           <Smartphone className="w-3.5 h-3.5 text-rose-700" />
           <span className="hidden sm:inline">Install App</span>
@@ -65,7 +65,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
             </div>
             <div>
               <h4 className="font-display text-sm font-bold flex items-center gap-1.5">
-                <span>Install UTSAVO Mobile App (PWA)</span>
+                <span>Install SAGUNOO Mobile App (PWA)</span>
                 <span className="px-1.5 py-0.5 rounded-full bg-rose-500/30 text-rose-200 text-[10px] uppercase font-bold">
                   Fast & Offline
                 </span>
@@ -105,7 +105,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
                   <Smartphone className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="font-display text-sm font-bold">Install UTSAVO App</h4>
+                  <h4 className="font-display text-sm font-bold">Install SAGUNOO App</h4>
                   <span className="text-[10px] text-amber-200">Progressive Web App (PWA)</span>
                 </div>
               </div>
@@ -119,7 +119,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
 
             <div className="p-6 space-y-4 text-xs text-stone-700">
               <p className="leading-relaxed">
-                Install UTSAVO on your iPhone, iPad, or Android for the best full-screen celebration planning experience:
+                Install SAGUNOO on your iPhone, iPad, or Android for the best full-screen celebration planning experience:
               </p>
 
               <div className="space-y-3 bg-stone-50 p-4 rounded-2xl border border-stone-200">
@@ -157,7 +157,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
                   <div className="flex-1">
                     <p className="font-semibold text-stone-900">Tap "Add" in top-right</p>
                     <p className="text-[11px] text-stone-500 mt-0.5">
-                      The official UTSAVO icon will appear instantly on your phone's home screen!
+                      The official SAGUNOO icon will appear instantly on your phone's home screen!
                     </p>
                   </div>
                 </div>

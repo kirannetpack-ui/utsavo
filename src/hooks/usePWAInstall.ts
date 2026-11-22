@@ -1,5 +1,5 @@
 /**
- * UTSAVO — PWA Installation Hook
+ * SAGUNOO — PWA Installation Hook
  * Manages beforeinstallprompt events, standalone mode detection, and iOS Safari detection.
  */
 

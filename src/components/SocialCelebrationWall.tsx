@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Real Celebration Social Wall
+ * SAGUNOO - Real Celebration Social Wall
  * Aggregates user-uploaded event photos and testimonials from past bookings
  * to showcase authentic venue experiences (Weddings, Bratabandha, Pasni, Newari Bhoj, Corporate Galas).
  */
@@ -83,7 +83,7 @@ export const SocialCelebrationWall: React.FC<SocialCelebrationWallProps> = ({ on
     if (navigator.share) {
       navigator.share({
         title: post.celebrationTitle,
-        text: `Check out ${post.hostName}'s celebration at ${post.venueName} on UTSAVO Nepal!`,
+        text: `Check out ${post.hostName}'s celebration at ${post.venueName} on SAGUNOO Nepal!`,
         url: window.location.href,
       }).catch(() => {});
     } else {
@@ -158,7 +158,7 @@ export const SocialCelebrationWall: React.FC<SocialCelebrationWallProps> = ({ on
       coverPhoto: postPhotos[0]?.url || formData.coverPhoto,
       verifiedBooking: true,
       cateringHighlights: formData.cateringHighlights,
-      tags: [`#${formData.eventType}`, `#${matchedVenue?.district || 'Nepal'}Celebrations`, '#UTSAVOVerified'],
+      tags: [`#${formData.eventType}`, `#${matchedVenue?.district || 'Nepal'}Celebrations`, '#SAGUNOOVerified'],
     });
 
     setIsUploadModalOpen(false);
@@ -564,7 +564,7 @@ export const SocialCelebrationWall: React.FC<SocialCelebrationWallProps> = ({ on
                 <div className="flex items-center justify-between text-xs text-neutral-500 px-1">
                   <span className="flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Protected by UTSAVO Escrow Guarantee</span>
+                    <span>Protected by SAGUNOO Escrow Guarantee</span>
                   </span>
                   <span>{selectedPostForModal.eventDateBS}</span>
                 </div>

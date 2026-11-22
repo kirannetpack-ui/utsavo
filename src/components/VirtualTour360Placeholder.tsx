@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Interactive 360° Virtual Tour Placeholder Layout
+ * SAGUNOO - Interactive 360° Virtual Tour Placeholder Layout
  * Helps remote hosts, NRIs, and event planners inspect halls, lawns, sightlines,
  * seating configurations, and spatial zones before an in-person site visit.
  */

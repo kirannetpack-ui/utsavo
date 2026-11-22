@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Cultural Artists & Specialized Celebration Vendors Data
+ * SAGUNOO — Cultural Artists & Specialized Celebration Vendors Data
  * Preserving authentic Nepali ceremonial traditions and providing turnkey talent
  */
 
@@ -13,7 +13,7 @@ export const initialCulturalVendors: CulturalVendor[] = [
     category: 'PANCHE_NAUMATI_BAJA',
     leaderOrContact: 'Ustad Prem Bahadur Pariyar',
     phone: '+977-9846012345',
-    email: 'naumati.gandharva@utsavo.np',
+    email: 'naumati.gandharva@sagunoo.com.np',
     district: 'Kaski',
     province: 'Gandaki',
     address: 'Bagar-1, Pokhara / Travel Service to Kathmandu & Chitwan',
@@ -70,7 +70,7 @@ export const initialCulturalVendors: CulturalVendor[] = [
     category: 'NEWARI_DHIME_BAJA',
     leaderOrContact: 'Nhuche Ratna Maharjan',
     phone: '+977-9851088741',
-    email: 'dhime.patan@utsavo.np',
+    email: 'dhime.patan@sagunoo.com.np',
     district: 'Lalitpur',
     province: 'Bagmati',
     address: 'Mangalbazar, Patan Heritage Square',
@@ -125,7 +125,7 @@ export const initialCulturalVendors: CulturalVendor[] = [
     category: 'VEDIC_PUROHIT_ACHARYA',
     leaderOrContact: 'Acharya Damodar Adhikari (M.A. Sanskrit, Banaras)',
     phone: '+977-9841298765',
-    email: 'acharya.damodar@utsavo.np',
+    email: 'acharya.damodar@sagunoo.com.np',
     district: 'Kathmandu',
     province: 'Bagmati',
     address: 'Gausala, Kathmandu (Near Pashupatinath Temple)',
@@ -236,7 +236,7 @@ export const initialCulturalVendors: CulturalVendor[] = [
     category: 'BRIDAL_MAKEUP_MEHENDI',
     leaderOrContact: 'Shristi Thapa Magar',
     phone: '+977-9849554433',
-    email: 'shristi.makeup@utsavo.np',
+    email: 'shristi.makeup@sagunoo.com.np',
     district: 'Kathmandu',
     province: 'Bagmati',
     address: 'Lazimpat, Kathmandu / Doorstep Bridal Suite Service',
@@ -292,7 +292,7 @@ export const initialCulturalVendors: CulturalVendor[] = [
     category: 'TRADITIONAL_ATTIRE_JEWELRY',
     leaderOrContact: 'Rajan Shrestha',
     phone: '+977-9851234987',
-    email: 'dhaka.heritage@utsavo.np',
+    email: 'dhaka.heritage@sagunoo.com.np',
     district: 'Kathmandu',
     province: 'Bagmati',
     address: 'New Road & Ason, Kathmandu / Delivery Across Nepal',

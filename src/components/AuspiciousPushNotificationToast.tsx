@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Auspicious Push Notification Toast Banner
+ * SAGUNOO - Auspicious Push Notification Toast Banner
  * Simulated native push-notification sliding in from top-right / top-center
  * alerting users to upcoming highly-auspicious dates based on their Panchanga preferences.
  */
@@ -78,7 +78,7 @@ export const AuspiciousPushNotificationToast: React.FC<AuspiciousPushNotificatio
               <Bell className="w-3 h-3 fill-stone-950" />
             </div>
             <span className="text-xs font-bold tracking-tight text-amber-200">
-              UTSAVO Panchanga Alert • शुभ साइत सूचना
+              SAGUNOO Panchanga Alert • शुभ साइत सूचना
             </span>
           </div>
 

@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Super Administrator & Finance Settlement Dashboard
+ * SAGUNOO - Super Administrator & Finance Settlement Dashboard
  * Features:
  * 1. Marketplace overview, GMV, Escrow reconciliation
  * 2. KYC PAN/VAT verification
@@ -154,7 +154,7 @@ export const AdminDashboard: React.FC = () => {
             Central Administration & Marketplace Oversight
           </span>
           <h2 className="font-display text-2xl font-bold text-stone-900 mt-1">
-            UTSAVO Operations, Governance & Finance Console
+            SAGUNOO Operations, Governance & Finance Console
           </h2>
           <p className="text-xs text-stone-500 mt-0.5">
             Nationwide multi-vendor party palace governance, Nepal Government regulatory compliance intelligence, and automated settlements.
@@ -644,7 +644,7 @@ export const AdminDashboard: React.FC = () => {
                   Statutory Rule Enforcement & Live Gazette Scanner
                 </h3>
                 <p className="text-xs text-stone-300 max-w-2xl mt-1 leading-relaxed">
-                  UTSAVO is driven strictly according to Nepal Government laws. The intelligence engine periodically scans official gazettes (नेपाल राजपत्र) and alerts the admin to review and choose whether to apply rule changes to the platform.
+                  SAGUNOO is driven strictly according to Nepal Government laws. The intelligence engine periodically scans official gazettes (नेपाल राजपत्र) and alerts the admin to review and choose whether to apply rule changes to the platform.
                 </p>
               </div>
 
@@ -911,7 +911,7 @@ export const AdminDashboard: React.FC = () => {
             ))}
             <div>[2026-11-14 07:15:00] GOVT_COMPLIANCE_ENFORCED: Labour Act 2074 minimum wage rule NPR 668/day shift applied platform-wide.</div>
             <div>[2026-11-12 00:20:12] AUDIT_PAYMENT_CONFIRMED: Txn ESW-2083-98214902 validated server-side. Deposit NPR 303,969 credited.</div>
-            <div>[2026-11-12 00:15:40] AUDIT_CONTRACT_SIGNED: Booking UTS-2083-4921 signed with SHA256 cryptographic hash.</div>
+            <div>[2026-11-12 00:15:40] AUDIT_CONTRACT_SIGNED: Booking SGN-2083-4921 signed with SHA256 cryptographic hash.</div>
             <div>[2026-11-11 16:40:00] AUDIT_OFFER_ACCEPTED: Negotiation neg-102 mutually finalized between party palace and client.</div>
             <div>[2026-11-10 14:30:00] AUDIT_KYC_VERIFIED: The Regal Pavilion PAN 602918471 verified against Inland Revenue Department records.</div>
           </div>

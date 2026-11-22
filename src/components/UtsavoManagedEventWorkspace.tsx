@@ -1,20 +1,20 @@
 /**
- * UTSAVO — Full-Service Managed Event Concierge ("Have UTSAVO Organize Your Whole Event")
+ * SAGUNOO — Full-Service Managed Event Concierge ("Have SAGUNOO Organize Your Whole Event")
  *
  * Features:
- * 1. Explicit Client Authority Onboarding ("Yes, let UTSAVO organize my whole event — under my control")
+ * 1. Explicit Client Authority Onboarding ("Yes, let SAGUNOO organize my whole event — under my control")
  * 2. Step 1 (Smart Parameter Gathering): Date (BS/AD + Panchanga Muhurat), Shift & Time window, Pax breakdown,
  *    Multi-currency Budget & Flexibility, Scope (Inside Nepal 7 Provinces / 77 Districts or Worldwide).
  * 3. Step 2 (Mandatory Vendor Functions Capture — Never Missed): All 12 core vendor functions + custom functions.
  *    Suggestive allocations & tiers pre-computed from Step 1; client retains full authority to toggle ON/OFF,
- *    pick Engagement Mode (UTSAVO Full Manage / Co-Select Marketplace / Client Has Own Vendor / Not Needed),
+ *    pick Engagement Mode (SAGUNOO Full Manage / Co-Select Marketplace / Client Has Own Vendor / Not Needed),
  *    pick Marketplace Venues/Artists directly, adjust budgets, or lock custom specs.
  * 4. Step 3 (Globally Sourced Operational & Guest Standards): Weather backup contingency, elder/wheelchair/kid care,
  *    10 PM DAO curfew & Havan fire/drone permits, genset kVA load, culinary dietary isolations, VIP welcome hampers.
  * 5. Step 4 (Smart Suggestive Blueprint — Client Editable): Calls Gemini 4 Hydrogen + Google Search grounding
  *    (/api/managed-event/suggest-blueprint) with deterministic fallback. Every timeline slot, checklist item,
  *    and note is directly editable by the client before or after locking the dossier.
- * 6. Persistent Right-Rail Direct UTSAVO Team Coordination Panel (Anytime): Two-way portal messaging, instant callback
+ * 6. Persistent Right-Rail Direct SAGUNOO Team Coordination Panel (Anytime): Two-way portal messaging, instant callback
  *    window request, WhatsApp & Viber escalation with pre-filled brief reference.
  */
 
@@ -243,7 +243,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
   // New custom run-of-show slot draft
   const [newSlotTime, setNewSlotTime] = useState('');
   const [newSlotActivity, setNewSlotActivity] = useState('');
-  const [newSlotOwner, setNewSlotOwner] = useState('UTSAVO Event Director');
+  const [newSlotOwner, setNewSlotOwner] = useState('SAGUNOO Event Director');
 
   // Pre-submission & Live Coordination Messaging
   const [pendingClientNotes, setPendingClientNotes] = useState<
@@ -347,7 +347,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
         title,
         mode: 'UTSAVO_FULL_MANAGE',
         budgetAmount: Number(newCustomBudget) || 0,
-        specifications: newCustomSpecs.trim() || 'Coordinated by UTSAVO Team per client brief',
+        specifications: newCustomSpecs.trim() || 'Coordinated by SAGUNOO Team per client brief',
       },
     ]);
     setNewCustomTitle('');
@@ -497,7 +497,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
       },
       blueprint,
       status: 'BRIEF_SUBMITTED',
-      assignedCoordinatorName: 'Aarav Shrestha (Senior UTSAVO Event Director)',
+      assignedCoordinatorName: 'Aarav Shrestha (Senior SAGUNOO Event Director)',
       assignedCoordinatorPhone: '+977-9801122334',
       initialMessage:
         pendingClientNotes.length > 0
@@ -509,7 +509,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
     setActiveDossierId(created.id);
     setViewMode('TRACKER');
     setSubmittedNotice(
-      `Dossier #${created.requestRef} assigned to UTSAVO Producer ${created.assignedCoordinatorName}. You maintain 100% edit authority and direct chat access anytime.`
+      `Dossier #${created.requestRef} assigned to SAGUNOO Producer ${created.assignedCoordinatorName}. You maintain 100% edit authority and direct chat access anytime.`
     );
   };
 
@@ -544,7 +544,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
   };
 
   const whatsappBriefText = encodeURIComponent(
-    `Namaste UTSAVO Team! Reference: ${
+    `Namaste SAGUNOO Team! Reference: ${
       activeSubmittedDossier?.requestRef || 'NEW-MANAGED-BRIEF'
     } | Event: ${eventTitle} | Date: ${eventDateBS} BS (${eventDateAD}) | Pax: ${totalPax} | Budget: ${budgetCurrency} ${totalBudget.toLocaleString()} | Active Vendor Functions: ${activeVendorFunctionsCount}. Requesting direct coordinator discussion.`
   );
@@ -566,13 +566,13 @@ export const UtsavoManagedEventWorkspace: React.FC<
                   <span>Explore Venues</span>
                 </button>
               )}
-              <span>UTSAVO Full-Service Event Production</span>
+              <span>SAGUNOO Full-Service Event Production</span>
               <span className="text-amber-500/70">·</span>
               <span>Global Best Practices + Client Full Authority</span>
             </div>
 
             <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white">
-              Let UTSAVO Organize Your Entire Event — On Your Terms
+              Let SAGUNOO Organize Your Entire Event — On Your Terms
             </h1>
 
             <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
@@ -580,7 +580,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
               <strong className="text-white">Vendor Function</strong> upfront, generates globally
               sourced suggestive recommendations, and keeps{' '}
               <strong className="text-amber-300">100% selection authority in your hands</strong>{' '}
-              with direct UTSAVO Director coordination anytime.
+              with direct SAGUNOO Director coordination anytime.
             </p>
           </div>
 
@@ -620,7 +620,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
               className="w-4 h-4 rounded border-amber-400 text-amber-500 focus:ring-amber-400"
             />
             <span className="font-semibold text-amber-100">
-              Yes, I authorize UTSAVO to coordinate and organize my whole event — while keeping final approval &amp; override authority with me.
+              Yes, I authorize SAGUNOO to coordinate and organize my whole event — while keeping final approval &amp; override authority with me.
             </span>
           </label>
           <span className="text-[11px] text-stone-300 tabular-nums shrink-0">
@@ -706,7 +706,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                         Step 1: Date, Time, Guest Count, Budget &amp; Event Scope
                       </h2>
                       <p className="text-stone-500 mt-0.5">
-                        Enter your baseline numbers first. UTSAVO suggests smart allocations next,
+                        Enter your baseline numbers first. SAGUNOO suggests smart allocations next,
                         and you control every choice.
                       </p>
                     </div>
@@ -1226,7 +1226,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                         Step 2: Vendor Functions &amp; Service Ownership Matrix
                       </h2>
                       <p className="text-stone-500 mt-0.5">
-                        Tell UTSAVO which vendor functions you want us to manage end-to-end,
+                        Tell SAGUNOO which vendor functions you want us to manage end-to-end,
                         co-select with you, or sync with your own appointed vendor. Suggestive
                         allocations below adapt automatically to your {budgetCurrency}{' '}
                         {totalBudget.toLocaleString()} budget &amp; {totalPax} guests.
@@ -1255,7 +1255,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                   {/* Quick Reset Suggestions Action */}
                   <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-amber-50/70 rounded-2xl border border-amber-200">
                     <span className="text-amber-950 font-medium">
-                      Smart Suggestive Mode populated all 12 UTSAVO vendor functions. Lock, tweak,
+                      Smart Suggestive Mode populated all 12 SAGUNOO vendor functions. Lock, tweak,
                       swap modes, or pick existing marketplace partners freely.
                     </span>
                     <button
@@ -1358,13 +1358,13 @@ export const UtsavoManagedEventWorkspace: React.FC<
                                   className="w-full px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded-lg font-semibold text-stone-800"
                                 >
                                   <option value="UTSAVO_FULL_MANAGE">
-                                    UTSAVO Sources &amp; Manages Full Turnkey
+                                    SAGUNOO Sources &amp; Manages Full Turnkey
                                   </option>
                                   <option value="CO_SELECT_MARKETPLACE">
                                     Shortlist Options &amp; Client Approves Final
                                   </option>
                                   <option value="CLIENT_HAS_OWN_VENDOR">
-                                    Client Already Has Own Vendor (UTSAVO Coordinates)
+                                    Client Already Has Own Vendor (SAGUNOO Coordinates)
                                   </option>
                                 </select>
                               </div>
@@ -1405,7 +1405,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                                     className="flex-1 min-w-0 px-2.5 py-1.5 bg-stone-50 border border-stone-300 rounded-lg"
                                   />
                                 </div>
-                                {/* Live UTSAVO Catalog Picker for Venue / Cultural Artists */}
+                                {/* Live SAGUNOO Catalog Picker for Venue / Cultural Artists */}
                                 {(isVenueRow || isArtistRow) && (
                                   <select
                                     value=""
@@ -1418,7 +1418,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                                     className="mt-1.5 w-full px-2 py-1 bg-amber-50/70 border border-amber-200 rounded-md text-[11px] text-amber-950 font-medium"
                                   >
                                     <option value="">
-                                      + Quick-pick verified UTSAVO{' '}
+                                      + Quick-pick verified SAGUNOO{' '}
                                       {isVenueRow ? 'Party Palace / Venue' : 'Artist / Ensemble'}...
                                     </option>
                                     {isVenueRow
@@ -2037,7 +2037,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                       className="px-6 py-3 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl font-bold shadow flex items-center gap-2 whitespace-nowrap shrink-0"
                     >
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>Submit Dossier &amp; Engage UTSAVO Team</span>
+                      <span>Submit Dossier &amp; Engage SAGUNOO Team</span>
                     </button>
                   </div>
                 </div>
@@ -2100,7 +2100,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                   {/* Team Action Updates Feed */}
                   <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-2">
                     <strong className="text-emerald-950 block">
-                      Live UTSAVO Team Progress Updates ({activeSubmittedDossier.teamActionUpdates.length})
+                      Live SAGUNOO Team Progress Updates ({activeSubmittedDossier.teamActionUpdates.length})
                     </strong>
                     <ul className="space-y-1 text-emerald-900">
                       {activeSubmittedDossier.teamActionUpdates.map((upd, idx) => (
@@ -2186,7 +2186,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                                 }}
                                 className="px-2 py-1 bg-white border border-stone-300 rounded-md font-medium"
                               >
-                                <option value="UTSAVO_FULL_MANAGE">UTSAVO Full Manage</option>
+                                <option value="UTSAVO_FULL_MANAGE">SAGUNOO Full Manage</option>
                                 <option value="CO_SELECT_MARKETPLACE">Co-Select Marketplace</option>
                                 <option value="CLIENT_HAS_OWN_VENDOR">Client Own Vendor</option>
                               </select>
@@ -2210,7 +2210,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
         </div>
 
         {/* ================================================================= */}
-        {/* RIGHT RAIL (4 cols): DIRECT UTSAVO TEAM COORDINATION ANYTIME      */}
+        {/* RIGHT RAIL (4 cols): DIRECT SAGUNOO TEAM COORDINATION ANYTIME      */}
         {/* ================================================================= */}
         <aside className="lg:col-span-4 space-y-4 lg:sticky lg:top-24">
           <div className="bg-white rounded-3xl border border-stone-200 p-5 space-y-4 text-xs shadow-sm">
@@ -2220,7 +2220,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                   Available Anytime · Pre or Post Brief
                 </span>
                 <h3 className="font-display text-base font-bold text-stone-900">
-                  Direct UTSAVO Coordination Desk
+                  Direct SAGUNOO Coordination Desk
                 </h3>
                 <p className="text-[11px] text-stone-500 mt-0.5">
                   Lead Producer:{' '}
@@ -2293,7 +2293,7 @@ export const UtsavoManagedEventWorkspace: React.FC<
                   <>
                     <div className="p-2.5 rounded-xl text-[11px] bg-white border border-stone-200 text-stone-800">
                       <strong className="block text-[10px] text-amber-900 mb-0.5">
-                        Aarav Shrestha (UTSAVO Event Director)
+                        Aarav Shrestha (SAGUNOO Event Director)
                       </strong>
                       Namaste {clientName || 'Host'}! Fill in your date, pax, budget, and vendor
                       functions — or send us any question right here anytime while planning.
@@ -2324,14 +2324,14 @@ export const UtsavoManagedEventWorkspace: React.FC<
                       handleSendDirectMessage('PORTAL_CHAT');
                     }
                   }}
-                  placeholder="Coordinate directly with UTSAVO team..."
+                  placeholder="Coordinate directly with SAGUNOO team..."
                   className="flex-1 px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs"
                 />
                 <button
                   type="button"
                   onClick={() => handleSendDirectMessage('PORTAL_CHAT')}
                   className="px-3.5 py-2 bg-amber-900 hover:bg-amber-950 text-white rounded-xl font-bold shrink-0"
-                  title="Send message to UTSAVO Coordination Desk"
+                  title="Send message to SAGUNOO Coordination Desk"
                 >
                   <Send className="w-3.5 h-3.5" />
                 </button>

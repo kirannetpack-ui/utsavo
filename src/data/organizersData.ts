@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Professional Event Organizers & Management Companies
+ * SAGUNOO - Professional Event Organizers & Management Companies
  * Grounded in global standards (MPI, ILEA, Event Safety Alliance, NEMA)
  * Incorporating technical riders, run-of-show scheduling, liability compliance & vendor coordination.
  */

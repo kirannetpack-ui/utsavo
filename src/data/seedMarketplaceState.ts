@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Seed Marketplace State
+ * SAGUNOO - Seed Marketplace State
  * Active bookings, negotiations, inquiries, and verified reviews
  */
 
@@ -130,7 +130,7 @@ export const SEED_NEGOTIATIONS: NegotiationThread[] = [
 export const SEED_BOOKINGS: Booking[] = [
   {
     id: 'book-uts-1001',
-    bookingRef: 'UTS-2083-4921',
+    bookingRef: 'SGN-2083-4921',
     venueId: 'venue-regal-pavilion-ktm',
     venueName: 'The Regal Pavilion & Heritage Banquet',
     hallId: 'regal-kailash-hall',
@@ -176,7 +176,7 @@ export const SEED_BOOKINGS: Booking[] = [
   },
   {
     id: 'book-uts-1002',
-    bookingRef: 'UTS-2083-8930',
+    bookingRef: 'SGN-2083-8930',
     venueId: 'venue-pokhara-lakeside-resort',
     venueName: 'Pokhara Lakeside Majestic Garden & Convention',
     hallId: 'plr-annapurna-lawn',
@@ -214,7 +214,7 @@ export const SEED_BOOKINGS: Booking[] = [
   },
   {
     id: 'book-uts-1003',
-    bookingRef: 'UTS-2083-3918',
+    bookingRef: 'SGN-2083-3918',
     venueId: 'venue-bhaktapur-durbar-banquet',
     venueName: 'Bhaktapur Durbar Banquet & Juju Dhau Pavilion',
     hallId: 'bdb-shree-hall',
@@ -248,7 +248,7 @@ export const SEED_REVIEWS: VerifiedReview[] = [
   {
     id: 'rev-1',
     venueId: 'venue-regal-pavilion-ktm',
-    bookingRef: 'UTS-2083-4921',
+    bookingRef: 'SGN-2083-4921',
     customerName: 'Bibek Poudel & Puja Adhikari',
     eventType: 'WEDDING',
     eventDateBS: '2083 Kartik 18',
@@ -268,7 +268,7 @@ export const SEED_REVIEWS: VerifiedReview[] = [
   {
     id: 'rev-2',
     venueId: 'venue-pokhara-lakeside-resort',
-    bookingRef: 'UTS-2083-8930',
+    bookingRef: 'SGN-2083-8930',
     customerName: 'Nabin Gurung',
     eventType: 'PASNI',
     eventDateBS: '2083 Kartik 24',
@@ -287,7 +287,7 @@ export const SEED_REVIEWS: VerifiedReview[] = [
   {
     id: 'rev-3',
     venueId: 'venue-bhaktapur-durbar-banquet',
-    bookingRef: 'UTS-2083-2847',
+    bookingRef: 'SGN-2083-2847',
     customerName: 'Rajesh K.C.',
     eventType: 'RECEPTION',
     eventDateBS: '2083 Ashwin 12',

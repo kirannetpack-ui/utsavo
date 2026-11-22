@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Standalone Public Guest Invitation Card View
+ * SAGUNOO — Standalone Public Guest Invitation Card View
  * Solves: "The QR should open the exact same invitation card with information and the link should also show the exact card."
  * Renders when a guest opens /invite/:code or clicks/scans the QR code.
  */
@@ -33,8 +33,8 @@ interface PublicInvitationCardViewProps {
 }
 
 const defaultFallbackInvitation: DigitalInvitation = {
-  id: 'inv-utsavo-2083-01',
-  invitationCode: 'UTS-INV-8921',
+  id: 'inv-sagunoo-2083-01',
+  invitationCode: 'SGN-INV-8921',
   hostUserId: 'user-sample',
   hostName: 'Kiran Thapa & Family',
   hostPhone: '+977-9851023456',
@@ -240,7 +240,7 @@ export const PublicInvitationCardView: React.FC<PublicInvitationCardViewProps> =
               className="p-2 rounded-xl text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-colors flex items-center gap-1.5 text-xs font-bold"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">UTSAVO Marketplace</span>
+              <span className="hidden sm:inline">SAGUNOO Marketplace</span>
             </button>
           )}
           <BrandLogo variant="light" size="sm" showSubtitle={false} />
@@ -673,7 +673,7 @@ export const PublicInvitationCardView: React.FC<PublicInvitationCardViewProps> =
 
       {/* Footer */}
       <footer className="mt-12 text-center text-xs text-stone-400 space-y-1">
-        <p>UTSAVO — Nepal's Smart Celebration Marketplace · Powered by Digital Nimantrana Suite</p>
+        <p>SAGUNOO — Nepal's Smart Celebration Marketplace · Powered by Digital Nimantrana Suite</p>
         <p className="text-[10px]">Zero food waste catering sync for banquet palaces across Nepal</p>
       </footer>
     </div>

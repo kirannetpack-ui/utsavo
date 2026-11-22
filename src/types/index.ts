@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Core Types & Domain Models
+ * SAGUNOO - Core Types & Domain Models
  * Nepal's Smart Celebration Marketplace
  */
 
@@ -165,7 +165,7 @@ export interface VenueOffer {
   badgeText: string;             // e.g. "⚡ 15% OFF", "Save Rs. 50,000", "🎁 Free Mandap Rig"
   discountType: 'PERCENTAGE' | 'FLAT_AMOUNT' | 'COMPLIMENTARY_ADDON';
   discountValue: number;         // e.g. 15 (percent) or 50000 (NPR)
-  promoCode: string;             // e.g. "UTSAVO15", "VIVAHA2083"
+  promoCode: string;             // e.g. "SAGUNOO15", "VIVAHA2083"
   validUntilBS: string;          // e.g. "2083 Falgun 30"
   validUntilAD?: string;         // e.g. "2027-03-14"
   minGuests?: number;            // e.g. 250
@@ -279,7 +279,7 @@ export interface DestinationCelebrationPackage {
 
 export interface DestinationInquiry {
   id: string;
-  inquiryRef: string; // e.g. "UTS-DEST-NP-8924"
+  inquiryRef: string; // e.g. "SGN-DEST-NP-8924"
   clientName: string;
   clientEmail: string;
   clientPhone: string;
@@ -432,7 +432,7 @@ export type BookingStatus =
 
 export interface Booking {
   id: string;
-  bookingRef: string; // e.g. "UTS-2083-9842"
+  bookingRef: string; // e.g. "SGN-2083-9842"
   venueId: string;
   venueName: string;
   hallId: string;
@@ -652,7 +652,7 @@ export interface CeremonySubEvent {
 
 export interface DigitalInvitation {
   id: string;
-  invitationCode: string; // e.g. "UTS-INV-8901"
+  invitationCode: string; // e.g. "SGN-INV-8901"
   hostUserId: string;
   hostName: string;
   hostPhone: string;
@@ -739,7 +739,7 @@ export interface KitchenPrepSheet {
 // LEGAL CONTRACT & QUOTATION TYPES (Nepal Contract Act 2056)
 // -------------------------------------------------------------
 export interface LegalContractDocument {
-  contractRef: string; // e.g. "UTS-KRA-2083-0419"
+  contractRef: string; // e.g. "SGN-KRA-2083-0419"
   dateIssuedBS: string;
   dateIssuedAD: string;
   partyAVenue: {
@@ -948,7 +948,7 @@ export interface SocialCelebrationPost {
   guestCount: number;              // e.g. 550
   photos: SocialCelebrationPhoto[];
   coverPhoto: string;
-  verifiedBooking: boolean;        // True if verified via UTSAVO escrow or PAN invoice
+  verifiedBooking: boolean;        // True if verified via SAGUNOO escrow or PAN invoice
   likesCount: number;
   userLiked?: boolean;
   cateringHighlights?: string[];   // e.g. ["Live Jalebi Counter", "Hyderabadi Biryani", "Traditional Samay Baji"]
@@ -1010,7 +1010,7 @@ export interface ExcessFoodRescuePledge {
   clientConsentTimestamp?: string;
   clientConsentDeclaration: string;
   partnerType: FoodDistributionPartnerType;
-  organizationName: string; // e.g. "UTSAVO Annapurna Seva", "Food for Life Nepal", "Manav Sewa Ashram", "Rokpa Nepal"
+  organizationName: string; // e.g. "SAGUNOO Annapurna Seva", "Food for Life Nepal", "Manav Sewa Ashram", "Rokpa Nepal"
   estimatedSurplusPortions: number; // e.g. 50-150 portions
   foodCategory: 'VEGETARIAN_SATVIK' | 'TRADITIONAL_NEPALI_FEAST' | 'BUFFET_VARIETY' | 'SWEETS_MITHAI';
   eventEndTime: string;
@@ -1293,7 +1293,7 @@ export interface FavoriteVenueAlert {
 }
 
 // -------------------------------------------------------------
-// UTSAVO FULL-SERVICE MANAGED EVENT CONCIERGE (END-TO-END EVENTS)
+// SAGUNOO FULL-SERVICE MANAGED EVENT CONCIERGE (END-TO-END EVENTS)
 // -------------------------------------------------------------
 export type VendorFunctionKey =
   | 'VENUE_AND_HALL'
@@ -1444,7 +1444,7 @@ export interface ManagedEventRequest {
   // Step 4: Smart Suggestive Blueprint (Client Editable)
   blueprint: ManagedEventBlueprint;
 
-  // Step 5: Direct UTSAVO Team Coordination & Lifecycle
+  // Step 5: Direct SAGUNOO Team Coordination & Lifecycle
   status:
     | 'DRAFT_DISCOVERY'
     | 'BRIEF_SUBMITTED'

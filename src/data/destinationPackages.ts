@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Iconic Nepal Destination Celebrations & Tourism Seed Data
+ * SAGUNOO - Iconic Nepal Destination Celebrations & Tourism Seed Data
  * Curated world-class destination wedding & ceremony packages across Nepal
  */
 
@@ -71,7 +71,7 @@ export const DESTINATION_PACKAGES: DestinationCelebrationPackage[] = [
       },
     ],
     includedExperiences: [
-      'Dedicated UTSAVO Destination Concierge & Multilingual Coordinator',
+      'Dedicated SAGUNOO Destination Concierge & Multilingual Coordinator',
       'Complete venue rental for 3 nights at premier 5-star lakeside resort',
       'Custom Vedic Mandap & thematic stage floral architecture',
       'Traditional Panchai Baja & contemporary DJ sound rig',

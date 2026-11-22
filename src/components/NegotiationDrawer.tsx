@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Structured Negotiation & Counter-Offer System
+ * SAGUNOO - Structured Negotiation & Counter-Offer System
  * Section 9: Tamper-evident negotiation versions, itemized concessions,
  * counter-proposals, AI Negotiation Summary record, and acceptance flow.
  */

@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Swipe-to-Dismiss Mobile Navigation Drawer
+ * SAGUNOO — Swipe-to-Dismiss Mobile Navigation Drawer
  * Enables smooth mobile navigation across all 10 event management sections, planning tools,
  * and Gemini AI / Live Voice suites with 1:1 horizontal swipe-left-to-dismiss touch physics.
  */
@@ -239,7 +239,7 @@ export const MobileNavDrawer: React.FC<MobileNavDrawerProps> = ({
     icon: React.ComponentType<{ className?: string }>;
   }> = [
     { id: 'EXPLORE', label: 'Explore Venues & Palaces', nepali: 'भेन्यु खोज', icon: Compass },
-    { id: 'MANAGED_EVENT', label: 'UTSAVO Full-Service Event', nepali: 'UTSAVO सेवा', icon: Sparkles },
+    { id: 'MANAGED_EVENT', label: 'SAGUNOO Full-Service Event', nepali: 'SAGUNOO सेवा', icon: Sparkles },
     { id: 'DESTINATION', label: 'Destination Nepal & Abroad', nepali: 'डेस्टिनेशन उत्सव', icon: Mountain },
     { id: 'VENDORS', label: 'Cultural Artists & Vendors', nepali: 'कलाकार तथा बाजा', icon: Music },
     { id: 'ORGANIZERS', label: 'Verified Event Planners', nepali: 'इभेन्ट अर्गनाइजर', icon: Award },

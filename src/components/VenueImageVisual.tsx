@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Resilient Venue Image Visual
+ * SAGUNOO - Resilient Venue Image Visual
  * Rich domain illustrations and fallback graphics for Nepali celebration venues
  */
 

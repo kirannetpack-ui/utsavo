@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Hindu Panchanga Muhurat Suggestion & Requirement Cross-Reference Engine
+ * SAGUNOO — Hindu Panchanga Muhurat Suggestion & Requirement Cross-Reference Engine
  * Evaluates Nepal Panchanga Nirnayak Samiti auspicious dates against user event requirements
  * (EventType, Province/District, Guests, Per-Plate Budget, Space Setting, Shift, Mandap, Genset, Parking)
  * and live marketplace venue availability / bookings.

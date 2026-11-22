@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Modular Nepal Payment Integration Gateway
+ * SAGUNOO - Modular Nepal Payment Integration Gateway
  * Section 11: Real simulated eSewa, Khalti, Fonepay QR, and Bank Wire reconciliation
  */
 
@@ -270,7 +270,7 @@ export const PaymentModal: React.FC = () => {
                   <div className="text-blue-950 font-bold">Direct Corporate Bank Transfer</div>
                   <div className="p-2.5 bg-white rounded-lg border border-stone-200 text-[11px] space-y-1">
                     <div>Bank: <strong>Nabil Bank Limited (Durbarmarg Branch)</strong></div>
-                    <div>Account Name: <strong>UTSAVO CELEBRATIONS PVT. LTD.</strong></div>
+                    <div>Account Name: <strong>SAGUNOO CELEBRATIONS PVT. LTD.</strong></div>
                     <div>Account No: <strong>01001017502948</strong></div>
                   </div>
                   <div>

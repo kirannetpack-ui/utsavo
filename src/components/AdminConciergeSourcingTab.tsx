@@ -1,5 +1,5 @@
 /**
- * UTSAVO — System Admin Concierge Sourcing & Worldwide Fulfillment Panel
+ * SAGUNOO — System Admin Concierge Sourcing & Worldwide Fulfillment Panel
  * Manages:
  * 1. Client Star Hotel Venue Requests (scouting availability, quoting rates, & 1-click publishing into live Venues)
  * 2. Outside-Nepal Worldwide Celebrations Dossiers (updating milestone stages, logging deliverables & coordinator notes)
@@ -136,7 +136,7 @@ export const AdminConciergeSourcingTab: React.FC<AdminConciergeSourcingTabProps>
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>UTSAVO Managed Event Briefs ({managedEventRequests.length})</span>
+            <span>SAGUNOO Managed Event Briefs ({managedEventRequests.length})</span>
           </button>
 
           <button
@@ -171,7 +171,7 @@ export const AdminConciergeSourcingTab: React.FC<AdminConciergeSourcingTabProps>
         </span>
       </div>
 
-      {/* PANEL 0: UTSAVO FULL-SERVICE MANAGED EVENT BRIEFS */}
+      {/* PANEL 0: SAGUNOO FULL-SERVICE MANAGED EVENT BRIEFS */}
       {subTab === 'MANAGED_EVENTS' && (
         <div className="space-y-4">
           {managedEventRequests.map((req: ManagedEventRequest) => {
@@ -228,7 +228,7 @@ export const AdminConciergeSourcingTab: React.FC<AdminConciergeSourcingTabProps>
                       {req.budgetCurrency} {req.totalBudget.toLocaleString()}
                     </strong>
                     <div className="text-[11px] text-stone-500">
-                      {utsavomanagedCount} UTSAVO Managed · {clientOwnCount} Client Own
+                      {utsavomanagedCount} SAGUNOO Managed · {clientOwnCount} Client Own
                     </div>
                   </div>
                 </div>
@@ -427,7 +427,7 @@ export const AdminConciergeSourcingTab: React.FC<AdminConciergeSourcingTabProps>
                             e.preventDefault();
                             sendManagedEventMessage(req.id, {
                               senderRole: 'UTSAVO_TEAM',
-                              senderName: coordNameDraft[req.id] || req.assignedCoordinatorName || 'UTSAVO Producer Desk',
+                              senderName: coordNameDraft[req.id] || req.assignedCoordinatorName || 'SAGUNOO Producer Desk',
                               channel: 'PORTAL_CHAT',
                               text: managedReplyDraft[req.id].trim(),
                             });
@@ -444,7 +444,7 @@ export const AdminConciergeSourcingTab: React.FC<AdminConciergeSourcingTabProps>
                           if (!txt) return;
                           sendManagedEventMessage(req.id, {
                             senderRole: 'UTSAVO_TEAM',
-                            senderName: coordNameDraft[req.id] || req.assignedCoordinatorName || 'UTSAVO Producer Desk',
+                            senderName: coordNameDraft[req.id] || req.assignedCoordinatorName || 'SAGUNOO Producer Desk',
                             channel: 'PORTAL_CHAT',
                             text: txt,
                           });

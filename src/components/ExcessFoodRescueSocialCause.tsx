@@ -1,11 +1,11 @@
 /**
- * UTSAVO - Annapurna Seva: Excess Feast Food Recovery & Social Cause
+ * SAGUNOO - Annapurna Seva: Excess Feast Food Recovery & Social Cause
  * (उत्सव अन्नपूर्णा सेवा - अतिरिक्त भोजन पुनर्वितरण सामाजिक पहल)
  * 
  * Strict Client Consent-Driven Model:
  * - 100% Voluntary. If client does not permit, zero food is touched or dispatched.
  * - Options to distribute to:
- *   1. UTSAVO Direct Rapid Rescue Van & Volunteers (उत्सव अन्नपूर्णा द्रुत सेवा)
+ *   1. SAGUNOO Direct Rapid Rescue Van & Volunteers (उत्सव अन्नपूर्णा द्रुत सेवा)
  *   2. Registered Humanitarian Partner (Manav Sewa Ashram, Food for Life Nepal, Rokpa Nepal, Robin Hood Army)
  *   3. Host's Nominated Local Shelter / Old Age Home
  * - Nepal DFTQC (Department of Food Technology and Quality Control) Food Safety Compliance
@@ -63,7 +63,7 @@ export const ExcessFoodRescueSocialCause: React.FC<ExcessFoodRescueSocialCausePr
   const [clientHostName, setClientHostName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [partnerType, setPartnerType] = useState<FoodDistributionPartnerType>('UTSAVO_DIRECT_RESCUE');
-  const [selectedOrgName, setSelectedOrgName] = useState('UTSAVO Annapurna Seva (उत्सव अन्नपूर्णा सेवा)');
+  const [selectedOrgName, setSelectedOrgName] = useState('SAGUNOO Annapurna Seva (उत्सव अन्नपूर्णा सेवा)');
   const [customOrgName, setCustomOrgName] = useState('');
   const [estimatedSurplusPortions, setEstimatedSurplusPortions] = useState(80);
   const [foodCategory, setFoodCategory] = useState<ExcessFoodRescuePledge['foodCategory']>('TRADITIONAL_NEPALI_FEAST');
@@ -102,7 +102,7 @@ export const ExcessFoodRescueSocialCause: React.FC<ExcessFoodRescueSocialCausePr
 
     const orgToUse =
       partnerType === 'UTSAVO_DIRECT_RESCUE'
-        ? 'UTSAVO Annapurna Seva (उत्सव अन्नपूर्णा सेवा)'
+        ? 'SAGUNOO Annapurna Seva (उत्सव अन्नपूर्णा सेवा)'
         : partnerType === 'REGISTERED_ORGANIZATION'
         ? selectedOrgName
         : customOrgName.trim() || 'Host Nominated Local Ashram / Community Shelter';
@@ -169,7 +169,7 @@ export const ExcessFoodRescueSocialCause: React.FC<ExcessFoodRescueSocialCausePr
             <div className="space-y-3 max-w-2xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/20 border border-rose-400/30 text-rose-300 text-xs font-semibold">
                 <Heart className="w-3.5 h-3.5 text-rose-400" />
-                <span>UTSAVO Social Cause · सामाजिक उत्तरदायित्व पहल</span>
+                <span>SAGUNOO Social Cause · सामाजिक उत्तरदायित्व पहल</span>
               </div>
               <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
                 उत्सव अन्नपूर्णा सेवा
@@ -284,14 +284,14 @@ export const ExcessFoodRescueSocialCause: React.FC<ExcessFoodRescueSocialCausePr
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Option 1: UTSAVO Direct Rescue */}
+            {/* Option 1: SAGUNOO Direct Rescue */}
             <div className="bg-white rounded-3xl p-6 sm:p-7 border border-stone-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
               <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-900 mb-4">
                 <Truck className="w-6 h-6 text-amber-800" />
               </div>
               <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider block">विकल्प १ (Direct Channel)</span>
               <h3 className="font-display text-xl font-bold text-stone-900 mt-1">
-                UTSAVO Direct Rapid Rescue Van (उत्सव प्रत्यक्ष द्रुत टोली)
+                SAGUNOO Direct Rapid Rescue Van (उत्सव प्रत्यक्ष द्रुत टोली)
               </h3>
               <p className="text-xs text-stone-600 leading-relaxed mt-2.5">
                 उत्सवले आफैं स्ट्यान्डबाइमा राखेको विशेष खाद्य भ्यान र स्वयंसेवकहरूले भोज समापन भएको २ घण्टाभित्रै पार्टी प्यालेसको भान्साबाट अछूतो भोजन स्टेनलेस स्टिलका तातो बक्सहरूमा प्याक गरी नजिकका आश्रमहरूमा पुर्‍याउँछ।
@@ -319,7 +319,7 @@ export const ExcessFoodRescueSocialCause: React.FC<ExcessFoodRescueSocialCausePr
                   }}
                   className="text-xs font-bold text-amber-900 hover:text-amber-700 flex items-center gap-1"
                 >
-                  <span>Select UTSAVO Direct</span>
+                  <span>Select SAGUNOO Direct</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -402,7 +402,7 @@ export const ExcessFoodRescueSocialCause: React.FC<ExcessFoodRescueSocialCausePr
                   </h4>
                   {partner.isUtsavoDirect ? (
                     <span className="px-2 py-0.5 rounded text-[9px] bg-amber-200 text-amber-900 font-bold shrink-0">
-                      UTSAVO Direct
+                      SAGUNOO Direct
                     </span>
                   ) : (
                     <span className="px-2 py-0.5 rounded text-[9px] bg-emerald-100 text-emerald-800 font-bold shrink-0">
@@ -698,7 +698,7 @@ export const ExcessFoodRescueSocialCause: React.FC<ExcessFoodRescueSocialCausePr
                     />
                     <div className="flex items-center gap-1.5 mb-1">
                       <Truck className="w-3.5 h-3.5 text-amber-800" />
-                      <span className="text-xs">UTSAVO Direct</span>
+                      <span className="text-xs">SAGUNOO Direct</span>
                     </div>
                     <span className="text-[10px] text-stone-500 block font-normal">
                       उत्सवको आफ्नै द्रुत उद्धार भ्यान तथा स्वयंसेवक

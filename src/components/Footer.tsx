@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Clean Footer
+ * SAGUNOO - Clean Footer
  * Follows anti-slop restraint: quiet copyright, trust notes, and links
  */
 
@@ -70,7 +70,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenCancellations }) => {
 
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-stone-500">
           <div>
-            © {new Date().getFullYear()} UTSAVO Technologies Pvt. Ltd. All rights reserved.
+            © {new Date().getFullYear()} SAGUNOO Technologies Pvt. Ltd. All rights reserved.
           </div>
           <div className="flex items-center gap-4">
             <span className="hover:text-stone-400 cursor-pointer">Terms of Service</span>

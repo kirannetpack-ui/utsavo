@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Advanced Catering & Menu Packages Engine
+ * SAGUNOO - Advanced Catering & Menu Packages Engine
  * Authentic Nepali banquets, Newari feasts, Terai Mithila dishes, and modern celebrations.
  */
 

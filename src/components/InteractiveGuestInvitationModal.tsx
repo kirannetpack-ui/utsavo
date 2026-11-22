@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Interactive Fullscreen Guest E-Card & RSVP Modal
+ * SAGUNOO — Interactive Fullscreen Guest E-Card & RSVP Modal
  * Solves: "Invitation is not opening the Invitation e-card"
  * Provides an authentic traditional Nepali ceremonial invitation experience with instant RSVP.
  */

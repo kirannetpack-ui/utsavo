@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Bilingual Nepali / English Localization Engine
+ * SAGUNOO - Bilingual Nepali / English Localization Engine
  */
 
 import React, { createContext, useContext, useState } from 'react';
@@ -15,7 +15,7 @@ interface TranslationDictionary {
 
 export const DICTIONARY: TranslationDictionary = {
   // Brand & Navigation
-  brandName: { en: 'UTSAVO', ne: 'उत्सवो' },
+  brandName: { en: 'SAGUNOO', ne: 'सगुनो' },
   tagline: { en: "Nepal's Smart Celebration Marketplace", ne: "नेपालको पहिलो स्मार्ट उत्सव तथा पार्टी प्यालेस बजार" },
   navExplore: { en: 'Explore Venues', ne: 'स्थल खोज्नुहोस्' },
   navMuhurats: { en: 'Panchanga Dates', ne: 'पञ्चाङ्ग शुभ साइत' },

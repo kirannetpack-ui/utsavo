@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Nepal's Smart Celebration Marketplace
+ * SAGUNOO — Nepal's Smart Celebration Marketplace
  * Main Application Shell & Master Orchestration
  */
 
@@ -66,7 +66,7 @@ const MainShell: React.FC = () => {
     return 'EXPLORE';
   });
 
-  // Check if current URL is an invitation link (e.g. /invite/UTS-INV-8921 or ?invite=UTS-INV-8921 or #invite/...)
+  // Check if current URL is an invitation link (e.g. /invite/SGN-INV-8921 or ?invite=SGN-INV-8921 or #invite/...)
   const [activeInviteCode, setActiveInviteCode] = useState<string | null>(() => {
     if (typeof window === 'undefined') return null;
     const path = window.location.pathname;
@@ -349,13 +349,13 @@ const MainShell: React.FC = () => {
           setIsAiAssistantOpen(true);
         }}
         className="fixed bottom-20 lg:bottom-6 right-5 z-40 bg-amber-900 hover:bg-amber-950 text-white p-3.5 rounded-full shadow-xl transition-transform hover:scale-105 flex items-center gap-2 border border-amber-700/50"
-        title="Open UTSAVO Gemini AI Assistant"
+        title="Open SAGUNOO Gemini AI Assistant"
       >
         <span className="relative flex h-2.5 w-2.5">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400"></span>
         </span>
-        <span className="text-xs font-semibold pr-1">UTSAVO AI</span>
+        <span className="text-xs font-semibold pr-1">SAGUNOO AI</span>
       </button>
 
       {/* Mobile App & PWA Bottom Navigation Bar */}

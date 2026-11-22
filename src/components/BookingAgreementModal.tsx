@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Digital Booking Agreement & Contract Modal
+ * SAGUNOO - Digital Booking Agreement & Contract Modal
  * Section 10: Legal terms, PAN/VAT disclosures, schedule clauses, and digital signature
  */
 
@@ -81,7 +81,7 @@ export const BookingAgreementModal: React.FC = () => {
             {/* Header Stamp */}
             <div className="flex justify-between items-start border-b border-stone-200 pb-4">
               <div>
-                <span className="font-display text-xl font-bold text-amber-950">UTSAVO</span>
+                <span className="font-display text-xl font-bold text-amber-950">SAGUNOO</span>
                 <div className="text-[11px] text-stone-500">Nepal's Smart Celebration Marketplace</div>
                 <div className="text-[11px] text-stone-400">Electronic Commerce & Hospitality Act Compliant</div>
               </div>

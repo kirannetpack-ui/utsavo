@@ -1,6 +1,6 @@
 {
-  "name": "UTSAVO — Nepal's Smart Celebration Marketplace",
-  "description": "Multi-vendor event venue and party palace discovery, Hindu Panchanga auspicious date calendar, menu customization, structured negotiation, and booking platform across Nepal.",
+  "name": "SAGUNOO — Nepal's Auspicious Celebration Platform",
+  "description": "SAGUNOO is Nepal's smart celebration marketplace and managed event platform for verified party palaces, Hindu Panchanga auspicious dates, menu customization, structured negotiation, and digital Nimantrana.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

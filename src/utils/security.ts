@@ -1,5 +1,5 @@
 /**
- * UTSAVO Security Utilities
+ * SAGUNOO Security Utilities
  * Defensive programming, XSS prevention, URL validation, and input sanitization.
  */
 

@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Customer & Event Organizer Dashboard
+ * SAGUNOO - Customer & Event Organizer Dashboard
  * Section 12: Upcoming celebrations, active negotiations, signed contracts, verified reviews,
  * and Bookmarked 'Saved Venues & Vendors' Management
  */
@@ -281,7 +281,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
               </span>
             </button>
 
-            {/* TAB 6: UTSAVO Organizes Whole Event */}
+            {/* TAB 6: SAGUNOO Organizes Whole Event */}
             <button
               onClick={() => setActiveTab('MANAGED_EVENTS')}
               className={`px-3.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
@@ -291,7 +291,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
               }`}
             >
               <Sparkles className={`w-3.5 h-3.5 ${activeTab === 'MANAGED_EVENTS' ? 'text-amber-300' : 'text-amber-800'}`} />
-              <span>{language === 'ne' ? 'UTSAVO पूर्ण इभेन्ट' : 'UTSAVO Organizes'}</span>
+              <span>{language === 'ne' ? 'SAGUNOO पूर्ण इभेन्ट' : 'SAGUNOO Organizes'}</span>
               <span
                 className={`ml-0.5 px-1.5 py-0.2 rounded-full text-[10px] font-bold tabular-nums ${
                   activeTab === 'MANAGED_EVENTS' ? 'bg-amber-800 text-amber-200' : 'bg-stone-200 text-stone-700'
@@ -1620,19 +1620,19 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
         <FavoriteVenueAlertsPanel onNavigateView={onNavigateView} />
       )}
 
-      {/* TAB: UTSAVO FULL-SERVICE MANAGED EVENTS */}
+      {/* TAB: SAGUNOO FULL-SERVICE MANAGED EVENTS */}
       {activeTab === 'MANAGED_EVENTS' && (
         <div className="space-y-5">
           <div className="p-5 bg-white rounded-3xl border border-stone-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-amber-900">
-                {language === 'ne' ? 'पूर्ण इभेन्ट व्यवस्थापन र समन्वय' : 'UTSAVO Managed Event Dossiers · Client Authority'}
+                {language === 'ne' ? 'पूर्ण इभेन्ट व्यवस्थापन र समन्वय' : 'SAGUNOO Managed Event Dossiers · Client Authority'}
               </span>
               <h3 className="font-display text-xl font-bold text-stone-900 mt-0.5">
-                Events Organized by UTSAVO Under Your Direct Control
+                Events Organized by SAGUNOO Under Your Direct Control
               </h3>
               <p className="text-xs text-stone-500 mt-0.5">
-                Adjust any vendor function ownership mode, track UTSAVO producer sourcing actions, or coordinate directly with your dedicated team.
+                Adjust any vendor function ownership mode, track SAGUNOO producer sourcing actions, or coordinate directly with your dedicated team.
               </p>
             </div>
             {onNavigateView && (
@@ -1651,7 +1651,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
               <Sparkles className="w-8 h-8 text-amber-700 mx-auto" />
               <h4 className="font-bold text-stone-900 text-sm">No Managed Event Dossiers Yet</h4>
               <p className="text-xs text-stone-500 max-w-md mx-auto">
-                Start the smart UTSAVO Managed Event Planner to gather your time, date, pax, budget, vendor functions, and global standards.
+                Start the smart SAGUNOO Managed Event Planner to gather your time, date, pax, budget, vendor functions, and global standards.
               </p>
               {onNavigateView && (
                 <button
@@ -1739,7 +1739,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                             }}
                             className="w-full px-2 py-1 bg-white border border-stone-300 rounded-lg text-[11px] font-semibold text-stone-800"
                           >
-                            <option value="UTSAVO_FULL_MANAGE">UTSAVO Full Manage</option>
+                            <option value="UTSAVO_FULL_MANAGE">SAGUNOO Full Manage</option>
                             <option value="CO_SELECT_MARKETPLACE">Co-Select Marketplace</option>
                             <option value="CLIENT_HAS_OWN_VENDOR">Client Has Own Vendor</option>
                             <option value="NOT_NEEDED">Not Needed</option>
@@ -1753,7 +1753,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-2 border-t border-stone-100">
                     <div className="p-3.5 rounded-2xl bg-stone-50 border border-stone-200 space-y-2">
                       <strong className="block text-stone-900">
-                        UTSAVO Producer Updates ({req.teamActionUpdates.length})
+                        SAGUNOO Producer Updates ({req.teamActionUpdates.length})
                       </strong>
                       <ul className="space-y-1.5 text-[11px] text-stone-700 max-h-40 overflow-y-auto">
                         {req.teamActionUpdates.map((upd, idx) => (
@@ -1767,7 +1767,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                         <span className="text-[11px] text-stone-500">Direct phone/chat escalation:</span>
                         <WhatsAppViberButtons
                           phone={req.assignedCoordinatorPhone || '+9779801122334'}
-                          messageText={`Namaste UTSAVO Concierge Team! Coordinating on Managed Event Brief #${req.requestRef} (${req.eventTitle}, ${req.eventDateBS} BS).`}
+                          messageText={`Namaste SAGUNOO Concierge Team! Coordinating on Managed Event Brief #${req.requestRef} (${req.eventTitle}, ${req.eventDateBS} BS).`}
                           variant="badges"
                         />
                       </div>
@@ -1776,7 +1776,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                     <div className="p-3.5 rounded-2xl bg-amber-50/40 border border-amber-200 space-y-2.5 flex flex-col justify-between">
                       <div>
                         <strong className="block text-amber-950 mb-2">
-                          Direct Coordination with UTSAVO Team ({req.coordinationMessages.length})
+                          Direct Coordination with SAGUNOO Team ({req.coordinationMessages.length})
                         </strong>
                         <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                           {req.coordinationMessages.map((msg) => (
@@ -1816,7 +1816,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                               setManagedChatDraft((prev) => ({ ...prev, [req.id]: '' }));
                             }
                           }}
-                          placeholder="Message UTSAVO producer directly (vendor change, visit request, tasting)..."
+                          placeholder="Message SAGUNOO producer directly (vendor change, visit request, tasting)..."
                           className="flex-1 px-3 py-1.5 bg-white border border-stone-300 rounded-xl text-xs"
                         />
                         <button

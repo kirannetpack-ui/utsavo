@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Authenticated User Workspace & AI Chat Firestore Sync
+ * SAGUNOO - Authenticated User Workspace & AI Chat Firestore Sync
  * Persists user profiles, bookmarked venues/vendors, and Gemini AI conversation history
  * cleanly under `/users/{uid}` following hardened rules and explicit error boundaries.
  */
@@ -58,8 +58,8 @@ export async function syncAuthenticatedUserProfile(user: User): Promise<void> {
   const ref = doc(db, 'users', user.uid);
   try {
     const snap = await getDoc(ref);
-    const email = (user.email || 'user@utsavo.com').slice(0, 100);
-    const displayName = (user.displayName || email.split('@')[0] || 'UTSAVO Member').slice(0, 100);
+    const email = (user.email || 'user@sagunoo.com').slice(0, 100);
+    const displayName = (user.displayName || email.split('@')[0] || 'SAGUNOO Member').slice(0, 100);
 
     if (snap.exists()) {
       const existing = snap.data();

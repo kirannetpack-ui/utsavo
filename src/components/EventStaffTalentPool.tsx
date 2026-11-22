@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Celebration Workforce & Gig Talent Pool (उत्सव जनशक्ति तथा गिग कार्यथलो)
+ * SAGUNOO - Celebration Workforce & Gig Talent Pool (उत्सव जनशक्ति तथा गिग कार्यथलो)
  * Features:
  * 1. View Density Switcher: Small Icons (Default), Medium Cards, Large Detailed Cards.
  * 2. Multi-selection for vendors: Choose candidates individually or multiple at once with bulk WhatsApp shift outreach.
@@ -337,7 +337,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
     addStaffReview(selectedStaffForDossier.id, {
       staffId: selectedStaffForDossier.id,
       reviewerName: reviewerName.trim() || 'Venue Banquet Manager',
-      reviewerOrganization: reviewerOrg.trim() || 'Utsavo Partner Venue',
+      reviewerOrganization: reviewerOrg.trim() || 'Sagunoo Partner Venue',
       reviewerRole: reviewerRole.trim() || 'Floor Supervisor',
       rating: Number(reviewRating),
       punctualityScore: Number(reviewPunctuality),
@@ -361,7 +361,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
   // Handle Bulk WhatsApp Dispatch
   const handleBulkWhatsAppDispatch = () => {
     const staffNames = selectedStaffObjects.map((s) => s.fullName).join(', ');
-    const message = `Namaste! We are contacting a selected team of ${selectedStaffObjects.length} celebration professionals via UTSAVO (${staffNames}) for an upcoming event shift at ${bulkVenueName} on ${bulkShiftDateBS} (${bulkShiftTime} Shift). Total shift pay adheres to Nepal Government statutory standards (NPR ${statutoryRules.minDailyShiftWageNpr}/shift minimum). Notes: ${bulkShiftNotes}`;
+    const message = `Namaste! We are contacting a selected team of ${selectedStaffObjects.length} celebration professionals via SAGUNOO (${staffNames}) for an upcoming event shift at ${bulkVenueName} on ${bulkShiftDateBS} (${bulkShiftTime} Shift). Total shift pay adheres to Nepal Government statutory standards (NPR ${statutoryRules.minDailyShiftWageNpr}/shift minimum). Notes: ${bulkShiftNotes}`;
     
     // Open primary selected worker's WhatsApp with full team brief
     const targetPhone = selectedStaffObjects[0]?.whatsapp || selectedStaffObjects[0]?.phone || '+9779800000000';
@@ -481,7 +481,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
               </span>
             </div>
             <p className="text-xs text-stone-600 leading-relaxed">
-              <strong>Vendor Shift Cancellation (&lt;48h / &lt;24h):</strong> Cancelling &lt;48h triggers <strong>50% Reporting Pay</strong> (NPR {Math.round(statutoryRules.minDailyShiftWageNpr * 0.5).toLocaleString()}); cancelling &lt;24h or post-check-in pays <strong>100% Full Shift Wage</strong> (NPR {statutoryRules.minDailyShiftWageNpr.toLocaleString()}). <strong>+45 min Call-Time No-Show &amp; Backfill:</strong> Staff unverified past +45 min face a <strong>14–28 day late-drop cooldown</strong> while UTSAVO auto-pings high-reliability standby workers in the same district with a verified peer referral swap.
+              <strong>Vendor Shift Cancellation (&lt;48h / &lt;24h):</strong> Cancelling &lt;48h triggers <strong>50% Reporting Pay</strong> (NPR {Math.round(statutoryRules.minDailyShiftWageNpr * 0.5).toLocaleString()}); cancelling &lt;24h or post-check-in pays <strong>100% Full Shift Wage</strong> (NPR {statutoryRules.minDailyShiftWageNpr.toLocaleString()}). <strong>+45 min Call-Time No-Show &amp; Backfill:</strong> Staff unverified past +45 min face a <strong>14–28 day late-drop cooldown</strong> while SAGUNOO auto-pings high-reliability standby workers in the same district with a verified peer referral swap.
             </p>
           </div>
         </div>
@@ -803,7 +803,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
                   <div className="flex items-center gap-1">
                     <WhatsAppViberButtons
                       phone={staff.whatsapp || staff.phone}
-                      messageText={`Namaste ${staff.fullName}! We found your profile on UTSAVO. We have an upcoming event shift and would like to hire you.`}
+                      messageText={`Namaste ${staff.fullName}! We found your profile on SAGUNOO. We have an upcoming event shift and would like to hire you.`}
                       variant="badges"
                     />
 
@@ -938,7 +938,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
                   <div className="flex items-center gap-1.5">
                     <WhatsAppViberButtons
                       phone={staff.whatsapp || staff.phone}
-                      messageText={`Namaste ${staff.fullName}! We found your profile on UTSAVO. We have an upcoming event shift.`}
+                      messageText={`Namaste ${staff.fullName}! We found your profile on SAGUNOO. We have an upcoming event shift.`}
                       variant="badges"
                     />
                     <a
@@ -1103,7 +1103,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
                   <div className="flex items-center gap-2 pt-1">
                     <WhatsAppViberButtons
                       phone={staff.whatsapp || staff.phone}
-                      messageText={`Namaste ${staff.fullName}! We found your profile on UTSAVO. We have an upcoming event shift.`}
+                      messageText={`Namaste ${staff.fullName}! We found your profile on SAGUNOO. We have an upcoming event shift.`}
                       variant="badges"
                     />
                     <a
@@ -1330,7 +1330,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
                   Open Workforce Registration (खुला जनशक्ति दर्ता)
                 </span>
                 <h3 className="font-display text-2xl font-bold text-stone-900 mt-1">
-                  Join the UTSAVO Celebration Workforce Pool
+                  Join the SAGUNOO Celebration Workforce Pool
                 </h3>
                 <p className="text-xs text-stone-500 mt-1">
                   Full-time, part-time & weekend event gigs across Nepal. No restrictions on candidate numbers.
@@ -2105,7 +2105,7 @@ export const EventStaffTalentPool: React.FC<EventStaffTalentPoolProps> = ({
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <WhatsAppViberButtons
                   phone={selectedStaffForDossier.whatsapp || selectedStaffForDossier.phone}
-                  messageText={`Namaste ${selectedStaffForDossier.fullName}! We have reviewed your UTSAVO profile (Rating: ${selectedStaffForDossier.rating.toFixed(1)} ★) and would like to hire you for an upcoming event shift.`}
+                  messageText={`Namaste ${selectedStaffForDossier.fullName}! We have reviewed your SAGUNOO profile (Rating: ${selectedStaffForDossier.rating.toFixed(1)} ★) and would like to hire you for an upcoming event shift.`}
                   variant="badges"
                 />
                 <a

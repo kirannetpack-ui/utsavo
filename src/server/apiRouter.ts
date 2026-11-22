@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Backend API Router (Gemini AI Proxy & Endpoints)
+ * SAGUNOO - Backend API Router (Gemini AI Proxy & Endpoints)
  * Shared across standalone server (AI Studio dev) and Vercel serverless deployment
  */
 
@@ -31,7 +31,7 @@ const ai = new GoogleGenAI({
 apiRouter.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
-    app: 'UTSAVO',
+    app: 'SAGUNOO',
     hasApiKey: !!process.env.GEMINI_API_KEY,
     timestamp: new Date().toISOString(),
   });
@@ -40,13 +40,13 @@ apiRouter.get('/health', (_req, res) => {
 // 1. Multi-Turn Chatbot Endpoint (gemini-4-hydrogen / gemini-3.1-flash-lite with role system instructions)
 const CHAT_ROLE_INSTRUCTIONS: Record<string, string> = {
   EVENT_PLANNER:
-    'You are UTSAVO Event Producer & Planning Assistant for Nepal. Guide clients on wedding (Bibaha), reception, Bratabandha, Pasni, party palace selection, run-of-show logistics, sound curfews (10:00 PM DAO rule), and catering menus across Nepal in warm, structured English or Nepali.',
+    'You are SAGUNOO Event Producer & Planning Assistant for Nepal. Guide clients on wedding (Bibaha), reception, Bratabandha, Pasni, party palace selection, run-of-show logistics, sound curfews (10:00 PM DAO rule), and catering menus across Nepal in warm, structured English or Nepali.',
   PANCHANGA_PANDIT:
-    'You are UTSAVO Hindu Panchanga & Vedic Ritual Advisor. Explain Samiti auspicious dates, Tithi, Nakshatra, Lagan windows, seasonal suitability, and ceremonial requirements (Vivah Mandap, Havan, Bratabandha, Griha Pravesh) clearly and respectfully.',
+    'You are SAGUNOO Hindu Panchanga & Vedic Ritual Advisor. Explain Samiti auspicious dates, Tithi, Nakshatra, Lagan windows, seasonal suitability, and ceremonial requirements (Vivah Mandap, Havan, Bratabandha, Griha Pravesh) clearly and respectfully.',
   NEGOTIATION_STRATEGIST:
-    'You are UTSAVO Hospitality Commercial Strategist. Help hosts calculate per-plate costs + 10% Service Charge + 13% IRD VAT, spot off-season concession opportunities, and structure fair counter-offers for venues in NPR.',
+    'You are SAGUNOO Hospitality Commercial Strategist. Help hosts calculate per-plate costs + 10% Service Charge + 13% IRD VAT, spot off-season concession opportunities, and structure fair counter-offers for venues in NPR.',
   DESTINATION_CONCIERGE:
-    'You are UTSAVO Destination & NRI Celebration Concierge specializing in Pokhara, Kathmandu, Nagarkot, Chitwan, and Nepali diaspora events abroad. Cover guest room blocks, travel logistics, visas, customs for wedding attire, and mountain weather backups.',
+    'You are SAGUNOO Destination & NRI Celebration Concierge specializing in Pokhara, Kathmandu, Nagarkot, Chitwan, and Nepali diaspora events abroad. Cover guest room blocks, travel logistics, visas, customs for wedding attire, and mountain weather backups.',
 };
 
 apiRouter.post('/chat', async (req, res) => {
@@ -260,7 +260,7 @@ apiRouter.post('/destination-sourcing', async (req, res) => {
     } = req.body;
 
     const prompt = `
-You are the Chief Destination Concierge for UTSAVO, Nepal's Smart Celebration & Tourism Authority.
+You are the Chief Destination Concierge for SAGUNOO, Nepal's Smart Celebration & Tourism Authority.
 A client is planning an iconic Destination Celebration in Nepal. Sourced from globally reputable travel & event standards, provide comprehensive, up-to-date guidance grounded in Google Search.
 
 Client Dossier:
@@ -292,7 +292,7 @@ Please provide a structured, inspiring, highly practical destination blueprint w
       config: {
         tools: [{ googleSearch: {} }],
         systemInstruction:
-          'You are UTSAVO Global Destination Concierge. You champion luxury destination tourism in Nepal, highlighting Pokhara, Kathmandu, Nagarkot, Chitwan, Muktinath, and Everest. Provide authoritative, warm, and structured event planning dossiers.',
+          'You are SAGUNOO Global Destination Concierge. You champion luxury destination tourism in Nepal, highlighting Pokhara, Kathmandu, Nagarkot, Chitwan, Muktinath, and Everest. Provide authoritative, warm, and structured event planning dossiers.',
       },
     });
 
@@ -325,7 +325,7 @@ apiRouter.post('/destination-outside-nepal-sourcing', async (req, res) => {
     const dossier = req.body || {};
 
     const prompt = `
-You are UTSAVO's Executive International Celebration Director. A client wants to host an unforgettable celebration OUTSIDE OF NEPAL.
+You are SAGUNOO's Executive International Celebration Director. A client wants to host an unforgettable celebration OUTSIDE OF NEPAL.
 Using live Google Search grounding, research practical hospitality, visa, cultural ceremony, and memorable experiential arrangements for the target country & city below.
 
 Client Gathered Dossier:
@@ -359,7 +359,7 @@ Provide a structured, inspiring, actionable arrangement blueprint with these 5 s
       config: {
         tools: [{ googleSearch: {} }],
         systemInstruction:
-          'You are UTSAVO Executive International Celebration Director helping Nepali diaspora and global clients host extraordinary weddings and milestones outside Nepal. Be practical, accurate on international venue/fire/visa logistics, and deeply creative.',
+          'You are SAGUNOO Executive International Celebration Director helping Nepali diaspora and global clients host extraordinary weddings and milestones outside Nepal. Be practical, accurate on international venue/fire/visa logistics, and deeply creative.',
       },
     });
 
@@ -393,7 +393,7 @@ apiRouter.post('/regulatory-compliance-intelligence', async (req, res) => {
     const { category, specificQuery } = req.body || {};
 
     const prompt = `
-You are the Nepal Government Regulatory Compliance Engine for UTSAVO (Nepal's Celebration & Party Palace Marketplace).
+You are the Nepal Government Regulatory Compliance Engine for SAGUNOO (Nepal's Celebration & Party Palace Marketplace).
 Search the latest verified Nepal Government legal acts, gazette notices (नेपाल राजपत्र), ministry directives, and municipal circulars concerning:
 1. LABOUR ACT 2074 (श्रम ऐन २०७४) & MINIMUM WAGE: Verify statutory minimum wage notifications by the Ministry of Labour, Employment and Social Security (current statutory baseline: NPR 17,300/month, NPR 668/day shift, NPR 89/hour), overtime rules (1.5x for >8 hours), and temporary/gig worker protections.
 2. DAO SOUND POLLUTION & CURFEW: District Administration Office (DAO Kathmandu, Lalitpur, Bhaktapur) notifications regarding party palace sound curfew (mandatory cutoff at 10:00 PM / 22:00 hrs) and decibel restrictions for DJs, brass bands, and outdoor speakers.
@@ -402,10 +402,10 @@ Search the latest verified Nepal Government legal acts, gazette notices (ने�
 
 Specific Focus query: ${specificQuery || 'Latest Nepal Gazette circulars regarding minimum wages, party palace noise curfew, and banquet VAT/TDS'}
 
-Provide an authoritative compliance report for UTSAVO's Super Admin with:
+Provide an authoritative compliance report for SAGUNOO's Super Admin with:
 A. Current Enforced Legal Rules & Gazette Numbers
 B. Recent or Proposed Circular Updates (with effective dates if any)
-C. Direct Impact on UTSAVO Platform (Wages, Contracts, Run-of-Show, VAT)
+C. Direct Impact on SAGUNOO Platform (Wages, Contracts, Run-of-Show, VAT)
 D. Actionable Recommendation for Platform Admin (Whether to Apply or Maintain)
 `;
 
@@ -445,7 +445,7 @@ D. Actionable Recommendation for Platform Admin (Whether to Apply or Maintain)
     console.error('Regulatory Compliance Error:', err);
     res.json({
       status: 'fallback',
-      report: `### 🇳🇵 नेपाल सरकार वैधानिक मापदण्ड तथा राजपत्र अद्यावधिक विश्लेषण (UTSAVO Statutory Compliance Overview)\n\n**१. श्रम ऐन २०७४ तथा न्यूनतम पारिश्रमिक मापदण्ड (Labour Act 2074):**\n- श्रम, रोजगार तथा सामाजिक सुरक्षा मन्त्रालयको राजपत्र सूचना अनुसार नेपाल सरकारद्वारा तोकिएको न्यूनतम पारिश्रमिक **मासिक रू. १७,३००** (आधारभूत रू. १०,८२० + महँगी भत्ता रू. ६,४८०) हो।\n- दैनिक सिफ्ट (८ घण्टा) को लागि न्यूनतम पारिश्रमिक **रू. ६६८** र प्रतिघण्टा **रू. ८९** कायम गरिएको छ।\n- UTSAVO को नियम: कुनै पनि पार्टी प्यालेस वा क्याटररले कामदारलाई रू. ६६८ भन्दा कम भुक्तानी गर्न पाउने छैनन्। पारिश्रमिक नतोकेका कामदारलाई यो नियम स्वतः लागू हुन्छ।\n\n**२. जिल्ला प्रशासन कार्यालय ध्वनि नियन्त्रण तथा रात्रीकालीन सुरक्षा (DAO Sound Curfew):**\n- काठमाडौँ तथा ललितपुर जिल्ला प्रशासन कार्यालयको आदेश अनुसार आवासीय क्षेत्रका पार्टी प्यालेस तथा ब्यान्क्वेटहरूमा **राति १०:०० बजे (२२:००)** पछि डिजे, लाउडस्पिकर र बाजा पूर्ण रूपमा बन्द गर्नुपर्नेछ।\n- UTSAVO को कार्यान्वयन: प्रत्येक डिजिटल सम्झौता र रन-अफ-शोमा १०:०० बजे साउन्ड कट-अफ अनिवार्य शर्तको रूपमा राखिएको छ।\n\n**३. आन्तरिक राजस्व विभाग (IRD VAT & TDS Compliance):**\n- पार्टी प्यालेस तथा क्याटरिङ सेवामा **१३% भ्याट** र सेवा भुक्तानीमा **१.५% टीडीएस** अनिवार्य रूपमा कट्टी गरी प्यान बिलिङ गर्नुपर्नेछ।\n\n**४. खाद्य स्वच्छता तथा गुणस्तर ऐन, २०८१ (Food Safety & Quality Act 2081):**\n- ब्यान्क्वेट भान्सामा पिउने पानीको ल्याब परीक्षण र खानाको तापक्रम मापदण्ड पालना हुनुपर्नेछ।`,
+      report: `### 🇳🇵 नेपाल सरकार वैधानिक मापदण्ड तथा राजपत्र अद्यावधिक विश्लेषण (SAGUNOO Statutory Compliance Overview)\n\n**१. श्रम ऐन २०७४ तथा न्यूनतम पारिश्रमिक मापदण्ड (Labour Act 2074):**\n- श्रम, रोजगार तथा सामाजिक सुरक्षा मन्त्रालयको राजपत्र सूचना अनुसार नेपाल सरकारद्वारा तोकिएको न्यूनतम पारिश्रमिक **मासिक रू. १७,३००** (आधारभूत रू. १०,८२० + महँगी भत्ता रू. ६,४८०) हो।\n- दैनिक सिफ्ट (८ घण्टा) को लागि न्यूनतम पारिश्रमिक **रू. ६६८** र प्रतिघण्टा **रू. ८९** कायम गरिएको छ।\n- SAGUNOO को नियम: कुनै पनि पार्टी प्यालेस वा क्याटररले कामदारलाई रू. ६६८ भन्दा कम भुक्तानी गर्न पाउने छैनन्। पारिश्रमिक नतोकेका कामदारलाई यो नियम स्वतः लागू हुन्छ।\n\n**२. जिल्ला प्रशासन कार्यालय ध्वनि नियन्त्रण तथा रात्रीकालीन सुरक्षा (DAO Sound Curfew):**\n- काठमाडौँ तथा ललितपुर जिल्ला प्रशासन कार्यालयको आदेश अनुसार आवासीय क्षेत्रका पार्टी प्यालेस तथा ब्यान्क्वेटहरूमा **राति १०:०० बजे (२२:००)** पछि डिजे, लाउडस्पिकर र बाजा पूर्ण रूपमा बन्द गर्नुपर्नेछ।\n- SAGUNOO को कार्यान्वयन: प्रत्येक डिजिटल सम्झौता र रन-अफ-शोमा १०:०० बजे साउन्ड कट-अफ अनिवार्य शर्तको रूपमा राखिएको छ।\n\n**३. आन्तरिक राजस्व विभाग (IRD VAT & TDS Compliance):**\n- पार्टी प्यालेस तथा क्याटरिङ सेवामा **१३% भ्याट** र सेवा भुक्तानीमा **१.५% टीडीएस** अनिवार्य रूपमा कट्टी गरी प्यान बिलिङ गर्नुपर्नेछ।\n\n**४. खाद्य स्वच्छता तथा गुणस्तर ऐन, २०८१ (Food Safety & Quality Act 2081):**\n- ब्यान्क्वेट भान्सामा पिउने पानीको ल्याब परीक्षण र खानाको तापक्रम मापदण्ड पालना हुनुपर्नेछ।`,
       sources: [
         { title: 'Ministry of Labour, Employment and Social Security (MoLESS)', uri: 'https://moless.gov.np' },
         { title: 'Inland Revenue Department Nepal (IRD)', uri: 'https://ird.gov.np' },
@@ -518,7 +518,7 @@ apiRouter.post('/negotiation-summary', async (req, res) => {
       fairnessAndReadinessNote: isAccepted
         ? 'Terms are mutually ratified and ready for digital contract execution and 25% escrow deposit settlement under Nepal Contract Act 2056.'
         : 'Both customer and venue operator can review every counter-offer delta below before locking final terms or submitting another counter-proposal.',
-      generatedWith: 'UTSAVO Deterministic Audit Synthesizer',
+      generatedWith: 'SAGUNOO Deterministic Audit Synthesizer',
       generatedAt: new Date().toISOString(),
     };
   };
@@ -556,7 +556,7 @@ apiRouter.post('/negotiation-summary', async (req, res) => {
     }));
 
     const prompt = `
-Analyze the following structured banquet negotiation thread on UTSAVO (Nepal's party palace & event marketplace) and produce an impartial, crystal-clear negotiation summary record for BOTH the customer and the venue vendor.
+Analyze the following structured banquet negotiation thread on SAGUNOO (Nepal's party palace & event marketplace) and produce an impartial, crystal-clear negotiation summary record for BOTH the customer and the venue vendor.
 
 Thread Metadata:
 - Enquiry ID: ${thread.enquiryId}
@@ -580,7 +580,7 @@ Strictly summarize ONLY the facts, NPR amounts, concessions, amenities, and date
       contents: prompt,
       config: {
         systemInstruction:
-          'You are an impartial commercial agreement auditor for UTSAVO Nepal. Produce concise, factual summaries reconciling counter-offers, price deltas in NPR, concessions, and agreed terms so both customer and vendor share a single source of truth.',
+          'You are an impartial commercial agreement auditor for SAGUNOO Nepal. Produce concise, factual summaries reconciling counter-offers, price deltas in NPR, concessions, and agreed terms so both customer and vendor share a single source of truth.',
         responseMimeType: 'application/json',
         responseSchema: {
           type: Type.OBJECT,
@@ -852,11 +852,11 @@ apiRouter.post('/smart-venue-matcher', async (req, res) => {
         : `NPR ${budgetAmountNpr.toLocaleString()} total`;
 
     return {
-      matcherOverview: `Evaluated ${venueSummaries.length} verified UTSAVO party palaces across ${locationLabel} for a ${guestCount}-guest ${eventType.replace(/_/g, ' ').toLowerCase()} targeting ${budgetLabel}. Below are the top ${ranked.length} ranked matches including estimated 10% service charge and 13% Nepal VAT.`,
+      matcherOverview: `Evaluated ${venueSummaries.length} verified SAGUNOO party palaces across ${locationLabel} for a ${guestCount}-guest ${eventType.replace(/_/g, ' ').toLowerCase()} targeting ${budgetLabel}. Below are the top ${ranked.length} ranked matches including estimated 10% service charge and 13% Nepal VAT.`,
       recommendations: ranked.map((item, idx) =>
         buildSingleDeterministicRecommendation(item.venue, idx + 1, item.reasons)
       ),
-      generatedWith: 'UTSAVO Multi-Factor Venue Ranker',
+      generatedWith: 'SAGUNOO Multi-Factor Venue Ranker',
       generatedAt: new Date().toISOString(),
     };
   };
@@ -867,7 +867,7 @@ apiRouter.post('/smart-venue-matcher', async (req, res) => {
     }
 
     const prompt = `
-You are UTSAVO's Smart Venue Matcher for Nepal's party palaces and banquet halls.
+You are SAGUNOO's Smart Venue Matcher for Nepal's party palaces and banquet halls.
 Select and rank the TOP 3 best-fit party palaces ONLY from the verified venue catalog JSON below based on the user's event preferences and budget.
 
 User Event Preferences & Budget:
@@ -906,7 +906,7 @@ Rules:
       contents: prompt,
       config: {
         systemInstruction:
-          'You are UTSAVO Smart Venue Matcher helping families and planners in Nepal pick the top 3 best-fit party palaces based strictly on verified venue data, guest count, and NPR budget.',
+          'You are SAGUNOO Smart Venue Matcher helping families and planners in Nepal pick the top 3 best-fit party palaces based strictly on verified venue data, guest count, and NPR budget.',
         responseMimeType: 'application/json',
         responseSchema: {
           type: Type.OBJECT,
@@ -1045,7 +1045,7 @@ let favoriteVenueAlertsStore: ServerFavoriteVenueAlert[] = [
     alertKind: 'LAST_MINUTE_CANCELLATION',
     title: 'Last-Minute Evening Slot Released at The Regal Pavilion',
     message:
-      'Booking #UTS-2083-4890 was released by the prior host. Grand Kailash Ballroom is now immediately open for 2083 Mangsir 09 (Vivah Muhurat) Evening Shift.',
+      'Booking #SGN-2083-4890 was released by the prior host. Grand Kailash Ballroom is now immediately open for 2083 Mangsir 09 (Vivah Muhurat) Evening Shift.',
     dateBS: '2083 Mangsir 09',
     dateAD: '2026-11-25',
     shift: 'EVENING',
@@ -1054,7 +1054,7 @@ let favoriteVenueAlertsStore: ServerFavoriteVenueAlert[] = [
     nakshatra: 'Rohini (रोहिणी)',
     auspiciousTime: '04:30 PM - 10:30 PM',
     discountOrIncentiveNote: 'Priority Express Rebooking · 10% Deposit Transfer Fee Waived',
-    sourceBookingRef: 'UTS-2083-4890',
+    sourceBookingRef: 'SGN-2083-4890',
     createdAt: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
     isRead: false,
   },
@@ -1118,7 +1118,7 @@ let favoriteVenueAlertsStore: ServerFavoriteVenueAlert[] = [
     nakshatra: 'Anuradha (अनुराधा)',
     auspiciousTime: '08:00 AM - 12:30 PM',
     discountOrIncentiveNote: 'Complimentary Juju Dhau Welcome Service',
-    sourceBookingRef: 'UTS-2083-3918-HOLD',
+    sourceBookingRef: 'SGN-2083-3918-HOLD',
     createdAt: new Date(Date.now() - 1000 * 60 * 140).toISOString(),
     isRead: false,
   },
@@ -1405,11 +1405,11 @@ apiRouter.post('/favorite-venue-alerts/mark-read', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
-// 9. UTSAVO Full-Service Managed Event Global Sourcing & Blueprint Generator
+// 9. SAGUNOO Full-Service Managed Event Global Sourcing & Blueprint Generator
 // ---------------------------------------------------------------------------
 apiRouter.post('/managed-event/suggest-blueprint', async (req, res) => {
   const dossier = req.body || {};
-  const eventTitle = String(dossier.eventTitle || 'UTSAVO Managed Celebration').slice(0, 180);
+  const eventTitle = String(dossier.eventTitle || 'SAGUNOO Managed Celebration').slice(0, 180);
   const eventType = String(dossier.eventType || 'WEDDING').slice(0, 60);
   const eventScope = dossier.eventScope === 'OUTSIDE_NEPAL' ? 'OUTSIDE_NEPAL' : 'INSIDE_NEPAL';
   const locationLabel = [dossier.cityOrLocality, dossier.district, dossier.province, dossier.country]
@@ -1432,7 +1432,7 @@ apiRouter.post('/managed-event/suggest-blueprint', async (req, res) => {
     const isDayOrMorning = shift === 'MORNING' || shift === 'FULL_DAY';
 
     return {
-      executiveSummary: `Tailored Full-Service Execution Blueprint for "${eventTitle}" (${totalPax} guests in ${locationLabel}) on ${eventDateBS} BS (${eventDateAD}). Within ${budgetCurrency} ${totalBudget.toLocaleString()} (~${budgetCurrency} ${perGuest.toLocaleString()}/guest), UTSAVO manages ${
+      executiveSummary: `Tailored Full-Service Execution Blueprint for "${eventTitle}" (${totalPax} guests in ${locationLabel}) on ${eventDateBS} BS (${eventDateAD}). Within ${budgetCurrency} ${totalBudget.toLocaleString()} (~${budgetCurrency} ${perGuest.toLocaleString()}/guest), SAGUNOO manages ${
         activeVFs.length - clientOwnVFs.length
       } turnkey vendor functions and seamlessly integrates ${clientOwnVFs.length} client-appointed vendor(s). Every suggestion remains editable under full client authority.`,
       panchangaAndTimingAdvice: `For ${shift} (${startTime} – ${endTime}) in ${locationLabel}: Schedule vendor load-in 150 minutes prior, lock acoustic soundcheck 45 minutes before VIP arrival, and reserve a buffer block ahead of dining service to protect ceremony punctuality.`,
@@ -1441,7 +1441,7 @@ apiRouter.post('/managed-event/suggest-blueprint', async (req, res) => {
           id: 'ai-slot-1',
           timeSlot: isDayOrMorning ? '07:00 AM - 08:45 AM' : '12:00 PM - 02:30 PM',
           activity: 'Technical Rigging, Floral Mandap Sign-Off & Backup Genset Load Test',
-          leadOwner: 'UTSAVO Executive Director + Venue Engineer',
+          leadOwner: 'SAGUNOO Executive Director + Venue Engineer',
           notes: 'Inspect kitchen hygiene temperature logs, fire extinguishers & elder wheelchair ramps.',
           included: true,
         },
@@ -1479,13 +1479,13 @@ apiRouter.post('/managed-event/suggest-blueprint', async (req, res) => {
             eventScope === 'INSIDE_NEPAL'
               ? '10:00 PM DAO Sound Curfew Transition, Farewell & Annapurna Food Rescue'
               : 'Send-Off Finale, Gift Hampers & Post-Event Surplus Food Recovery',
-          leadOwner: 'UTSAVO Night Producer + Operations Crew',
+          leadOwner: 'SAGUNOO Night Producer + Operations Crew',
           notes: 'Complete venue strike audit and final vendor sign-off.',
           included: true,
         },
       ],
       vendorCoordinationPlaybook: [
-        'Appoint one dedicated UTSAVO Producer as the single command bridge between all client-chosen and marketplace vendors.',
+        'Appoint one dedicated SAGUNOO Producer as the single command bridge between all client-chosen and marketplace vendors.',
         'Consolidate load-in windows across venue, decor, AV riggers, and kitchen supply trucks to eliminate venue bottlenecks.',
         'Lock 48-hour weather contingency trigger between garden lawn and backup indoor hall.',
         'Synchronize Digital Nimantrana guest counts with kitchen brigade 24 hours prior to curb food waste.',
@@ -1520,7 +1520,7 @@ apiRouter.post('/managed-event/suggest-blueprint', async (req, res) => {
         },
       ],
       webSources: [],
-      generatedWith: 'UTSAVO Global Event Production Synthesizer',
+      generatedWith: 'SAGUNOO Global Event Production Synthesizer',
       generatedAt: new Date().toISOString(),
     };
   };
@@ -1533,13 +1533,13 @@ apiRouter.post('/managed-event/suggest-blueprint', async (req, res) => {
     const vendorSummary = activeVFs
       .map(
         (vf: any) =>
-          `- ${vf.label}: mode=${vf.mode}, tier=${vf.selectedTier}, budget=${budgetCurrency} ${vf.allocatedBudgetAmount}, vendor="${vf.preferredVendorOrVenueName || 'UTSAVO to source'}", specs="${vf.specifications || ''}"`
+          `- ${vf.label}: mode=${vf.mode}, tier=${vf.selectedTier}, budget=${budgetCurrency} ${vf.allocatedBudgetAmount}, vendor="${vf.preferredVendorOrVenueName || 'SAGUNOO to source'}", specs="${vf.specifications || ''}"`
       )
       .join('\n');
 
     const prompt = `
-You are UTSAVO's Chief Global Event Director & Executive Producer.
-A client wants UTSAVO itself to organize their entire event end-to-end, starting from their core time, date, pax, budget, and all requested vendor functions.
+You are SAGUNOO's Chief Global Event Director & Executive Producer.
+A client wants SAGUNOO itself to organize their entire event end-to-end, starting from their core time, date, pax, budget, and all requested vendor functions.
 Using Google Search grounding for authentic regional/seasonal/weather, permit, hospitality, and global event-management best practices for ${locationLabel}, generate a practical, suggestive, client-editable blueprint.
 
 Client Dossier:
@@ -1561,7 +1561,7 @@ Return ONLY a valid JSON object inside a \`\`\`json code fence with exact keys:
   "recommendedRunOfShow": [
     { "id": "slot-1", "timeSlot": "...", "activity": "...", "leadOwner": "...", "notes": "...", "included": true }
   ],
-  "vendorCoordinationPlaybook": ["4 concise actionable coordination rules factoring in client's own vendors and UTSAVO-sourced vendors"],
+  "vendorCoordinationPlaybook": ["4 concise actionable coordination rules factoring in client's own vendors and SAGUNOO-sourced vendors"],
   "globalRiskAndPermitsChecklist": [
     { "id": "chk-1", "category": "PERMITS_CURFEW" | "WEATHER_SAFETY" | "VENDOR_HANDOFF" | "GUEST_CARE", "item": "...", "completed": false }
   ]
@@ -1574,7 +1574,7 @@ Return ONLY a valid JSON object inside a \`\`\`json code fence with exact keys:
       config: {
         tools: [{ googleSearch: {} }],
         systemInstruction:
-          'You are an international senior event producer for UTSAVO. Always incorporate seasonal climate considerations, local noise/fire/drone permits, accessible hospitality for elders/children, and seamless vendor run-of-show synchronization. Return valid JSON inside a ```json fence.',
+          'You are an international senior event producer for SAGUNOO. Always incorporate seasonal climate considerations, local noise/fire/drone permits, accessible hospitality for elders/children, and seamless vendor run-of-show synchronization. Return valid JSON inside a ```json fence.',
       },
     });
 
@@ -1609,7 +1609,7 @@ Return ONLY a valid JSON object inside a \`\`\`json code fence with exact keys:
               id: String(s.id || `slot-${idx + 1}`),
               timeSlot: String(s.timeSlot || ''),
               activity: String(s.activity || ''),
-              leadOwner: String(s.leadOwner || 'UTSAVO Event Director'),
+              leadOwner: String(s.leadOwner || 'SAGUNOO Event Director'),
               notes: String(s.notes || ''),
               included: s.included !== false,
             }))

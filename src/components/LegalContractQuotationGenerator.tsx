@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Downloadable Legal Contract & Official PDF Quotation Generator
+ * SAGUNOO — Downloadable Legal Contract & Official PDF Quotation Generator
  * Conforming strictly to the Nepal Contract Act 2056 (नेपाल करार ऐन २०५६)
  */
 
@@ -49,7 +49,7 @@ export const LegalContractQuotationGenerator: React.FC<LegalContractQuotationGen
 
   // Document Fields State
   const [docData, setDocData] = useState({
-    contractRef: `UTS-KRA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+    contractRef: `SGN-KRA-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
     dateIssuedBS: '2083 Kartik 30',
     dateIssuedAD: new Date().toISOString().split('T')[0],
     
@@ -171,7 +171,7 @@ export const LegalContractQuotationGenerator: React.FC<LegalContractQuotationGen
             <div className="flex justify-between items-start border-b-2 border-stone-800 pb-4">
               <div>
                 <span className="font-display text-2xl font-bold tracking-tight text-amber-950 block">
-                  UTSAVO
+                  SAGUNOO
                 </span>
                 <span className="text-[10px] uppercase tracking-widest text-stone-500 font-bold block">
                   NEPAL'S SMART CELEBRATION MARKETPLACE
@@ -407,7 +407,7 @@ export const LegalContractQuotationGenerator: React.FC<LegalContractQuotationGen
                     <Stamp className="w-6 h-6 text-emerald-700" />
                     <div>
                       <span className="font-bold text-[10px] block font-mono">DIGITALLY CERTIFIED</span>
-                      <span className="text-[8px] text-stone-400">UTSAVO Trust Stamp · {docData.venuePan}</span>
+                      <span className="text-[8px] text-stone-400">SAGUNOO Trust Stamp · {docData.venuePan}</span>
                     </div>
                   </div>
                   <CheckCircle className="w-5 h-5 text-emerald-600" />

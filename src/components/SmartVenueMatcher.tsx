@@ -1,5 +1,5 @@
 /**
- * UTSAVO — AI-Driven Smart Venue Matcher
+ * SAGUNOO — AI-Driven Smart Venue Matcher
  * Analyzes user occasion preferences, Nepal district/province selection, guest count,
  * and NPR budget (Total or Per-Plate incl. 10% SC & 13% IRD VAT) to recommend the
  * top 3 best-fit party palaces across Nepal.

@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Authentic Social Celebration Wall Seed Data
+ * SAGUNOO - Authentic Social Celebration Wall Seed Data
  * Real-life weddings, Bratabandha, Pasni, Newari bhoj, and corporate galas
  * hosted at verified Nepali party palaces and banquets.
  */
@@ -18,7 +18,7 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     hostName: 'Rohan Shakya & Sneha Bajracharya',
     hostRole: 'Groom & Bride',
     reviewQuote: "Hosting 650 guests without a single hitch. The sound curfew management and valet parking were world-class!",
-    detailedStory: "We booked the Grand Kailash Ballroom through UTSAVO for our Mangsir wedding. From the traditional Newari toran entrance to the warm buffet spread, everything exceeded expectations. The venue team accommodated our Baraat arrival seamlessly, and the escrow payment via UTSAVO gave our families complete peace of mind.",
+    detailedStory: "We booked the Grand Kailash Ballroom through SAGUNOO for our Mangsir wedding. From the traditional Newari toran entrance to the warm buffet spread, everything exceeded expectations. The venue team accommodated our Baraat arrival seamlessly, and the escrow payment via SAGUNOO gave our families complete peace of mind.",
     overallRating: 5.0,
     cateringRating: 4.9,
     hospitalityRating: 5.0,
@@ -107,7 +107,7 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     hostName: 'Bikash Gurung & Aarati Thapa',
     hostRole: 'Groom & Bride',
     reviewQuote: "Golden hour sunset over Phewa Lake with the Annapurna range backdrop. Our guests are still talking about it!",
-    detailedStory: "Coming from the UK for our destination wedding in Nepal, UTSAVO made remote venue coordination completely painless. The 2-day booking covered our Sangeet evening and Vivah. The lakeside deck stage with fairy lights was straight out of a dream.",
+    detailedStory: "Coming from the UK for our destination wedding in Nepal, SAGUNOO made remote venue coordination completely painless. The 2-day booking covered our Sangeet evening and Vivah. The lakeside deck stage with fairy lights was straight out of a dream.",
     overallRating: 5.0,
     cateringRating: 4.8,
     hospitalityRating: 5.0,
@@ -135,7 +135,7 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     verifiedBooking: true,
     likesCount: 215,
     cateringHighlights: ['Thakali Jimbu Mutton', 'Fresh Himalayan Trout Fry', 'Live BBQ Counter', 'Pokhara Sel Roti'],
-    tags: ['#DestinationNepal', '#PokharaWedding', '#LakesideVibes', '#AnnapurnaView', '#UTSAVODestination'],
+    tags: ['#DestinationNepal', '#PokharaWedding', '#LakesideVibes', '#AnnapurnaView', '#SAGUNOODestination'],
     createdAt: '2026-02-26T16:00:00Z',
   },
   {
@@ -261,7 +261,7 @@ export const SEED_SOCIAL_CELEBRATION_POSTS: SocialCelebrationPost[] = [
     verifiedBooking: true,
     likesCount: 189,
     cateringHighlights: ['Live Tandoor Naan & Kebabs', 'Mutton Rogan Josh', 'Kaju Katli Platter', 'Mocktail Bar'],
-    tags: ['#SanepaReception', '#LalitpurWeddings', '#GrandReception', '#ValetParking', '#UTSAVOCouple'],
+    tags: ['#SanepaReception', '#LalitpurWeddings', '#GrandReception', '#ValetParking', '#SAGUNOOCouple'],
     createdAt: '2026-11-09T08:30:00Z',
   },
 ];

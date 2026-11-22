@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Downloadable QR Code Generation & Print Suite
+ * SAGUNOO — Downloadable QR Code Generation & Print Suite
  * Solves: "Integrate a QR code generation utility into the Digital Nimantrana Suite that creates
  * a unique, downloadable QR code for every invitation, which links directly to the specific editable E-card URL."
  */
@@ -59,7 +59,7 @@ export const NimantranaQrCodeUtility: React.FC<NimantranaQrCodeUtilityProps> = (
   const publicGuestUrl = getPublicInvitationUrl(invitation.invitationCode);
   const editableSuiteUrl = typeof window !== 'undefined' && window.location?.origin
     ? `${window.location.origin}/?view=NIMANTRANA&code=${invitation.invitationCode}`
-    : `https://utsavo.com/?view=NIMANTRANA&code=${invitation.invitationCode}`;
+    : `https://sagunoo.com/?view=NIMANTRANA&code=${invitation.invitationCode}`;
 
   const currentTargetUrl = targetType === 'GUEST_INVITATION' ? publicGuestUrl : editableSuiteUrl;
 
@@ -111,7 +111,7 @@ export const NimantranaQrCodeUtility: React.FC<NimantranaQrCodeUtilityProps> = (
     if (!qrPngUrl) return;
     triggerFileDownload(
       qrPngUrl,
-      `UTSAVO-QR-${invitation.invitationCode}-${targetType.toLowerCase()}.png`
+      `SAGUNOO-QR-${invitation.invitationCode}-${targetType.toLowerCase()}.png`
     );
   };
 
@@ -122,7 +122,7 @@ export const NimantranaQrCodeUtility: React.FC<NimantranaQrCodeUtilityProps> = (
     });
     downloadSvgFile(
       svgString,
-      `UTSAVO-Vector-QR-${invitation.invitationCode}.svg`
+      `SAGUNOO-Vector-QR-${invitation.invitationCode}.svg`
     );
   };
 
@@ -131,7 +131,7 @@ export const NimantranaQrCodeUtility: React.FC<NimantranaQrCodeUtilityProps> = (
     const cleanTitle = invitation.celebrantsTitle.replace(/[^a-zA-Z0-9]/g, '-');
     triggerFileDownload(
       badgePngUrl,
-      `UTSAVO-${cleanTitle}-Print-Wedding-Badge-300DPI.png`
+      `SAGUNOO-${cleanTitle}-Print-Wedding-Badge-300DPI.png`
     );
   };
 

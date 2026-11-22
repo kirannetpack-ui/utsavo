@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Customer Event Budgeting Tracker
+ * SAGUNOO — Customer Event Budgeting Tracker
  * Allows customers & celebration hosts to define a total event budget (NPR),
  * allocate category budgets, log & settle vendor expenses across Venue, Food,
  * Decor, Entertainment, Photo/Media, and Cultural Logistics, and sync live bookings.
@@ -467,12 +467,12 @@ export const EventBudgetTracker: React.FC<EventBudgetTrackerProps> = ({ bookings
       });
 
       if (added.length === 0) {
-        setSyncNotice('All active UTSAVO bookings are already synced in your budget ledger.');
+        setSyncNotice('All active SAGUNOO bookings are already synced in your budget ledger.');
         setTimeout(() => setSyncNotice(null), 3000);
         return prev;
       }
 
-      setSyncNotice(`Imported ${added.length} line item(s) from your active UTSAVO bookings.`);
+      setSyncNotice(`Imported ${added.length} line item(s) from your active SAGUNOO bookings.`);
       setTimeout(() => setSyncNotice(null), 3000);
       return {
         ...prev,
@@ -510,7 +510,7 @@ export const EventBudgetTracker: React.FC<EventBudgetTrackerProps> = ({ bookings
       [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
     const link = document.createElement('a');
     link.setAttribute('href', encodeURI(csv));
-    link.setAttribute('download', 'UTSAVO_Event_Budget_Tracker.csv');
+    link.setAttribute('download', 'SAGUNOO_Event_Budget_Tracker.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

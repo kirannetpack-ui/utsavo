@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Real-Time Favorite Venue Availability & Cancellation Alerts Panel
+ * SAGUNOO - Real-Time Favorite Venue Availability & Cancellation Alerts Panel
  * Displays live Server-Sent Events (SSE) push alerts for a customer's bookmarked favorite venues
  * whenever auspicious Panchanga calendar dates open or last-minute booking cancellations release slots.
  */

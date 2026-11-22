@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Smart Conversational Event Planning Assistant & Hindu Panchanga Cross-Referencer
+ * SAGUNOO - Smart Conversational Event Planning Assistant & Hindu Panchanga Cross-Referencer
  * Suggests auspicious dates for specific event types based on Nepal Panchanga Nirnayak Samiti data,
  * cross-referencing every Muhurat against guest count, budget, location, shift, space & facility requirements.
  */

@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Firebase Client Configuration & Initialization
+ * SAGUNOO - Firebase Client Configuration & Initialization
  */
 
 import { initializeApp } from 'firebase/app';

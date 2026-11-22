@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Real-Time Availability & Panchanga Muhurat Integration Engine
+ * SAGUNOO — Real-Time Availability & Panchanga Muhurat Integration Engine
  * Provides live slot tracking (Available, Limited, Booked) for both Venues & Cultural Vendors.
  * Fully synchronized with Nepal Panchanga Nirnayak Samiti auspicious dates (2083 / 2084 BS).
  */
@@ -187,7 +187,7 @@ export function lockEntitySlot(
     localStorage.setItem(storageKey, JSON.stringify(overrides));
 
     // Dispatch global storage event for instant UI re-render across all open tabs/modals
-    window.dispatchEvent(new CustomEvent('utsavo:availability_updated', {
+    window.dispatchEvent(new CustomEvent('sagunoo:availability_updated', {
       detail: { entityId, dateBS, shift }
     }));
 

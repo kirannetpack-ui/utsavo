@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Full-Service Managed Event Templates & Suggestive Blueprint Engine
+ * SAGUNOO — Full-Service Managed Event Templates & Suggestive Blueprint Engine
  * Provides smart suggestive defaults across all 12 core vendor functions and global
  * event-production standards based on Date, Time, Pax, Budget, and Event Type,
  * while ensuring the client retains 100% authority to modify or override every selection.
@@ -253,7 +253,7 @@ export function buildSuggestiveBlueprint(params: {
       id: 'slot-loadin',
       timeSlot: isMorningOrFull ? '06:30 AM - 08:30 AM' : '11:30 AM - 02:30 PM',
       activity: 'Venue Handover, Decor Mandap Rigging, Soundcheck & Genset Load Test',
-      leadOwner: 'UTSAVO Event Director + Venue Ops',
+      leadOwner: 'SAGUNOO Event Director + Venue Ops',
       notes: 'Verify 3-phase generator load, Havan fire extinguishers, and elder wheelchair ramp clearance.',
       included: true,
     },
@@ -294,7 +294,7 @@ export function buildSuggestiveBlueprint(params: {
         params.eventScope === 'INSIDE_NEPAL'
           ? 'DAO 10:00 PM Outdoor Sound Fade, Indoor Lounge Acoustic Wrap & Annapurna Food Rescue'
           : 'Evening Finale Toast, Gift Hamper Distribution & Voluntary Excess Food Recovery',
-      leadOwner: 'UTSAVO Night Director + DFTQC Rescue Partner',
+      leadOwner: 'SAGUNOO Night Director + DFTQC Rescue Partner',
       notes: 'Pack sealed surplus food cleanly (if client opted in) and sign venue clearance log.',
       included: true,
     },
@@ -337,18 +337,18 @@ export function buildSuggestiveBlueprint(params: {
   ];
 
   return {
-    executiveSummary: `UTSAVO Full-Service Managed Event Blueprint for "${params.eventTitle}" (${params.totalPax} guests in ${params.locationLabel}) on ${params.eventDateBS} BS (${params.eventDateAD}). Configured with ${params.budgetCurrency} ${params.totalBudget.toLocaleString()} total ceiling (~${params.budgetCurrency} ${perHead.toLocaleString()}/guest): ${managedCount} vendor functions under UTSAVO end-to-end execution and ${ownVendorCount} client-owned vendor(s) integrated seamlessly. You retain 100% authority to tweak any function, budget share, or timeline slot.`,
+    executiveSummary: `SAGUNOO Full-Service Managed Event Blueprint for "${params.eventTitle}" (${params.totalPax} guests in ${params.locationLabel}) on ${params.eventDateBS} BS (${params.eventDateAD}). Configured with ${params.budgetCurrency} ${params.totalBudget.toLocaleString()} total ceiling (~${params.budgetCurrency} ${perHead.toLocaleString()}/guest): ${managedCount} vendor functions under SAGUNOO end-to-end execution and ${ownVendorCount} client-owned vendor(s) integrated seamlessly. You retain 100% authority to tweak any function, budget share, or timeline slot.`,
     panchangaAndTimingAdvice: `For ${params.shift} window (${params.startTime}–${params.endTime}) on ${params.eventDateBS} BS, load-in begins 2.5 hours prior so floral Mandap, AV soundcheck, and kitchen sanitization finish 30 minutes before VIP guest arrivals.`,
     recommendedRunOfShow,
     vendorCoordinationPlaybook: [
-      'Single-Point UTSAVO Executive Director coordinates all site visits, B2B royalty clearances & contract milestones.',
+      'Single-Point SAGUNOO Executive Director coordinates all site visits, B2B royalty clearances & contract milestones.',
       'Client approves every vendor shortlist & sample menu before escrow release.',
       'Unified load-in dock schedule prevents traffic congestion between decor trucks, caterers & Panche Baja troupes.',
       'Real-time RSVP kitchen headcount sync prevents shortages or costly 20% over-buffering.',
     ],
     globalRiskAndPermitsChecklist,
     webSources: [],
-    generatedWith: 'UTSAVO Smart Global Event Synthesizer',
+    generatedWith: 'SAGUNOO Smart Global Event Synthesizer',
     generatedAt: new Date().toISOString(),
   };
 }
@@ -356,7 +356,7 @@ export function buildSuggestiveBlueprint(params: {
 export const SEED_MANAGED_EVENT_REQUESTS: ManagedEventRequest[] = [
   {
     id: 'mgd-seed-1',
-    requestRef: 'UTS-MGD-2083-9104',
+    requestRef: 'SGN-MGD-2083-9104',
     wantsUtsavoFullManagement: true,
     clientName: 'Kiran Sharma (Event Host)',
     clientEmail: 'kiran.sharma@example.com',
@@ -397,7 +397,7 @@ export const SEED_MANAGED_EVENT_REQUESTS: ManagedEventRequest[] = [
             mode: 'CLIENT_HAS_OWN_VENDOR',
             clientAuthorityLocked: true,
             preferredVendorOrVenueName: 'Family Kul-Purohit Pt. Hari Prasad Sharma',
-            specifications: 'Own family Purohit leading Sankalpa; UTSAVO supplies bilingual guide sheet & complete Puja Samagri kit.',
+            specifications: 'Own family Purohit leading Sankalpa; SAGUNOO supplies bilingual guide sheet & complete Puja Samagri kit.',
           }
         : vf.key === 'VENUE_AND_HALL'
         ? {
@@ -445,15 +445,15 @@ export const SEED_MANAGED_EVENT_REQUESTS: ManagedEventRequest[] = [
       vendorFunctions: buildSuggestiveVendorFunctions('WEDDING', 2400000, 450),
     }),
     status: 'VENDOR_SOURCING_ACTIVE',
-    assignedCoordinatorName: 'Aarav Shrestha (Senior UTSAVO Event Director)',
+    assignedCoordinatorName: 'Aarav Shrestha (Senior SAGUNOO Event Director)',
     assignedCoordinatorPhone: '+977-9801122334',
     coordinationMessages: [
       {
         id: 'mgd-msg-1',
         senderRole: 'UTSAVO_TEAM',
-        senderName: 'Aarav Shrestha (UTSAVO Director)',
+        senderName: 'Aarav Shrestha (SAGUNOO Director)',
         channel: 'PORTAL_CHAT',
-        text: 'Namaste Kiran! We received your full-service brief (#UTS-MGD-2083-9104) for Basanta Panchami. We placed a courtesy 48h hold on The Regal Pavilion and synced your family Purohit requirements with our Samagri kit team.',
+        text: 'Namaste Kiran! We received your full-service brief (#SGN-MGD-2083-9104) for Basanta Panchami. We placed a courtesy 48h hold on The Regal Pavilion and synced your family Purohit requirements with our Samagri kit team.',
         timestamp: '2026-11-12T09:15:00.000Z',
       },
       {

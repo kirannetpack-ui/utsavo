@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Mobile App & PWA Bottom Navigation Bar
+ * SAGUNOO — Mobile App & PWA Bottom Navigation Bar
  * Specifically built for Mobile App & PWA standalone display modes.
  * Ensures the core celebration marketplace features are always 1-tap accessible.
  */
@@ -41,8 +41,8 @@ export const MobileAppNavBar: React.FC<MobileAppNavBarProps> = ({
     },
     {
       id: 'MANAGED_EVENT',
-      label: language === 'ne' ? 'UTSAVO सेवा' : 'UTSAVO Organizes',
-      shortLabel: 'UTSAVO',
+      label: language === 'ne' ? 'SAGUNOO सेवा' : 'SAGUNOO Organizes',
+      shortLabel: 'SAGUNOO',
       icon: Sparkles,
       onClick: () => setActiveView('MANAGED_EVENT'),
       isActive: activeView === 'MANAGED_EVENT',

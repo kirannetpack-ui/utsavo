@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Venue Operator Onboarding & Listing Management Wizard
+ * SAGUNOO - Venue Operator Onboarding & Listing Management Wizard
  * Section 5: Self-service registration, multi-hall configuration, legal PAN/VAT,
  * catering packages, operating policies, verification workflow, and live preview.
  */
@@ -1239,7 +1239,7 @@ export const VenueOnboardingModal: React.FC<VenueOnboardingModalProps> = ({ isOp
                     <p className="text-xs text-stone-500 mt-0.5">
                       {language === 'ne'
                         ? 'तपाईंको पार्टी प्यालेस ग्राहकहरूले कसरी देख्छन् पूर्वावलोकन गर्नुहोस् र प्रकाशन गर्नुहोस्।'
-                        : 'Review how your verified venue card appears on UTSAVO before publishing live.'}
+                        : 'Review how your verified venue card appears on SAGUNOO before publishing live.'}
                     </p>
                   </div>
                 </div>
@@ -1249,7 +1249,7 @@ export const VenueOnboardingModal: React.FC<VenueOnboardingModalProps> = ({ isOp
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                      <span>{language === 'ne' ? 'UTSAVO आधिकारिक प्रमाणिकरण चेकलिस्ट' : 'UTSAVO Verification Checklist'}</span>
+                      <span>{language === 'ne' ? 'SAGUNOO आधिकारिक प्रमाणिकरण चेकलिस्ट' : 'SAGUNOO Verification Checklist'}</span>
                     </span>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-700 text-white uppercase">
                       {formData.verificationStatus || 'VERIFIED'}
@@ -1343,8 +1343,8 @@ export const VenueOnboardingModal: React.FC<VenueOnboardingModalProps> = ({ isOp
                     <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                     <span>
                       {language === 'ne'
-                        ? 'भेन्यु सफलतापूर्वक सुरक्षित भयो! UTSAVO बजारमा प्रकाशित गरिँदैछ...'
-                        : 'Venue details saved successfully! Publishing to UTSAVO marketplace...'}
+                        ? 'भेन्यु सफलतापूर्वक सुरक्षित भयो! SAGUNOO बजारमा प्रकाशित गरिँदैछ...'
+                        : 'Venue details saved successfully! Publishing to SAGUNOO marketplace...'}
                     </span>
                   </div>
                 )}

@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Top Navigation Bar
+ * SAGUNOO - Top Navigation Bar
  * Follows Strict Top Bar Contract: 3 Zones, single-line typography, no decorative clutter
  */
 
@@ -100,9 +100,9 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={() => setActiveView('EXPLORE')}
               className="flex items-center text-left focus:outline-none group cursor-pointer"
-              title="UTSAVO — Nepal's Smart Celebration Marketplace"
+              title="SAGUNOO — Nepal's Auspicious Celebration Platform"
             >
-              <BrandLogo variant="light" size="md" />
+              <BrandLogo variant="light" size="md" showSubtitle={false} />
             </button>
           </div>
 
@@ -121,10 +121,10 @@ export const Header: React.FC<HeaderProps> = ({
               className={`hover:text-amber-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 activeView === 'MANAGED_EVENT' ? 'text-amber-950 font-bold bg-amber-50 px-2 py-1 rounded-lg' : 'text-stone-700'
               }`}
-              title="Let UTSAVO organize your entire event under your direct control"
+              title="Let SAGUNOO organize your entire event under your direct control"
             >
               <Sparkles className="w-4 h-4 text-amber-700" />
-              <span>{language === 'ne' ? 'UTSAVO सेवा' : 'UTSAVO Organizes'}</span>
+              <span>{language === 'ne' ? 'SAGUNOO सेवा' : 'SAGUNOO Organizes'}</span>
             </button>
             <button
               onClick={() => setActiveView('DESTINATION')}
@@ -229,7 +229,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 onClick={onOpenFeatures}
                 className="hover:text-rose-900 transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-900 font-bold border border-rose-200/80 shadow-2xs hover:bg-rose-100"
-                title="View complete UTSAVO feature matrix"
+                title="View complete SAGUNOO feature matrix"
               >
                 <Layers className="w-3.5 h-3.5 text-rose-700" />
                 <span>{language === 'ne' ? 'सबै सुविधाहरू' : 'All Features'}</span>
@@ -389,7 +389,7 @@ export const Header: React.FC<HeaderProps> = ({
           <span>{language === 'ne' ? 'भेन्यु खोज' : 'Explore Venues'}</span>
         </button>
 
-        {/* UTSAVO Organizes Whole Event */}
+        {/* SAGUNOO Organizes Whole Event */}
         <button
           onClick={() => setActiveView('MANAGED_EVENT')}
           className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap shrink-0 transition-all flex items-center gap-1.5 ${
@@ -399,7 +399,7 @@ export const Header: React.FC<HeaderProps> = ({
           }`}
         >
           <Sparkles className="w-3.5 h-3.5 text-amber-700" />
-          <span>{language === 'ne' ? 'UTSAVO सेवा' : 'UTSAVO Organizes'}</span>
+          <span>{language === 'ne' ? 'SAGUNOO सेवा' : 'SAGUNOO Organizes'}</span>
         </button>
 
         {/* Destination Nepal */}

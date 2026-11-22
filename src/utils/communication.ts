@@ -1,5 +1,5 @@
 /**
- * UTSAVO — WhatsApp & Viber Click-to-Chat Utilities
+ * SAGUNOO — WhatsApp & Viber Click-to-Chat Utilities
  * Direct messaging helpers formatted for Nepal phone numbers and mobile deep links
  */
 
@@ -31,7 +31,7 @@ export const createVenueInquiryMessage = (
   dateBS: string = 'Subha Muhurat',
   guests: number = 350
 ): string => {
-  return `नमस्ते! I discovered *${venueName}* on UTSAVO (Nepal's Celebration Marketplace).
+  return `नमस्ते! I discovered *${venueName}* on SAGUNOO (Nepal's Celebration Marketplace).
 
 I am inquiring about booking your venue:
 🎊 *Occasion*: ${eventType}
@@ -47,7 +47,7 @@ export const createVendorInquiryMessage = (
   dateBS: string = 'Upcoming Event',
   location: string = 'Kathmandu Valley'
 ): string => {
-  return `नमस्ते! I saw *${vendorName}* (${category}) on UTSAVO.
+  return `नमस्ते! I saw *${vendorName}* (${category}) on SAGUNOO.
 
 I would like to inquire about your availability and package rates:
 📅 *Occasion Date*: ${dateBS}
@@ -61,7 +61,7 @@ export const createDestinationInquiryMessage = (
   destination: string,
   inquiryRef?: string
 ): string => {
-  return `नमस्ते UTSAVO Destination Concierge!
+  return `नमस्ते SAGUNOO Destination Concierge!
 
 I am inquiring regarding the *${packageTitle}* in *${destination}*.
 ${inquiryRef ? `Reference ID: ${inquiryRef}\n` : ''}
@@ -72,7 +72,7 @@ export const getPublicInvitationUrl = (invitationCode: string): string => {
   if (typeof window !== 'undefined' && window.location?.origin) {
     return `${window.location.origin}/invite/${invitationCode}`;
   }
-  return `https://utsavo.com/invite/${invitationCode}`;
+  return `https://sagunoo.com/invite/${invitationCode}`;
 };
 
 export const createNimantranaShareMessage = (

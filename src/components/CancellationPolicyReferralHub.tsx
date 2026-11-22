@@ -1,5 +1,5 @@
 /**
- * UTSAVO — Global Cancellation Governance, Past-Deadline Resolution & Partner Referral Hub
+ * SAGUNOO — Global Cancellation Governance, Past-Deadline Resolution & Partner Referral Hub
  * Dynamic per-vendor policies, 5-stakeholder rules, Event Date & Time Over resolution,
  * and Cancelling Vendor Peer Referral & Escrow Handoff workflows.
  */
@@ -1205,7 +1205,7 @@ export const CancellationPolicyReferralHub: React.FC<CancellationPolicyReferralH
                     Active & Resolved Partner Referral Handoffs ({referralOffers.length})
                   </h3>
                   <p className="text-[11px] text-stone-500">
-                    Clients may accept a recommended partner and transfer 100% of held UTSAVO escrow directly, or decline for an immediate cash refund.
+                    Clients may accept a recommended partner and transfer 100% of held SAGUNOO escrow directly, or decline for an immediate cash refund.
                   </p>
                 </div>
               </div>

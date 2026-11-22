@@ -1,5 +1,5 @@
 /**
- * UTSAVO - Venue Operator Analytics & Business Intelligence Dashboard
+ * SAGUNOO - Venue Operator Analytics & Business Intelligence Dashboard
  * Powered by Recharts for real-time visualization of booking trends,
  * hourly inquiry volume, sales conversion funnel, and hall shift utilization.
  */
@@ -163,7 +163,7 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `UTSAVO_Analytics_${venue.name.replace(/\s+/g, '_')}_2083.csv`);
+    link.setAttribute('download', `SAGUNOO_Analytics_${venue.name.replace(/\s+/g, '_')}_2083.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -618,7 +618,7 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
                 <span>Off-Season Utilization (साउन & भदौ)</span>
               </span>
               <p className="text-stone-600 leading-relaxed text-[11px]">
-                Inquiries drop to 16 in Shrawan. Activate Utsavo's <strong>15% Off-Season Deal Badge</strong> and bundle complimentary Mandap rig to attract Bratabandha, Pasni, and corporate AGM bookings.
+                Inquiries drop to 16 in Shrawan. Activate Sagunoo's <strong>15% Off-Season Deal Badge</strong> and bundle complimentary Mandap rig to attract Bratabandha, Pasni, and corporate AGM bookings.
               </p>
             </div>
 
@@ -954,7 +954,7 @@ export const VenueAnalytics: React.FC<VenueAnalyticsProps> = ({
                 <span className="text-[10px] bg-amber-800 px-2 py-0.5 rounded font-bold">ACTIVE</span>
               </div>
               <p className="text-[11px] text-amber-100">
-                Your venue appears in the top 3 promoted spots on UTSAVO for wedding searches.
+                Your venue appears in the top 3 promoted spots on SAGUNOO for wedding searches.
               </p>
             </div>
           </div>
